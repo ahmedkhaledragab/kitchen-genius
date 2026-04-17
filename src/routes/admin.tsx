@@ -339,7 +339,7 @@ function AdminPage() {
           to="/admin/settings"
           className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-soft transition hover:border-primary/40 hover:shadow-card"
         >
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-foreground/5 text-foreground">
             <Settings className="h-6 w-6" />
           </span>
           <div className="min-w-0">
