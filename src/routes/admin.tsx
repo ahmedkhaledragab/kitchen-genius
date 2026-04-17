@@ -325,7 +325,7 @@ function AdminPage() {
                       <th className="hidden px-3 py-2 text-start font-semibold sm:table-cell">{t.admin.difficulty}</th>
                       <th className="hidden px-3 py-2 text-start font-semibold sm:table-cell">{t.admin.time}</th>
                       <th className="hidden px-3 py-2 text-start font-semibold md:table-cell">{lang === "ar" ? "تاريخ" : "Date"}</th>
-                      <th className="px-3 py-2 text-end font-semibold">{t.admin.delete}</th>
+                      <th className="px-3 py-2 text-end font-semibold">{lang === "ar" ? "إجراءات" : "Actions"}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -335,10 +335,26 @@ function AdminPage() {
                         className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}
                       >
                         <td className="px-3 py-2.5">
-                          <p className="truncate font-semibold">{r.title}</p>
-                          {r.description && (
-                            <p className="line-clamp-1 text-xs text-muted-foreground">{r.description}</p>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {r.image_url ? (
+                              <img
+                                src={r.image_url}
+                                alt=""
+                                loading="lazy"
+                                className="h-10 w-10 shrink-0 rounded-lg object-cover"
+                              />
+                            ) : (
+                              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
+                                <ChefHat className="h-4 w-4" />
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <p className="truncate font-semibold">{r.title}</p>
+                              {r.description && (
+                                <p className="line-clamp-1 text-xs text-muted-foreground">{r.description}</p>
+                              )}
+                            </div>
+                          </div>
                         </td>
                         <td className="hidden px-3 py-2.5 text-xs sm:table-cell">
                           <DiffBadge d={r.difficulty} t={t} />
@@ -350,15 +366,28 @@ function AdminPage() {
                           {dateFmt.format(new Date(r.created_at))}
                         </td>
                         <td className="px-3 py-2.5 text-end">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => remove(r.id)}
-                            className="rounded-lg text-destructive hover:bg-destructive/10"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="inline-flex items-center gap-1">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => startEdit(r)}
+                              className="rounded-lg text-primary hover:bg-primary/10"
+                              aria-label={t.admin.edit}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => remove(r.id)}
+                              className="rounded-lg text-destructive hover:bg-destructive/10"
+                              aria-label={t.admin.delete}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
