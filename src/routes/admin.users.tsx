@@ -143,6 +143,27 @@ function AdminUsersPage() {
     }
   };
 
+  const createUser = async () => {
+    if (!newUser.email || newUser.password.length < 6) {
+      toast.error(lang === "ar" ? "إيميل وكلمة سر صحيحين مطلوبين" : "Valid email and password required");
+      return;
+    }
+    setCreating(true);
+    const { data, error } = await supabase.functions.invoke("admin-create-user", {
+      body: newUser,
+    });
+    setCreating(false);
+    if (error || (data as { error?: string })?.error) {
+      const msg = (data as { message?: string })?.message ?? error?.message ?? "error";
+      toast.error(msg);
+      return;
+    }
+    toast.success(t.admin.users.userCreated);
+    setCreateOpen(false);
+    setNewUser({ email: "", password: "", display_name: "", make_admin: false });
+    refresh();
+  };
+
   const dateFmt = new Intl.DateTimeFormat(lang === "ar" ? "ar-EG" : "en-US", {
     year: "numeric",
     month: "short",
