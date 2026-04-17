@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLang } from "@/contexts/LanguageContext";
 
 export interface SiteSettings {
   site_name_ar: string;
@@ -40,6 +41,7 @@ interface SiteSettingsContextValue {
 const SiteSettingsContext = createContext<SiteSettingsContextValue | undefined>(undefined);
 
 export function SiteSettingsProvider({ children }: { children: ReactNode }) {
+  const { lang } = useLang();
   const [settings, setSettings] = useState<SiteSettings>(DEFAULTS);
   const [loading, setLoading] = useState(true);
 
@@ -90,7 +92,6 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
   // Keep <title>, <meta description>, OG/Twitter, and JSON-LD up to date
   useEffect(() => {
     if (typeof document === "undefined") return;
-    const lang = (document.documentElement.lang || "ar") as "ar" | "en";
     const name = lang === "ar" ? settings.site_name_ar : settings.site_name_en;
     const desc =
       (lang === "ar" ? settings.description_ar : settings.description_en) ||
@@ -149,7 +150,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
       ],
     };
     upsertJsonLd("site-jsonld", jsonLd);
-  }, [settings]);
+  }, [settings, lang]);
 
   return (
     <SiteSettingsContext.Provider value={{ settings, loading, refresh }}>
