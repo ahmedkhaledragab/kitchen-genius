@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Loader2, Search, Shield, ShieldOff, Ban, CheckCircle2, Pencil } from "lucide-react";
+import { Loader2, Search, Shield, ShieldOff, Ban, CheckCircle2, Pencil, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/admin/users")({
   head: () => ({ meta: [{ title: "إدارة المستخدمين — من اللي عندك؟" }] }),
@@ -48,6 +49,15 @@ function AdminUsersPage() {
 
   const [editing, setEditing] = useState<{ user: AdminUserRow; feature: "generate_recipes" | "detect_ingredients" } | null>(null);
   const [newLimit, setNewLimit] = useState<number>(10);
+
+  const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newUser, setNewUser] = useState({
+    email: "",
+    password: "",
+    display_name: "",
+    make_admin: false,
+  });
 
   const refresh = useCallback(async () => {
     setBusy(true);
@@ -133,6 +143,27 @@ function AdminUsersPage() {
     }
   };
 
+  const createUser = async () => {
+    if (!newUser.email || newUser.password.length < 6) {
+      toast.error(lang === "ar" ? "إيميل وكلمة سر صحيحين مطلوبين" : "Valid email and password required");
+      return;
+    }
+    setCreating(true);
+    const { data, error } = await supabase.functions.invoke("admin-create-user", {
+      body: newUser,
+    });
+    setCreating(false);
+    if (error || (data as { error?: string })?.error) {
+      const msg = (data as { message?: string })?.message ?? error?.message ?? "error";
+      toast.error(msg);
+      return;
+    }
+    toast.success(t.admin.users.userCreated);
+    setCreateOpen(false);
+    setNewUser({ email: "", password: "", display_name: "", make_admin: false });
+    refresh();
+  };
+
   const dateFmt = new Intl.DateTimeFormat(lang === "ar" ? "ar-EG" : "en-US", {
     year: "numeric",
     month: "short",
@@ -143,14 +174,24 @@ function AdminUsersPage() {
     <div className="mx-auto max-w-5xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-extrabold sm:text-2xl">{t.admin.users.title}</h1>
-        <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t.admin.users.search}
-            className="ps-9 rounded-xl"
-          />
+        <div className="flex flex-1 flex-wrap items-center justify-end gap-2 sm:flex-none">
+          <div className="relative w-full sm:w-64">
+            <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t.admin.users.search}
+              className="ps-9 rounded-xl"
+            />
+          </div>
+          <Button
+            type="button"
+            onClick={() => setCreateOpen(true)}
+            className="rounded-xl gradient-primary text-primary-foreground hover:opacity-95"
+          >
+            <UserPlus className="me-1 h-4 w-4" />
+            {t.admin.users.addUser}
+          </Button>
         </div>
       </div>
 
@@ -309,6 +350,79 @@ function AdminUsersPage() {
               onClick={saveLimit}
             >
               {t.admin.users.confirm}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={createOpen} onOpenChange={(o) => !creating && setCreateOpen(o)}>
+        <DialogContent className="rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>{t.admin.users.addUserTitle}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs font-semibold">{t.admin.users.emailLabel}</label>
+              <Input
+                type="email"
+                autoComplete="off"
+                value={newUser.email}
+                onChange={(e) => setNewUser((u) => ({ ...u, email: e.target.value }))}
+                className="mt-1 rounded-xl"
+                placeholder="user@example.com"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold">{t.admin.users.passwordLabel}</label>
+              <Input
+                type="password"
+                autoComplete="new-password"
+                value={newUser.password}
+                onChange={(e) => setNewUser((u) => ({ ...u, password: e.target.value }))}
+                className="mt-1 rounded-xl"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold">{t.admin.users.displayNameLabel}</label>
+              <Input
+                value={newUser.display_name}
+                onChange={(e) => setNewUser((u) => ({ ...u, display_name: e.target.value }))}
+                className="mt-1 rounded-xl"
+              />
+            </div>
+            <label className="flex items-center gap-2 text-sm">
+              <Checkbox
+                checked={newUser.make_admin}
+                onCheckedChange={(c) => setNewUser((u) => ({ ...u, make_admin: !!c }))}
+              />
+              <span>{t.admin.users.makeAdminLabel}</span>
+            </label>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              className="rounded-xl"
+              disabled={creating}
+              onClick={() => setCreateOpen(false)}
+            >
+              {t.admin.users.cancel}
+            </Button>
+            <Button
+              className="rounded-xl gradient-primary text-primary-foreground hover:opacity-95"
+              disabled={creating}
+              onClick={createUser}
+            >
+              {creating ? (
+                <>
+                  <Loader2 className="me-1 h-4 w-4 animate-spin" />
+                  {t.admin.users.creating}
+                </>
+              ) : (
+                <>
+                  <UserPlus className="me-1 h-4 w-4" />
+                  {t.admin.users.confirm}
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
