@@ -13,9 +13,11 @@ export function Header() {
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
         <Link to="/" className="flex items-center gap-2 group">
-          <span className="grid h-9 w-9 place-items-center rounded-2xl gradient-primary text-primary-foreground shadow-soft transition-transform group-hover:scale-105">
-            <ChefHat className="h-5 w-5" />
-          </span>
+          <img
+            src={logo}
+            alt={t.appName}
+            className="h-12 w-12 object-contain transition-transform group-hover:scale-105"
+          />
           <span className="text-base font-extrabold tracking-tight">{t.appName}</span>
         </Link>
 
