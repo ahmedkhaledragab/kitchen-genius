@@ -86,7 +86,10 @@ function AdminSettingsPage() {
     );
   }
 
-  const uploadFile = async (file: File, prefix: "logo" | "favicon"): Promise<string | null> => {
+  const uploadFile = async (
+    file: File,
+    prefix: "logo" | "favicon" | "og"
+  ): Promise<string | null> => {
     const ext = file.name.split(".").pop()?.toLowerCase() || "png";
     const path = `${prefix}-${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from("branding").upload(path, file, {
@@ -119,6 +122,16 @@ function AdminSettingsPage() {
     const url = await uploadFile(file, "favicon");
     setUploadingFav(false);
     if (url) setFaviconUrl(url);
+    e.target.value = "";
+  };
+
+  const onPickOg = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingOg(true);
+    const url = await uploadFile(file, "og");
+    setUploadingOg(false);
+    if (url) setOgImageUrl(url);
     e.target.value = "";
   };
 
