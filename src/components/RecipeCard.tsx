@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Clock, Flame, Heart } from "lucide-react";
+import { Clock, Flame, Heart, Database, Sparkles } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -59,7 +59,9 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite, index
         <div className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-extrabold leading-snug">{recipe.title}</h3>
+            <div className="flex items-center gap-1.5">
+              <h3 className="text-lg font-extrabold leading-snug">{recipe.title}</h3>
+            </div>
             {recipe.description && (
               <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{recipe.description}</p>
             )}
@@ -80,6 +82,25 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite, index
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+          {recipe.source === "local" ? (
+            <Badge
+              variant="secondary"
+              className="rounded-full border-0 bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+              title={t.recipe.localBadgeHint}
+            >
+              <Database className="me-1 h-3 w-3" />
+              {t.recipe.localBadge}
+            </Badge>
+          ) : recipe.source === "ai" ? (
+            <Badge
+              variant="secondary"
+              className="rounded-full border-0 bg-violet-500/15 text-violet-700 dark:text-violet-400"
+              title={t.recipe.aiBadgeHint}
+            >
+              <Sparkles className="me-1 h-3 w-3" />
+              {t.recipe.aiBadge}
+            </Badge>
+          ) : null}
           <Badge variant="secondary" className="rounded-full bg-primary/10 text-primary border-0">
             <Clock className="me-1 h-3 w-3" />
             {recipe.estimated_time_minutes} {t.recipe.minutes}
