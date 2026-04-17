@@ -302,12 +302,20 @@ function AdminPage() {
             <span className="gradient-text">{t.admin.title}</span>
           </h1>
         </div>
-        <Button asChild variant="outline" className="rounded-xl">
-          <Link to="/admin/users">
-            <Users className="me-1 h-4 w-4" />
-            {t.admin.users.title}
-          </Link>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" className="rounded-xl">
+            <Link to="/admin/ingredients">
+              <ChefHat className="me-1 h-4 w-4" />
+              {t.admin.ingredientsCatalog.manageLink}
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="rounded-xl">
+            <Link to="/admin/users">
+              <Users className="me-1 h-4 w-4" />
+              {t.admin.users.title}
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
