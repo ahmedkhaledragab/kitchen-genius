@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AuthContextValue {
@@ -55,6 +56,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    const lang =
+      typeof document !== "undefined" && document.documentElement.lang === "en" ? "en" : "ar";
+    toast.success(
+      lang === "ar"
+        ? "مع السلامة يا قمر، رجعيلنا بسرعة 💕"
+        : "See you soon lovely, come back quick 💕"
+    );
   };
 
   return (
