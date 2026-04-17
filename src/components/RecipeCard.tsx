@@ -120,6 +120,7 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite, index
             {t.recipe.steps} →
           </Button>
         )}
+        </div>
       </Card>
     </motion.div>
   );
