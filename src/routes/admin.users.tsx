@@ -153,14 +153,24 @@ function AdminUsersPage() {
     <div className="mx-auto max-w-5xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-extrabold sm:text-2xl">{t.admin.users.title}</h1>
-        <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t.admin.users.search}
-            className="ps-9 rounded-xl"
-          />
+        <div className="flex flex-1 flex-wrap items-center justify-end gap-2 sm:flex-none">
+          <div className="relative w-full sm:w-64">
+            <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t.admin.users.search}
+              className="ps-9 rounded-xl"
+            />
+          </div>
+          <Button
+            type="button"
+            onClick={() => setCreateOpen(true)}
+            className="rounded-xl gradient-primary text-primary-foreground hover:opacity-95"
+          >
+            <UserPlus className="me-1 h-4 w-4" />
+            {t.admin.users.addUser}
+          </Button>
         </div>
       </div>
 
