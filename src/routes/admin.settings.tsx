@@ -300,6 +300,51 @@ function AdminSettingsPage() {
         </div>
       </Card>
 
+      {/* Branding — primary color */}
+      <Card className="mt-4 rounded-3xl border-border/60 p-5">
+        <Label className="text-sm font-bold">{t.admin.siteSettings.brandingSection}</Label>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {t.admin.siteSettings.brandingSubtitle}
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-3">
+            <input
+              type="color"
+              value={primaryColor}
+              onChange={(e) => setPrimaryColor(e.target.value)}
+              className="h-12 w-12 cursor-pointer rounded-xl border border-border/60 bg-transparent"
+              aria-label={t.admin.siteSettings.primaryColor}
+            />
+            <Input
+              value={primaryColor}
+              onChange={(e) => setPrimaryColor(e.target.value)}
+              placeholder="#22c55e"
+              className="w-32 rounded-xl font-mono uppercase"
+              dir="ltr"
+              maxLength={7}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span
+              className="inline-block h-10 w-10 rounded-full border border-border/60"
+              style={{ backgroundColor: primaryColor }}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="rounded-xl"
+              onClick={() => setPrimaryColor("#22c55e")}
+            >
+              {t.admin.siteSettings.resetColor}
+            </Button>
+          </div>
+        </div>
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          {t.admin.siteSettings.primaryColorHint}
+        </p>
+      </Card>
+
       {/* Names + taglines */}
       <Card className="mt-4 rounded-3xl border-border/60 p-5">
         <div className="grid gap-4 sm:grid-cols-2">
