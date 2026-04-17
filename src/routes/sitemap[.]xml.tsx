@@ -10,7 +10,7 @@ function escapeXml(str: string): string {
     .replace(/'/g, "&apos;");
 }
 
-export const Route = createFileRoute("/sitemap.xml")({
+export const Route = createFileRoute("/sitemap[.]xml")({
   server: {
     handlers: {
       GET: async ({ request }) => {
