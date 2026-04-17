@@ -196,9 +196,62 @@ function AdminPage() {
   };
 
   const remove = async (id: string) => {
+    if (!window.confirm(lang === "ar" ? "تأكيد حذف الوصفة؟" : "Delete this recipe?")) return;
     const { error } = await supabase.from("recipes").delete().eq("id", id);
     if (error) toast.error(error.message);
-    else refresh();
+    else {
+      toast.success(lang === "ar" ? "تم الحذف" : "Deleted");
+      refresh();
+    }
+  };
+
+  const startEdit = (r: RecipeRow) => {
+    const ings = Array.isArray(r.ingredients) ? (r.ingredients as string[]) : [];
+    const stps = Array.isArray(r.steps) ? (r.steps as string[]) : [];
+    setEditing({
+      id: r.id,
+      title: r.title,
+      description: r.description ?? "",
+      ingredients: ings.join("\n"),
+      steps: stps.join("\n"),
+      estimated_time_minutes: r.estimated_time_minutes ?? 20,
+      difficulty: r.difficulty,
+      tags: (r.tags ?? []).join(", "),
+      cuisine: r.cuisine ?? "",
+      language: r.language,
+      image_url: r.image_url ?? "",
+    });
+  };
+
+  const saveEdit = async () => {
+    if (!editing) return;
+    setSavingEdit(true);
+    const ingredients = editing.ingredients.split(/[,،\n]/).map((s) => s.trim()).filter(Boolean);
+    const steps = editing.steps.split(/\n/).map((s) => s.trim()).filter(Boolean);
+    const tags = editing.tags.split(/[,،]/).map((s) => s.trim()).filter(Boolean);
+    const { error } = await supabase
+      .from("recipes")
+      .update({
+        title: editing.title,
+        description: editing.description || null,
+        ingredients,
+        steps,
+        estimated_time_minutes: Number(editing.estimated_time_minutes) || null,
+        difficulty: editing.difficulty,
+        tags,
+        cuisine: editing.cuisine || null,
+        language: editing.language,
+        image_url: editing.image_url || null,
+      })
+      .eq("id", editing.id);
+    setSavingEdit(false);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(t.admin.saved);
+      setEditing(null);
+      refresh();
+    }
   };
 
   const dateFmt = new Intl.DateTimeFormat(lang === "ar" ? "ar-EG" : "en-US", {
@@ -235,6 +288,11 @@ function AdminPage() {
         <StatCard icon={ShieldCheck} label={t.admin.stats.admins} value={stats.admins} tone="emerald" />
         <StatCard icon={Ban} label={t.admin.stats.banned} value={stats.banned} tone="destructive" />
         <StatCard icon={Sparkles} label={t.admin.stats.recipesToday} value={stats.todayUses} tone="primary" />
+      </div>
+
+      {/* Chart */}
+      <div className="mt-5">
+        <GenerationsChart />
       </div>
 
       {/* Tabs */}
