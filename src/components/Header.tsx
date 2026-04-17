@@ -3,6 +3,7 @@ import { Heart, Shield, Globe2, LogOut, Menu, Home } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LanguageContext";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -11,12 +12,16 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import logo from "@/assets/logo.png";
+import defaultLogo from "@/assets/logo.png";
 
 export function Header() {
   const { user, isAdmin, signOut } = useAuth();
   const { t, lang, toggleLang } = useLang();
+  const { settings } = useSiteSettings();
   const [open, setOpen] = useState(false);
+
+  const logo = settings.logo_url || defaultLogo;
+  const siteName = lang === "ar" ? settings.site_name_ar : settings.site_name_en;
 
   const close = () => setOpen(false);
 
