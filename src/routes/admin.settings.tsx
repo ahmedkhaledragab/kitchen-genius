@@ -46,6 +46,7 @@ function AdminSettingsPage() {
   const [keywordsEn, setKeywordsEn] = useState("");
   const [ogImageUrl, setOgImageUrl] = useState<string | null>(null);
   const [twitterHandle, setTwitterHandle] = useState("");
+  const [primaryColor, setPrimaryColor] = useState<string>("#22c55e");
 
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -73,6 +74,7 @@ function AdminSettingsPage() {
     setKeywordsEn(settings.keywords_en ?? "");
     setOgImageUrl(settings.og_image_url);
     setTwitterHandle(settings.twitter_handle ?? "");
+    setPrimaryColor(settings.primary_color ?? "#22c55e");
   }, [settings]);
 
   if (loading) return null;
@@ -151,6 +153,7 @@ function AdminSettingsPage() {
         keywords_en: keywordsEn.trim() || null,
         og_image_url: ogImageUrl,
         twitter_handle: cleanedTwitter,
+        primary_color: primaryColor || null,
         logo_url: logoUrl,
         favicon_url: faviconUrl,
         updated_by: user?.id ?? null,
