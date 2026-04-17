@@ -188,7 +188,15 @@ function HomePage() {
           (i) => !ingredients.includes(i) && !excluded.includes(i),
         );
         setIngredients((prev) => [...prev, ...fresh]);
-        toast.success(`+${fresh.length}`);
+        toast.success(
+          fresh.length > 0
+            ? lang === "ar"
+              ? `لقّينا ${fresh.length} مكونات في ثلاجتك 💖`
+              : `Found ${fresh.length} ingredients in your fridge 💖`
+            : lang === "ar"
+              ? "ملقيناش مكونات جديدة 🌸"
+              : "No new ingredients found 🌸"
+        );
       }
     } finally {
       setImageBusy(false);

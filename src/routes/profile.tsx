@@ -65,7 +65,7 @@ function ProfilePage() {
   const onAvatarPick = async (file: File) => {
     if (!user) return;
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("الصورة كبيرة (أقصى 5MB)");
+      toast.error("الصورة كبيرة شوية يا حلوة (أقصى 5MB) 🌸");
       return;
     }
     setUploading(true);
