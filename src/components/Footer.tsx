@@ -1,17 +1,25 @@
 import { Heart, Sparkles, Facebook, Instagram } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 export function Footer() {
   const { lang } = useLang();
+  const { settings } = useSiteSettings();
   const year = new Date().getFullYear();
+  const siteName = lang === "ar" ? settings.site_name_ar : settings.site_name_en;
 
   return (
     <footer className="relative mt-12 border-t border-border/60 bg-gradient-to-br from-primary/5 via-background to-accent/5">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row">
-        <p className="text-xs text-muted-foreground">
-          © {year} {lang === "ar" ? "من اللي عندك؟" : "What's in your kitchen?"} ·{" "}
-          {lang === "ar" ? "كل الحقوق محفوظة" : "All rights reserved"}
-        </p>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          {settings.logo_url && (
+            <img src={settings.logo_url} alt={siteName} className="h-6 w-6 object-contain" />
+          )}
+          <p>
+            © {year} {siteName} ·{" "}
+            {lang === "ar" ? "كل الحقوق محفوظة" : "All rights reserved"}
+          </p>
+        </div>
 
         <div className="flex items-center gap-2">
           <div className="group inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-3.5 py-1.5 text-xs font-semibold shadow-sm backdrop-blur">
