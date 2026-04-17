@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.detect-ingredients]
 verify_jwt = true
+
+[functions.generate-recipe-image]
+verify_jwt = true
