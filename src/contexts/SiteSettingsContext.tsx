@@ -15,6 +15,7 @@ export interface SiteSettings {
   favicon_url: string | null;
   og_image_url: string | null;
   twitter_handle: string | null;
+  primary_color: string | null;
 }
 
 const DEFAULTS: SiteSettings = {
@@ -30,6 +31,7 @@ const DEFAULTS: SiteSettings = {
   favicon_url: null,
   og_image_url: null,
   twitter_handle: null,
+  primary_color: null,
 };
 
 interface SiteSettingsContextValue {
@@ -49,7 +51,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase
       .from("site_settings")
       .select(
-        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle"
+        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color"
       )
       .limit(1)
       .maybeSingle();
@@ -67,10 +69,38 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
         favicon_url: data.favicon_url,
         og_image_url: data.og_image_url,
         twitter_handle: data.twitter_handle,
+        primary_color: (data as { primary_color?: string | null }).primary_color ?? null,
       });
     }
     setLoading(false);
   }, []);
+
+  // Apply dynamic primary color to CSS variables
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const root = document.documentElement;
+    if (!settings.primary_color) {
+      root.style.removeProperty("--primary");
+      root.style.removeProperty("--primary-glow");
+      root.style.removeProperty("--primary-foreground");
+      root.style.removeProperty("--ring");
+      return;
+    }
+    const oklch = hexToOklch(settings.primary_color);
+    if (!oklch) return;
+    const { l, c, h } = oklch;
+    root.style.setProperty("--primary", `oklch(${l.toFixed(3)} ${c.toFixed(3)} ${h.toFixed(1)})`);
+    root.style.setProperty(
+      "--primary-glow",
+      `oklch(${Math.min(l + 0.1, 0.95).toFixed(3)} ${(c * 0.85).toFixed(3)} ${h.toFixed(1)})`
+    );
+    // Foreground: white if dark color, dark if light color
+    root.style.setProperty(
+      "--primary-foreground",
+      l < 0.6 ? "oklch(0.99 0.01 95)" : "oklch(0.22 0.03 150)"
+    );
+    root.style.setProperty("--ring", `oklch(${l.toFixed(3)} ${c.toFixed(3)} ${h.toFixed(1)})`);
+  }, [settings.primary_color]);
 
   useEffect(() => {
     refresh();
