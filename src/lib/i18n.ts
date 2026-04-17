@@ -1,8 +1,7 @@
 // Tiny i18n helper — Arabic (default) + English
 export type Lang = "ar" | "en";
 
-export const translations = {
-  ar: {
+const arDict = {
     appName: "من اللي عندك؟",
     tagline: "اكتب اللي عندك في المطبخ، وإحنا نطلعلك وصفات تقدر تعملها فوراً 🍳",
     nav: {
