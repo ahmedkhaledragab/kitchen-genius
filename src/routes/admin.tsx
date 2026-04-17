@@ -7,6 +7,7 @@ import {
   Settings,
   Menu,
   X,
+  Sparkles,
 } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -54,14 +55,19 @@ function AdminLayout() {
       exact: true,
     },
     {
-      to: "/admin/users" as const,
-      icon: Users,
-      label: lang === "ar" ? "المستخدمين" : "Users",
+      to: "/admin/recipes" as const,
+      icon: ChefHat,
+      label: lang === "ar" ? "الوصفات" : "Recipes",
     },
     {
       to: "/admin/ingredients" as const,
-      icon: ChefHat,
+      icon: Sparkles,
       label: lang === "ar" ? "المكونات" : "Ingredients",
+    },
+    {
+      to: "/admin/users" as const,
+      icon: Users,
+      label: lang === "ar" ? "المستخدمين" : "Users",
     },
     {
       to: "/admin/settings" as const,
