@@ -172,6 +172,45 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          favicon_url: string | null
+          id: string
+          logo_url: string | null
+          singleton: boolean
+          site_name_ar: string
+          site_name_en: string
+          tagline_ar: string | null
+          tagline_en: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          favicon_url?: string | null
+          id?: string
+          logo_url?: string | null
+          singleton?: boolean
+          site_name_ar?: string
+          site_name_en?: string
+          tagline_ar?: string | null
+          tagline_en?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          favicon_url?: string | null
+          id?: string
+          logo_url?: string | null
+          singleton?: boolean
+          site_name_ar?: string
+          site_name_en?: string
+          tagline_ar?: string | null
+          tagline_en?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       usage_counters: {
         Row: {
           daily_limit: number

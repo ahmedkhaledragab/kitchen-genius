@@ -3,6 +3,7 @@ import { Outlet, createRootRoute, HeadContent, Scripts } from "@tanstack/react-r
 import appCss from "../styles.css?url";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
@@ -84,14 +85,16 @@ function RootComponent() {
   return (
     <LanguageProvider>
       <AuthProvider>
-        <div className="flex min-h-screen flex-col bg-background">
-          <Header />
-          <main className="flex-1">
-            <Outlet />
-          </main>
-          <Footer />
-        </div>
-        <Toaster richColors closeButton position="top-center" />
+        <SiteSettingsProvider>
+          <div className="flex min-h-screen flex-col bg-background">
+            <Header />
+            <main className="flex-1">
+              <Outlet />
+            </main>
+            <Footer />
+          </div>
+          <Toaster richColors closeButton position="top-center" />
+        </SiteSettingsProvider>
       </AuthProvider>
     </LanguageProvider>
   );

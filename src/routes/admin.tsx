@@ -15,6 +15,7 @@ import {
   X,
   Check,
   Wand2,
+  Settings,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -303,7 +304,7 @@ function AdminPage() {
       </div>
 
       {/* Quick navigation cards */}
-      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Link
           to="/admin/users"
           className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-soft transition hover:border-primary/40 hover:shadow-card"
@@ -331,6 +332,19 @@ function AdminPage() {
             <p className="truncate text-xs text-muted-foreground">
               {lang === "ar" ? "كتالوج المكونات الذكي" : "Smart ingredients catalog"}
             </p>
+          </div>
+        </Link>
+
+        <Link
+          to="/admin/settings"
+          className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-soft transition hover:border-primary/40 hover:shadow-card"
+        >
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-foreground/5 text-foreground">
+            <Settings className="h-6 w-6" />
+          </span>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-extrabold">{t.admin.siteSettings.manageLink}</p>
+            <p className="truncate text-xs text-muted-foreground">{t.admin.siteSettings.subtitle}</p>
           </div>
         </Link>
 
