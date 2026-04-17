@@ -11,6 +11,9 @@ import {
   Ban,
   Sparkles,
   LayoutDashboard,
+  Pencil,
+  X,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,6 +32,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { GenerationsChart } from "@/components/admin/GenerationsChart";
 import type { Difficulty } from "@/lib/recipe";
 
 export const Route = createFileRoute("/admin")({
