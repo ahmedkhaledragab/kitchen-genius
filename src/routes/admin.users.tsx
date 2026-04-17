@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Loader2, Search, Shield, ShieldOff, Ban, CheckCircle2, Pencil } from "lucide-react";
+import { Loader2, Search, Shield, ShieldOff, Ban, CheckCircle2, Pencil, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/contexts/AuthContext";
