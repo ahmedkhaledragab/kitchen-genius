@@ -338,7 +338,7 @@ function AdminPage() {
           href="#recipes-section"
           className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-soft transition hover:border-primary/40 hover:shadow-card"
         >
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-destructive/10 text-destructive">
             <Sparkles className="h-6 w-6" />
           </span>
           <div className="min-w-0">
