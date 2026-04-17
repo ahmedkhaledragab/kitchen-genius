@@ -138,6 +138,116 @@ serve(async (req: Request) => {
       });
     }
 
+    // ============== LOCAL-FIRST SEARCH ==============
+    // Search the recipes table before calling AI. If we find >= 3 good matches,
+    // return them without spending AI credits.
+    const norm = (s: string) =>
+      s
+        .toLowerCase()
+        .trim()
+        .replace(/[\u064B-\u065F\u0670]/g, "") // strip Arabic diacritics
+        .replace(/[إأآا]/g, "ا")
+        .replace(/[ىي]/g, "ي")
+        .replace(/ة/g, "ه")
+        .replace(/[^\p{L}\p{N}\s]/gu, " ")
+        .replace(/\s+/g, " ");
+
+    const userIngsNorm = ingredients.map(norm).filter(Boolean);
+    const excludeNorm = exclude.map(norm).filter(Boolean);
+
+    try {
+      const { data: pool } = await admin
+        .from("recipes")
+        .select("id,title,description,ingredients,missing_ingredients,steps,estimated_time_minutes,difficulty,tags,cuisine,language,image_url")
+        .eq("is_published", true)
+        .eq("language", language)
+        .limit(500);
+
+      type DbRecipe = {
+        id: string;
+        title: string;
+        description: string | null;
+        ingredients: unknown;
+        missing_ingredients: unknown;
+        steps: unknown;
+        estimated_time_minutes: number | null;
+        difficulty: string;
+        tags: string[] | null;
+        cuisine: string | null;
+        language: string;
+        image_url: string | null;
+      };
+
+      const scored: { r: DbRecipe; matched: number; missing: number }[] = [];
+      for (const r of (pool ?? []) as DbRecipe[]) {
+        const ings: string[] = Array.isArray(r.ingredients) ? (r.ingredients as string[]) : [];
+        const ingsNorm = ings.map((x) => norm(String(x)));
+
+        // exclude check: if any excluded item appears in ingredients, skip
+        const hasExcluded = excludeNorm.some((ex) =>
+          ingsNorm.some((ing) => ing.includes(ex)),
+        );
+        if (hasExcluded) continue;
+
+        // tag/filter check (best-effort)
+        if (filters.length) {
+          const tagsNorm = (r.tags ?? []).map(norm);
+          const allMatch = filters.every((f) => tagsNorm.some((t) => t.includes(norm(f))));
+          if (!allMatch) continue;
+        }
+
+        // matching: how many of user's ingredients appear in recipe ingredients
+        let matched = 0;
+        for (const u of userIngsNorm) {
+          if (ingsNorm.some((ing) => ing.includes(u) || u.includes(ing))) matched++;
+        }
+        if (matched === 0) continue;
+
+        const missing = Math.max(0, ingsNorm.length - matched);
+        scored.push({ r, matched, missing });
+      }
+
+      // sort by most matched, then fewest missing
+      scored.sort((a, b) => b.matched - a.matched || a.missing - b.missing);
+
+      const topLocal = scored.slice(0, 5);
+      if (topLocal.length >= 3) {
+        const recipesOut = topLocal.map(({ r, matched }) => {
+          const ings: string[] = Array.isArray(r.ingredients) ? (r.ingredients as string[]) : [];
+          const ingsNorm = ings.map((x) => norm(String(x)));
+          // missing_ingredients = recipe ingredients not present in user list
+          const missingList = ings.filter((_, i) => {
+            const ing = ingsNorm[i];
+            return !userIngsNorm.some((u) => ing.includes(u) || u.includes(ing));
+          });
+          return {
+            id: r.id,
+            title: r.title,
+            description: r.description ?? "",
+            ingredients: ings,
+            missing_ingredients: missingList,
+            steps: Array.isArray(r.steps) ? r.steps : [],
+            estimated_time_minutes: r.estimated_time_minutes ?? 30,
+            difficulty: r.difficulty,
+            tags: r.tags ?? [],
+            cuisine: r.cuisine ?? undefined,
+            image_url: r.image_url ?? undefined,
+            _source: "local",
+            _matched: matched,
+          };
+        });
+        return new Response(
+          JSON.stringify({ recipes: recipesOut, source: "local" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      // else: fall through to AI generation, but we may have a few local hits to merge later
+      console.log(`local search found ${topLocal.length} matches, falling back to AI`);
+    } catch (e) {
+      console.error("local search failed, falling back to AI:", e);
+    }
+    // ============== END LOCAL-FIRST SEARCH ==============
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       return new Response(
