@@ -1,10 +1,13 @@
 project_id = "ammshebfszuhmqvclfff"
 
 [functions.generate-recipes]
-verify_jwt = true
+verify_jwt = false
 
 [functions.detect-ingredients]
-verify_jwt = true
+verify_jwt = false
 
 [functions.generate-recipe-image]
-verify_jwt = true
+verify_jwt = false
+
+[functions.admin-create-user]
+verify_jwt = false
