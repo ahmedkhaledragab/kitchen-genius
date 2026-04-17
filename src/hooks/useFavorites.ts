@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLang } from "@/contexts/LanguageContext";
 import type { Recipe, FavoriteRow } from "@/lib/recipe";
 
 function recipeKey(r: Recipe) {
@@ -9,6 +11,7 @@ function recipeKey(r: Recipe) {
 
 export function useFavorites() {
   const { user } = useAuth();
+  const { t } = useLang();
   const [items, setItems] = useState<FavoriteRow[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -56,17 +59,27 @@ export function useFavorites() {
         return false;
       });
       if (existing) {
-        await supabase.from("favorites").delete().eq("id", existing.id);
+        const { error } = await supabase.from("favorites").delete().eq("id", existing.id);
+        if (error) {
+          toast.error(t.recipe.favoriteError);
+          return;
+        }
+        toast.success(t.recipe.favoriteRemoved);
       } else {
-        await supabase.from("favorites").insert({
+        const { error } = await supabase.from("favorites").insert({
           user_id: user.id,
           recipe_id: r.id ?? null,
           recipe_snapshot: r.id ? null : (r as unknown as never),
         });
+        if (error) {
+          toast.error(t.recipe.favoriteError);
+          return;
+        }
+        toast.success(t.recipe.favoriteAdded);
       }
       refresh();
     },
-    [items, user, refresh],
+    [items, user, refresh, t],
   );
 
   return { items, loading, isFavorite, toggle, refresh };
