@@ -1,6 +1,14 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, useRef } from "react";
-import { ArrowLeft, Image as ImageIcon, Loader2, Trash2, Upload } from "lucide-react";
+import {
+  ArrowLeft,
+  Image as ImageIcon,
+  Loader2,
+  Trash2,
+  Upload,
+  Search,
+  ExternalLink,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -31,12 +39,22 @@ function AdminSettingsPage() {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [faviconUrl, setFaviconUrl] = useState<string | null>(null);
 
+  // SEO state
+  const [descriptionAr, setDescriptionAr] = useState("");
+  const [descriptionEn, setDescriptionEn] = useState("");
+  const [keywordsAr, setKeywordsAr] = useState("");
+  const [keywordsEn, setKeywordsEn] = useState("");
+  const [ogImageUrl, setOgImageUrl] = useState<string | null>(null);
+  const [twitterHandle, setTwitterHandle] = useState("");
+
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingFav, setUploadingFav] = useState(false);
+  const [uploadingOg, setUploadingOg] = useState(false);
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const favInputRef = useRef<HTMLInputElement>(null);
+  const ogInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -49,6 +67,12 @@ function AdminSettingsPage() {
     setTaglineEn(settings.tagline_en ?? "");
     setLogoUrl(settings.logo_url);
     setFaviconUrl(settings.favicon_url);
+    setDescriptionAr(settings.description_ar ?? "");
+    setDescriptionEn(settings.description_en ?? "");
+    setKeywordsAr(settings.keywords_ar ?? "");
+    setKeywordsEn(settings.keywords_en ?? "");
+    setOgImageUrl(settings.og_image_url);
+    setTwitterHandle(settings.twitter_handle ?? "");
   }, [settings]);
 
   if (loading) return null;
