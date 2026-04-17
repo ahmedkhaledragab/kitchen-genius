@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, User as UserIcon, Shield, Globe2, LogOut } from "lucide-react";
+import { Heart, Shield, Globe2, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
