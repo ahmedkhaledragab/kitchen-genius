@@ -69,6 +69,11 @@ const arDict = {
       createOne: "يلا اعملي واحد وابدئي تطبخي 🍳",
       signInLink: "سجل دخول",
       loading: "لحظة...",
+      perks: {
+        recipes: "🍳 وصفات بمكوناتك",
+        favorites: "❤️ احفظي مفضلتك",
+        fridge: "📸 صوّري ثلاجتك",
+      },
     },
     profile: {
       title: "حسابي",
