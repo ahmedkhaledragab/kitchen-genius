@@ -102,6 +102,11 @@ const arDict = {
       saved: "تم الحفظ ✓",
       list: "كل الوصفات",
       delete: "حذف",
+      edit: "تعديل",
+      update: "حفظ التعديلات",
+      cancel: "إلغاء",
+      chartTitle: "توليدات الوصفات (آخر 7 أيام)",
+      chartEmpty: "لا توجد بيانات بعد",
       noAccess: "لا تملك صلاحيات الوصول لهذه الصفحة.",
       users: {
         title: "إدارة المستخدمين",
@@ -243,6 +248,11 @@ const enDict = {
       saved: "Saved ✓",
       list: "All recipes",
       delete: "Delete",
+      edit: "Edit",
+      update: "Save changes",
+      cancel: "Cancel",
+      chartTitle: "Recipe generations (last 7 days)",
+      chartEmpty: "No data yet",
       noAccess: "You don't have access to this page.",
       users: {
         title: "User management",
