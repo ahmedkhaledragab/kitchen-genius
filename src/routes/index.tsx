@@ -78,6 +78,17 @@ function HomePage() {
     };
   }, []);
 
+  // When the user switches language, clear stale results & inputs so they
+  // don't see Arabic recipes while browsing in English (or vice versa).
+  useEffect(() => {
+    setRecipes(null);
+    setOpenRecipe(null);
+    setIngredients([]);
+    setExcluded([]);
+    setInput("");
+    setExcludeInput("");
+  }, [lang]);
+
   const suggestions = useMemo(() => {
     const fromCatalog = lang === "ar" ? catalogAr : catalogEn;
     const fallback = lang === "ar" ? COMMON_INGREDIENTS_AR : COMMON_INGREDIENTS_EN;
