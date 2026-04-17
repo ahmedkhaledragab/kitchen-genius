@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Sparkles, X, Image as ImageIcon, Loader2, ChefHat } from "lucide-react";
@@ -41,6 +41,7 @@ function HomePage() {
   const { t, lang } = useLang();
   const { user } = useAuth();
   const { isFavorite, toggle } = useFavorites();
+  const navigate = useNavigate();
 
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [excluded, setExcluded] = useState<string[]>([]);
@@ -96,6 +97,11 @@ function HomePage() {
       toast.error(t.home.noIngredients);
       return;
     }
+    if (!user) {
+      toast.info(lang === "ar" ? "سجل دخول علشان نولّد لك وصفة" : "Sign in to generate a recipe");
+      navigate({ to: "/auth" });
+      return;
+    }
     setLoading(true);
     setRecipes(null);
     const res = await generateRecipes({
@@ -116,6 +122,11 @@ function HomePage() {
   };
 
   const handleImage = async (file: File) => {
+    if (!user) {
+      toast.info(lang === "ar" ? "سجل دخول علشان نتعرف على المكونات" : "Sign in to detect ingredients");
+      navigate({ to: "/auth" });
+      return;
+    }
     setImageBusy(true);
     try {
       const reader = new FileReader();
