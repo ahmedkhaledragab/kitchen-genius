@@ -98,8 +98,9 @@ const arDict = {
       confirm: "تأكيد",
       language: "اللغة",
     },
-  },
-  en: {
+} as const;
+
+const enDict = {
     appName: "What's in your kitchen?",
     tagline: "Type what you have, get cookable recipes in seconds 🍳",
     nav: {
@@ -196,10 +197,14 @@ const arDict = {
       confirm: "Confirm",
       language: "Language",
     },
-  },
 } as const;
 
-export type Translation = typeof translations.ar;
+export type Translation = typeof arDict;
+
+export const translations: Record<Lang, Translation> = {
+  ar: arDict,
+  en: enDict as unknown as Translation,
+};
 
 export const COMMON_INGREDIENTS_AR = [
   "بيض", "طماطم", "بصل", "ثوم", "جبنة", "جبنة موتزاريلا", "جبنة فيتا", "زيت زيتون",
