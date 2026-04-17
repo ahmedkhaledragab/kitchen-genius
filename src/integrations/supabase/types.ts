@@ -53,6 +53,7 @@ export type Database = {
           display_name: string | null
           email: string | null
           id: string
+          is_active: boolean
           preferred_language: string
           updated_at: string
         }
@@ -62,6 +63,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id: string
+          is_active?: boolean
           preferred_language?: string
           updated_at?: string
         }
@@ -71,6 +73,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          is_active?: boolean
           preferred_language?: string
           updated_at?: string
         }
@@ -133,6 +136,36 @@ export type Database = {
         }
         Relationships: []
       }
+      usage_counters: {
+        Row: {
+          daily_limit: number
+          day: string
+          feature: string
+          id: string
+          updated_at: string
+          used_count: number
+          user_id: string
+        }
+        Insert: {
+          daily_limit?: number
+          day?: string
+          feature: string
+          id?: string
+          updated_at?: string
+          used_count?: number
+          user_id: string
+        }
+        Update: {
+          daily_limit?: number
+          day?: string
+          feature?: string
+          id?: string
+          updated_at?: string
+          used_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -159,6 +192,38 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_users: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          created_at: string
+          display_name: string
+          email: string
+          fridge_limit: number
+          fridge_today: number
+          id: string
+          is_active: boolean
+          is_admin: boolean
+          recipes_limit: number
+          recipes_today: number
+        }[]
+      }
+      admin_set_user_limit: {
+        Args: { _feature: string; _new_limit: number; _user_id: string }
+        Returns: undefined
+      }
+      admin_set_user_role: {
+        Args: { _make_admin: boolean; _user_id: string }
+        Returns: undefined
+      }
+      admin_set_user_status: {
+        Args: { _is_active: boolean; _user_id: string }
+        Returns: undefined
+      }
+      check_and_increment_usage: {
+        Args: { _default_limit?: number; _feature: string; _user_id: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

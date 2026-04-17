@@ -1,6 +1,7 @@
 // supabase/functions/generate-recipes/index.ts
 // Calls Lovable AI Gateway with tool-calling for structured recipe output.
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -80,6 +81,50 @@ serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    // --- Auth + per-user daily limit ---
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: userData } = await userClient.auth.getUser();
+    const user = userData?.user;
+    if (!user) {
+      return new Response(
+        JSON.stringify({ error: "unauthorized", message: "سجّل دخول الأول." }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const { data: usage, error: usageError } = await admin.rpc("check_and_increment_usage", {
+      _user_id: user.id,
+      _feature: "generate_recipes",
+      _default_limit: 10,
+    });
+    if (usageError) {
+      console.error("usage rpc error", usageError);
+      return new Response(
+        JSON.stringify({ error: "usage_error", message: "تعذّر التحقق من الاستخدام." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+    const u = usage as { allowed: boolean; reason?: string; used?: number; limit?: number };
+    if (!u.allowed) {
+      const msg = u.reason === "banned"
+        ? "حسابك موقوف. تواصل مع الإدارة."
+        : u.reason === "limit_reached"
+          ? `وصلت لحد الاستخدام اليومي (${u.used}/${u.limit}).`
+          : "غير مسموح.";
+      return new Response(
+        JSON.stringify({ error: u.reason ?? "blocked", message: msg, used: u.used, limit: u.limit }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const body: ReqBody = await req.json();
     const ingredients = (body.ingredients ?? []).filter(Boolean);
     const exclude = (body.exclude ?? []).filter(Boolean);

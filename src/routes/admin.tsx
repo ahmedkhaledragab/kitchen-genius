@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
-import { Trash2, Plus, Loader2 } from "lucide-react";
+import { Trash2, Plus, Loader2, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -141,8 +141,16 @@ function AdminPage() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-20 pt-6">
-      <h1 className="text-2xl font-extrabold">{t.admin.title}</h1>
+    <div className="mx-auto max-w-3xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-xl font-extrabold sm:text-2xl">{t.admin.title}</h1>
+        <Button asChild variant="outline" className="rounded-xl">
+          <Link to="/admin/users">
+            <Users className="me-1 h-4 w-4" />
+            {t.admin.users.title}
+          </Link>
+        </Button>
+      </div>
 
       <Card className="mt-4 rounded-3xl border-border/60 p-5 shadow-card">
         <h2 className="text-base font-bold">{t.admin.addRecipe}</h2>
