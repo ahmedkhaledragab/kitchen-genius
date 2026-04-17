@@ -56,7 +56,7 @@ function AuthPage() {
         if (error) {
           toast.error(error.message);
         } else {
-          toast.success("تم إنشاء الحساب 👋");
+          toast.success("أهلاً بيكي في المطبخ يا قمر 💕🍳");
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
