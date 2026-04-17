@@ -14,6 +14,7 @@ import {
   Pencil,
   X,
   Check,
+  Wand2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -97,6 +98,7 @@ function AdminPage() {
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState<EditState | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
+  const [genImg, setGenImg] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -251,6 +253,34 @@ function AdminPage() {
       toast.success(t.admin.saved);
       setEditing(null);
       refresh();
+    }
+  };
+
+  const generateImage = async () => {
+    if (!editing) return;
+    setGenImg(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-recipe-image", {
+        body: {
+          recipeId: editing.id,
+          title: editing.title,
+          description: editing.description,
+          cuisine: editing.cuisine,
+        },
+      });
+      if (error) throw error;
+      const url = (data as { image_url?: string })?.image_url;
+      if (!url) throw new Error("no image");
+      setEditing((prev) => (prev ? { ...prev, image_url: url } : prev));
+      toast.success(lang === "ar" ? "تم توليد الصورة" : "Image generated");
+      refresh();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "error";
+      toast.error(
+        lang === "ar" ? `فشل توليد الصورة: ${msg}` : `Failed to generate image: ${msg}`
+      );
+    } finally {
+      setGenImg(false);
     }
   };
 
@@ -547,7 +577,26 @@ function AdminPage() {
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="text-xs font-semibold">{lang === "ar" ? "رابط الصورة" : "Image URL"}</label>
+                <div className="flex items-center justify-between gap-2">
+                  <label className="text-xs font-semibold">
+                    {lang === "ar" ? "رابط الصورة" : "Image URL"}
+                  </label>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={generateImage}
+                    disabled={genImg || !editing.title}
+                    className="h-7 rounded-lg border-primary/40 text-[11px] text-primary hover:bg-primary/10"
+                  >
+                    {genImg ? (
+                      <Loader2 className="me-1 h-3 w-3 animate-spin" />
+                    ) : (
+                      <Wand2 className="me-1 h-3 w-3" />
+                    )}
+                    {lang === "ar" ? "توليد بالذكاء الاصطناعي" : "Generate with AI"}
+                  </Button>
+                </div>
                 <Input
                   value={editing.image_url}
                   onChange={(e) => setEditing({ ...editing, image_url: e.target.value })}
