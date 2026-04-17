@@ -6,12 +6,11 @@ export async function generateRecipes(input: {
   exclude?: string[];
   filters?: string[];
   language: "ar" | "en";
-}): Promise<{ recipes: Recipe[] } | { error: string; message?: string }> {
+}): Promise<{ recipes: Recipe[]; source?: "local" | "ai" } | { error: string; message?: string }> {
   const { data, error } = await supabase.functions.invoke("generate-recipes", {
     body: input,
   });
   if (error) {
-    // try to read structured error
     const ctx = (error as { context?: Response }).context;
     if (ctx && typeof ctx.json === "function") {
       try {
@@ -23,7 +22,12 @@ export async function generateRecipes(input: {
     }
     return { error: "error", message: error.message };
   }
-  return data as { recipes: Recipe[] };
+  const payload = data as { recipes: Recipe[]; source?: "local" | "ai" };
+  const tagged = (payload.recipes ?? []).map((r) => ({
+    ...r,
+    source: r.source ?? payload.source ?? "ai",
+  }));
+  return { recipes: tagged, source: payload.source ?? "ai" };
 }
 
 export async function detectIngredientsFromImage(input: {

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Sparkles, X, Image as ImageIcon, Loader2, ChefHat } from "lucide-react";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/hooks/useFavorites";
 import { generateRecipes, detectIngredientsFromImage } from "@/lib/api";
 import { COMMON_INGREDIENTS_AR, COMMON_INGREDIENTS_EN } from "@/lib/i18n";
+import { supabase } from "@/integrations/supabase/client";
 import type { Recipe } from "@/lib/recipe";
 import { RecipeCard } from "@/components/RecipeCard";
 import { RecipeDetail } from "@/components/RecipeDetail";
@@ -54,8 +55,33 @@ function HomePage() {
   const [imageBusy, setImageBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Live ingredient suggestions from the admin-managed catalog (with fallback
+  // to the hardcoded list if the catalog is empty or fails to load).
+  const [catalogAr, setCatalogAr] = useState<string[]>([]);
+  const [catalogEn, setCatalogEn] = useState<string[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase
+      .from("ingredients_catalog")
+      .select("name_ar, name_en")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .limit(500)
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        setCatalogAr(data.map((d) => d.name_ar));
+        setCatalogEn(data.map((d) => d.name_en));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const suggestions = useMemo(() => {
-    const all = lang === "ar" ? COMMON_INGREDIENTS_AR : COMMON_INGREDIENTS_EN;
+    const fromCatalog = lang === "ar" ? catalogAr : catalogEn;
+    const fallback = lang === "ar" ? COMMON_INGREDIENTS_AR : COMMON_INGREDIENTS_EN;
+    const all = fromCatalog.length > 0 ? fromCatalog : fallback;
     const lc = input.trim().toLowerCase();
     const filtered = all
       .filter(
@@ -64,9 +90,9 @@ function HomePage() {
           !excluded.includes(s) &&
           (lc ? s.toLowerCase().includes(lc) : true),
       )
-      .slice(0, lc ? 8 : 12);
+      .slice(0, lc ? 10 : 16);
     return filtered;
-  }, [input, ingredients, excluded, lang]);
+  }, [input, ingredients, excluded, lang, catalogAr, catalogEn]);
 
   const addIngredient = (val: string) => {
     const v = val.trim();

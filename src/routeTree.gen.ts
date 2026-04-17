@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminIngredientsRouteImport } from './routes/admin.ingredients'
 
 const RecipesRoute = RecipesRouteImport.update({
   id: '/recipes',
@@ -46,6 +47,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminIngredientsRoute = AdminIngredientsRouteImport.update({
+  id: '/ingredients',
+  path: '/ingredients',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
+  '/admin/ingredients': typeof AdminIngredientsRoute
   '/admin/users': typeof AdminUsersRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
+  '/admin/ingredients': typeof AdminIngredientsRoute
   '/admin/users': typeof AdminUsersRoute
 }
 export interface FileRoutesById {
@@ -70,13 +78,28 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
+  '/admin/ingredients': typeof AdminIngredientsRoute
   '/admin/users': typeof AdminUsersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/auth' | '/profile' | '/recipes' | '/admin/users'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/profile'
+    | '/recipes'
+    | '/admin/ingredients'
+    | '/admin/users'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/auth' | '/profile' | '/recipes' | '/admin/users'
+  to:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/profile'
+    | '/recipes'
+    | '/admin/ingredients'
+    | '/admin/users'
   id:
     | '__root__'
     | '/'
@@ -84,6 +107,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/profile'
     | '/recipes'
+    | '/admin/ingredients'
     | '/admin/users'
   fileRoutesById: FileRoutesById
 }
@@ -139,14 +163,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/ingredients': {
+      id: '/admin/ingredients'
+      path: '/ingredients'
+      fullPath: '/admin/ingredients'
+      preLoaderRoute: typeof AdminIngredientsRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminIngredientsRoute: typeof AdminIngredientsRoute
   AdminUsersRoute: typeof AdminUsersRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminIngredientsRoute: AdminIngredientsRoute,
   AdminUsersRoute: AdminUsersRoute,
 }
 
