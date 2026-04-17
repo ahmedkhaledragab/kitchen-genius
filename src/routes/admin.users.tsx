@@ -354,6 +354,79 @@ function AdminUsersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={createOpen} onOpenChange={(o) => !creating && setCreateOpen(o)}>
+        <DialogContent className="rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>{t.admin.users.addUserTitle}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs font-semibold">{t.admin.users.emailLabel}</label>
+              <Input
+                type="email"
+                autoComplete="off"
+                value={newUser.email}
+                onChange={(e) => setNewUser((u) => ({ ...u, email: e.target.value }))}
+                className="mt-1 rounded-xl"
+                placeholder="user@example.com"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold">{t.admin.users.passwordLabel}</label>
+              <Input
+                type="password"
+                autoComplete="new-password"
+                value={newUser.password}
+                onChange={(e) => setNewUser((u) => ({ ...u, password: e.target.value }))}
+                className="mt-1 rounded-xl"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold">{t.admin.users.displayNameLabel}</label>
+              <Input
+                value={newUser.display_name}
+                onChange={(e) => setNewUser((u) => ({ ...u, display_name: e.target.value }))}
+                className="mt-1 rounded-xl"
+              />
+            </div>
+            <label className="flex items-center gap-2 text-sm">
+              <Checkbox
+                checked={newUser.make_admin}
+                onCheckedChange={(c) => setNewUser((u) => ({ ...u, make_admin: !!c }))}
+              />
+              <span>{t.admin.users.makeAdminLabel}</span>
+            </label>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              className="rounded-xl"
+              disabled={creating}
+              onClick={() => setCreateOpen(false)}
+            >
+              {t.admin.users.cancel}
+            </Button>
+            <Button
+              className="rounded-xl gradient-primary text-primary-foreground hover:opacity-95"
+              disabled={creating}
+              onClick={createUser}
+            >
+              {creating ? (
+                <>
+                  <Loader2 className="me-1 h-4 w-4 animate-spin" />
+                  {t.admin.users.creating}
+                </>
+              ) : (
+                <>
+                  <UserPlus className="me-1 h-4 w-4" />
+                  {t.admin.users.confirm}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
