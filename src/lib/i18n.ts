@@ -140,6 +140,7 @@ const arDict = {
         roleUpdated: "تم تحديث الدور",
         limitUpdated: "تم تحديث الليمت",
         you: "(أنت)",
+      },
       ingredientsCatalog: {
         title: "كتالوج المكونات",
         subtitle: "كل المكونات المتاحة كاقتراحات في الصفحة الرئيسية",
@@ -158,6 +159,7 @@ const arDict = {
         emptyAr: "اكتب الاسم بالعربي",
         emptyEn: "اكتب الاسم بالإنجليزي",
         backToAdmin: "رجوع للوحة التحكم",
+        manageLink: "إدارة المكونات",
       },
     },
     common: {
