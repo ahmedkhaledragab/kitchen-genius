@@ -85,7 +85,7 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite, index
           {recipe.source === "local" ? (
             <Badge
               variant="secondary"
-              className="rounded-full border-0 bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+              className="rounded-full border-0 bg-primary/15 text-primary"
               title={t.recipe.localBadgeHint}
             >
               <Database className="me-1 h-3 w-3" />
@@ -94,7 +94,7 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite, index
           ) : recipe.source === "ai" ? (
             <Badge
               variant="secondary"
-              className="rounded-full border-0 bg-violet-500/15 text-violet-700 dark:text-violet-400"
+              className="rounded-full border-0 bg-accent/15 text-accent"
               title={t.recipe.aiBadgeHint}
             >
               <Sparkles className="me-1 h-3 w-3" />
