@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, Shield, Globe2, LogOut, Menu, BookOpen, Home } from "lucide-react";
+import { Heart, Shield, Globe2, LogOut, Menu, Home } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LanguageContext";
@@ -38,9 +38,6 @@ export function Header() {
         <nav className="hidden items-center gap-1 md:flex">
           <Button asChild variant="ghost" size="sm" className="rounded-xl">
             <Link to="/">{t.nav.home}</Link>
-          </Button>
-          <Button asChild variant="ghost" size="sm" className="rounded-xl">
-            <Link to="/recipes">{lang === "ar" ? "الوصفات" : "Recipes"}</Link>
           </Button>
           {user && (
             <Button asChild variant="ghost" size="sm" className="rounded-xl">
@@ -122,12 +119,6 @@ export function Header() {
                   <Link to="/">
                     <Home className="me-2 h-4 w-4" />
                     {t.nav.home}
-                  </Link>
-                </Button>
-                <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
-                  <Link to="/recipes">
-                    <BookOpen className="me-2 h-4 w-4" />
-                    {lang === "ar" ? "كل الوصفات" : "All recipes"}
                   </Link>
                 </Button>
                 {user && (
