@@ -129,7 +129,7 @@ export function GenerationsChart() {
                   fontSize: 12,
                 }}
                 labelStyle={{ fontWeight: 700 }}
-                formatter={(v: number) => [v, lang === "ar" ? "توليدات" : "generations"]}
+                formatter={(v) => [String(v), lang === "ar" ? "توليدات" : "generations"]}
               />
               <Area
                 type="monotone"
