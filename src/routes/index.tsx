@@ -135,7 +135,11 @@ function HomePage() {
       return;
     }
     if (!user) {
-      toast.info(lang === "ar" ? "سجل دخول علشان نولّد لك وصفة" : "Sign in to generate a recipe");
+      toast.info(
+        lang === "ar"
+          ? "يلا يا قمر، سجّلي دخول الأول وهنطبخلك أحلى وصفة 💕🍳"
+          : "Hey lovely, sign in first and we'll cook up something delicious 💕🍳"
+      );
       navigate({ to: "/auth" });
       return;
     }
@@ -160,7 +164,11 @@ function HomePage() {
 
   const handleImage = async (file: File) => {
     if (!user) {
-      toast.info(lang === "ar" ? "سجل دخول علشان نتعرف على المكونات" : "Sign in to detect ingredients");
+      toast.info(
+        lang === "ar"
+          ? "سجّلي دخول يا حلوة وهنبص على ثلاجتك سوا 💕📸"
+          : "Sign in first sweetie, then we'll peek inside your fridge together 💕📸"
+      );
       navigate({ to: "/auth" });
       return;
     }
