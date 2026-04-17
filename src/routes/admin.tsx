@@ -57,6 +57,11 @@ interface RecipeRow {
   difficulty: Difficulty;
   language: string;
   created_at: string;
+  cuisine: string | null;
+  image_url: string | null;
+  tags: string[] | null;
+  ingredients: unknown;
+  steps: unknown;
 }
 
 interface UserRow {
@@ -65,6 +70,20 @@ interface UserRow {
   is_admin: boolean;
   recipes_today: number;
   recipes_limit: number;
+}
+
+interface EditState {
+  id: string;
+  title: string;
+  description: string;
+  ingredients: string;
+  steps: string;
+  estimated_time_minutes: number;
+  difficulty: Difficulty;
+  tags: string;
+  cuisine: string;
+  language: string;
+  image_url: string;
 }
 
 function AdminPage() {
@@ -76,6 +95,8 @@ function AdminPage() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [favCount, setFavCount] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [editing, setEditing] = useState<EditState | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -93,7 +114,7 @@ function AdminPage() {
     const [recipesRes, usersRes, favsRes] = await Promise.all([
       supabase
         .from("recipes")
-        .select("id, title, description, estimated_time_minutes, difficulty, language, created_at")
+        .select("id, title, description, estimated_time_minutes, difficulty, language, created_at, cuisine, image_url, tags, ingredients, steps")
         .order("created_at", { ascending: false }),
       supabase.rpc("admin_list_users"),
       supabase.from("favorites").select("*", { count: "exact", head: true }),
