@@ -174,38 +174,59 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          description_ar: string | null
+          description_en: string | null
           favicon_url: string | null
           id: string
+          keywords_ar: string | null
+          keywords_en: string | null
           logo_url: string | null
+          og_image_url: string | null
           singleton: boolean
           site_name_ar: string
           site_name_en: string
+          site_url: string | null
           tagline_ar: string | null
           tagline_en: string | null
+          twitter_handle: string | null
           updated_at: string
           updated_by: string | null
         }
         Insert: {
+          description_ar?: string | null
+          description_en?: string | null
           favicon_url?: string | null
           id?: string
+          keywords_ar?: string | null
+          keywords_en?: string | null
           logo_url?: string | null
+          og_image_url?: string | null
           singleton?: boolean
           site_name_ar?: string
           site_name_en?: string
+          site_url?: string | null
           tagline_ar?: string | null
           tagline_en?: string | null
+          twitter_handle?: string | null
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
+          description_ar?: string | null
+          description_en?: string | null
           favicon_url?: string | null
           id?: string
+          keywords_ar?: string | null
+          keywords_en?: string | null
           logo_url?: string | null
+          og_image_url?: string | null
           singleton?: boolean
           site_name_ar?: string
           site_name_en?: string
+          site_url?: string | null
           tagline_ar?: string | null
           tagline_en?: string | null
+          twitter_handle?: string | null
           updated_at?: string
           updated_by?: string | null
         }
