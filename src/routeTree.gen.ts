@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminIngredientsRouteImport } from './routes/admin.ingredients'
 
 const RecipesRoute = RecipesRouteImport.update({
@@ -47,6 +48,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminIngredientsRoute = AdminIngredientsRouteImport.update({
   id: '/ingredients',
   path: '/ingredients',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/recipes'
     | '/admin/ingredients'
+    | '/admin/settings'
     | '/admin/users'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/recipes'
     | '/admin/ingredients'
+    | '/admin/settings'
     | '/admin/users'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/recipes'
     | '/admin/ingredients'
+    | '/admin/settings'
     | '/admin/users'
   fileRoutesById: FileRoutesById
 }
@@ -163,6 +175,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/ingredients': {
       id: '/admin/ingredients'
       path: '/ingredients'
@@ -175,11 +194,13 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminIngredientsRoute: typeof AdminIngredientsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminIngredientsRoute: AdminIngredientsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
 }
 
@@ -195,3 +216,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
