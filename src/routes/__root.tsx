@@ -4,6 +4,7 @@ import appCss from "../styles.css?url";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -88,6 +89,7 @@ function RootComponent() {
           <main className="flex-1">
             <Outlet />
           </main>
+          <Footer />
         </div>
         <Toaster richColors closeButton position="top-center" />
       </AuthProvider>

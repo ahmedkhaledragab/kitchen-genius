@@ -11,6 +11,9 @@ import {
   Ban,
   Sparkles,
   LayoutDashboard,
+  Pencil,
+  X,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,6 +32,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { GenerationsChart } from "@/components/admin/GenerationsChart";
 import type { Difficulty } from "@/lib/recipe";
 
 export const Route = createFileRoute("/admin")({
@@ -46,6 +57,11 @@ interface RecipeRow {
   difficulty: Difficulty;
   language: string;
   created_at: string;
+  cuisine: string | null;
+  image_url: string | null;
+  tags: string[] | null;
+  ingredients: unknown;
+  steps: unknown;
 }
 
 interface UserRow {
@@ -54,6 +70,20 @@ interface UserRow {
   is_admin: boolean;
   recipes_today: number;
   recipes_limit: number;
+}
+
+interface EditState {
+  id: string;
+  title: string;
+  description: string;
+  ingredients: string;
+  steps: string;
+  estimated_time_minutes: number;
+  difficulty: Difficulty;
+  tags: string;
+  cuisine: string;
+  language: string;
+  image_url: string;
 }
 
 function AdminPage() {
@@ -65,6 +95,8 @@ function AdminPage() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [favCount, setFavCount] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [editing, setEditing] = useState<EditState | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -82,7 +114,7 @@ function AdminPage() {
     const [recipesRes, usersRes, favsRes] = await Promise.all([
       supabase
         .from("recipes")
-        .select("id, title, description, estimated_time_minutes, difficulty, language, created_at")
+        .select("id, title, description, estimated_time_minutes, difficulty, language, created_at, cuisine, image_url, tags, ingredients, steps")
         .order("created_at", { ascending: false }),
       supabase.rpc("admin_list_users"),
       supabase.from("favorites").select("*", { count: "exact", head: true }),
@@ -164,9 +196,62 @@ function AdminPage() {
   };
 
   const remove = async (id: string) => {
+    if (!window.confirm(lang === "ar" ? "تأكيد حذف الوصفة؟" : "Delete this recipe?")) return;
     const { error } = await supabase.from("recipes").delete().eq("id", id);
     if (error) toast.error(error.message);
-    else refresh();
+    else {
+      toast.success(lang === "ar" ? "تم الحذف" : "Deleted");
+      refresh();
+    }
+  };
+
+  const startEdit = (r: RecipeRow) => {
+    const ings = Array.isArray(r.ingredients) ? (r.ingredients as string[]) : [];
+    const stps = Array.isArray(r.steps) ? (r.steps as string[]) : [];
+    setEditing({
+      id: r.id,
+      title: r.title,
+      description: r.description ?? "",
+      ingredients: ings.join("\n"),
+      steps: stps.join("\n"),
+      estimated_time_minutes: r.estimated_time_minutes ?? 20,
+      difficulty: r.difficulty,
+      tags: (r.tags ?? []).join(", "),
+      cuisine: r.cuisine ?? "",
+      language: r.language,
+      image_url: r.image_url ?? "",
+    });
+  };
+
+  const saveEdit = async () => {
+    if (!editing) return;
+    setSavingEdit(true);
+    const ingredients = editing.ingredients.split(/[,،\n]/).map((s) => s.trim()).filter(Boolean);
+    const steps = editing.steps.split(/\n/).map((s) => s.trim()).filter(Boolean);
+    const tags = editing.tags.split(/[,،]/).map((s) => s.trim()).filter(Boolean);
+    const { error } = await supabase
+      .from("recipes")
+      .update({
+        title: editing.title,
+        description: editing.description || null,
+        ingredients,
+        steps,
+        estimated_time_minutes: Number(editing.estimated_time_minutes) || null,
+        difficulty: editing.difficulty,
+        tags,
+        cuisine: editing.cuisine || null,
+        language: editing.language,
+        image_url: editing.image_url || null,
+      })
+      .eq("id", editing.id);
+    setSavingEdit(false);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success(t.admin.saved);
+      setEditing(null);
+      refresh();
+    }
   };
 
   const dateFmt = new Intl.DateTimeFormat(lang === "ar" ? "ar-EG" : "en-US", {
@@ -205,6 +290,11 @@ function AdminPage() {
         <StatCard icon={Sparkles} label={t.admin.stats.recipesToday} value={stats.todayUses} tone="primary" />
       </div>
 
+      {/* Chart */}
+      <div className="mt-5">
+        <GenerationsChart />
+      </div>
+
       {/* Tabs */}
       <Tabs defaultValue="recipes" className="mt-6">
         <TabsList className="grid w-full grid-cols-2 rounded-2xl bg-muted/60 p-1 sm:w-auto sm:inline-grid">
@@ -235,7 +325,7 @@ function AdminPage() {
                       <th className="hidden px-3 py-2 text-start font-semibold sm:table-cell">{t.admin.difficulty}</th>
                       <th className="hidden px-3 py-2 text-start font-semibold sm:table-cell">{t.admin.time}</th>
                       <th className="hidden px-3 py-2 text-start font-semibold md:table-cell">{lang === "ar" ? "تاريخ" : "Date"}</th>
-                      <th className="px-3 py-2 text-end font-semibold">{t.admin.delete}</th>
+                      <th className="px-3 py-2 text-end font-semibold">{lang === "ar" ? "إجراءات" : "Actions"}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -245,10 +335,26 @@ function AdminPage() {
                         className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}
                       >
                         <td className="px-3 py-2.5">
-                          <p className="truncate font-semibold">{r.title}</p>
-                          {r.description && (
-                            <p className="line-clamp-1 text-xs text-muted-foreground">{r.description}</p>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {r.image_url ? (
+                              <img
+                                src={r.image_url}
+                                alt=""
+                                loading="lazy"
+                                className="h-10 w-10 shrink-0 rounded-lg object-cover"
+                              />
+                            ) : (
+                              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
+                                <ChefHat className="h-4 w-4" />
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <p className="truncate font-semibold">{r.title}</p>
+                              {r.description && (
+                                <p className="line-clamp-1 text-xs text-muted-foreground">{r.description}</p>
+                              )}
+                            </div>
+                          </div>
                         </td>
                         <td className="hidden px-3 py-2.5 text-xs sm:table-cell">
                           <DiffBadge d={r.difficulty} t={t} />
@@ -260,15 +366,28 @@ function AdminPage() {
                           {dateFmt.format(new Date(r.created_at))}
                         </td>
                         <td className="px-3 py-2.5 text-end">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => remove(r.id)}
-                            className="rounded-lg text-destructive hover:bg-destructive/10"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="inline-flex items-center gap-1">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => startEdit(r)}
+                              className="rounded-lg text-primary hover:bg-primary/10"
+                              aria-label={t.admin.edit}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => remove(r.id)}
+                              className="rounded-lg text-destructive hover:bg-destructive/10"
+                              aria-label={t.admin.delete}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -399,6 +518,159 @@ function AdminPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="h-4 w-4 text-primary" />
+              {t.admin.edit}
+            </DialogTitle>
+          </DialogHeader>
+          {editing && (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold">{t.admin.title_field}</label>
+                <Input
+                  value={editing.title}
+                  onChange={(e) => setEditing({ ...editing, title: e.target.value })}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold">{t.admin.desc}</label>
+                <Input
+                  value={editing.description}
+                  onChange={(e) => setEditing({ ...editing, description: e.target.value })}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold">{lang === "ar" ? "رابط الصورة" : "Image URL"}</label>
+                <Input
+                  value={editing.image_url}
+                  onChange={(e) => setEditing({ ...editing, image_url: e.target.value })}
+                  className="mt-1 rounded-xl"
+                  placeholder="/recipes/xxx.png"
+                />
+                {editing.image_url && (
+                  <img
+                    src={editing.image_url}
+                    alt=""
+                    className="mt-2 h-24 w-full rounded-xl object-cover"
+                    onError={(e) => ((e.currentTarget.style.display = "none"))}
+                  />
+                )}
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold">{t.admin.ingredients}</label>
+                <Textarea
+                  rows={3}
+                  value={editing.ingredients}
+                  onChange={(e) => setEditing({ ...editing, ingredients: e.target.value })}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold">{t.admin.steps}</label>
+                <Textarea
+                  rows={5}
+                  value={editing.steps}
+                  onChange={(e) => setEditing({ ...editing, steps: e.target.value })}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold">{t.admin.time}</label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={editing.estimated_time_minutes}
+                  onChange={(e) =>
+                    setEditing({ ...editing, estimated_time_minutes: Number(e.target.value) })
+                  }
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold">{t.admin.difficulty}</label>
+                <Select
+                  value={editing.difficulty}
+                  onValueChange={(v) => setEditing({ ...editing, difficulty: v as Difficulty })}
+                >
+                  <SelectTrigger className="mt-1 rounded-xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="easy">{t.recipe.easy}</SelectItem>
+                    <SelectItem value="medium">{t.recipe.medium}</SelectItem>
+                    <SelectItem value="hard">{t.recipe.hard}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold">{t.admin.tags}</label>
+                <Input
+                  value={editing.tags}
+                  onChange={(e) => setEditing({ ...editing, tags: e.target.value })}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold">{t.admin.cuisine}</label>
+                <Input
+                  value={editing.cuisine}
+                  onChange={(e) => setEditing({ ...editing, cuisine: e.target.value })}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold">{t.admin.language}</label>
+                <Select
+                  value={editing.language}
+                  onValueChange={(v) => setEditing({ ...editing, language: v })}
+                >
+                  <SelectTrigger className="mt-1 rounded-xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ar">العربية</SelectItem>
+                    <SelectItem value="en">English</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-xl"
+              onClick={() => setEditing(null)}
+              disabled={savingEdit}
+            >
+              <X className="me-1 h-4 w-4" />
+              {t.admin.cancel}
+            </Button>
+            <Button
+              type="button"
+              className="rounded-xl gradient-primary text-primary-foreground"
+              onClick={saveEdit}
+              disabled={savingEdit}
+            >
+              {savingEdit ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <Check className="me-1 h-4 w-4" />
+                  {t.admin.update}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

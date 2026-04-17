@@ -32,7 +32,31 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite, index
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
     >
-      <Card className="group relative overflow-hidden rounded-3xl border-border/60 bg-card p-5 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-warm">
+      <Card className="group relative overflow-hidden rounded-3xl border-border/60 bg-card shadow-card transition-all hover:-translate-y-0.5 hover:shadow-warm">
+        {recipe.image_url && (
+          <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
+            <img
+              src={recipe.image_url}
+              alt={recipe.title}
+              loading="lazy"
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            {onToggleFavorite && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFavorite();
+                }}
+                className="absolute end-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-background/85 text-foreground shadow-md backdrop-blur transition hover:bg-background"
+                aria-label={isFavorite ? t.recipe.remove : t.recipe.save}
+              >
+                <Heart className={`h-4 w-4 ${isFavorite ? "fill-rose-500 text-rose-500" : ""}`} />
+              </button>
+            )}
+          </div>
+        )}
+        <div className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <h3 className="text-lg font-extrabold leading-snug">{recipe.title}</h3>
@@ -40,7 +64,7 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite, index
               <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{recipe.description}</p>
             )}
           </div>
-          {onToggleFavorite && (
+          {!recipe.image_url && onToggleFavorite && (
             <button
               type="button"
               onClick={(e) => {
@@ -96,6 +120,7 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite, index
             {t.recipe.steps} →
           </Button>
         )}
+        </div>
       </Card>
     </motion.div>
   );
