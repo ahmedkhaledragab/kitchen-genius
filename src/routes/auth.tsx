@@ -29,6 +29,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -45,7 +46,10 @@ function AuthPage() {
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { display_name: name || email.split("@")[0] },
+            data: {
+              display_name: name || email.split("@")[0],
+              phone: phone.trim() || null,
+            },
           },
         });
         if (error) {
@@ -107,15 +111,29 @@ function AuthPage() {
 
         <form onSubmit={submit} className="space-y-3">
           {mode === "signup" && (
-            <div>
-              <label className="text-xs font-semibold">{t.auth.name}</label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-1 rounded-xl"
-                placeholder={t.auth.name}
-              />
-            </div>
+            <>
+              <div>
+                <label className="text-xs font-semibold">{t.auth.name}</label>
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-1 rounded-xl"
+                  placeholder={t.auth.name}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold">{t.profile.phoneOptional}</label>
+                <Input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  maxLength={20}
+                  className="mt-1 rounded-xl"
+                  placeholder={t.profile.phonePlaceholder}
+                  dir="ltr"
+                />
+              </div>
+            </>
           )}
           <div>
             <label className="text-xs font-semibold">{t.auth.email}</label>
