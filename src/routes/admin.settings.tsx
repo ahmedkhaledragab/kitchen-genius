@@ -137,6 +137,7 @@ function AdminSettingsPage() {
 
   const save = async () => {
     setSaving(true);
+    const cleanedTwitter = twitterHandle.trim().replace(/^@/, "") || null;
     const { error } = await supabase
       .from("site_settings")
       .update({
@@ -144,6 +145,12 @@ function AdminSettingsPage() {
         site_name_en: nameEn.trim() || settings.site_name_en,
         tagline_ar: taglineAr.trim() || null,
         tagline_en: taglineEn.trim() || null,
+        description_ar: descriptionAr.trim() || null,
+        description_en: descriptionEn.trim() || null,
+        keywords_ar: keywordsAr.trim() || null,
+        keywords_en: keywordsEn.trim() || null,
+        og_image_url: ogImageUrl,
+        twitter_handle: cleanedTwitter,
         logo_url: logoUrl,
         favicon_url: faviconUrl,
         updated_by: user?.id ?? null,
