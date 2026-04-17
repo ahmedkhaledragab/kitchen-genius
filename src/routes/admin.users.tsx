@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/admin/users")({
   head: () => ({ meta: [{ title: "إدارة المستخدمين — من اللي عندك؟" }] }),
@@ -48,6 +49,15 @@ function AdminUsersPage() {
 
   const [editing, setEditing] = useState<{ user: AdminUserRow; feature: "generate_recipes" | "detect_ingredients" } | null>(null);
   const [newLimit, setNewLimit] = useState<number>(10);
+
+  const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newUser, setNewUser] = useState({
+    email: "",
+    password: "",
+    display_name: "",
+    make_admin: false,
+  });
 
   const refresh = useCallback(async () => {
     setBusy(true);
