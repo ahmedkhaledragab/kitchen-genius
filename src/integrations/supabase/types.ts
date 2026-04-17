@@ -87,6 +87,7 @@ export type Database = {
           email: string | null
           id: string
           is_active: boolean
+          phone: string | null
           preferred_language: string
           updated_at: string
         }
@@ -97,6 +98,7 @@ export type Database = {
           email?: string | null
           id: string
           is_active?: boolean
+          phone?: string | null
           preferred_language?: string
           updated_at?: string
         }
@@ -107,6 +109,7 @@ export type Database = {
           email?: string | null
           id?: string
           is_active?: boolean
+          phone?: string | null
           preferred_language?: string
           updated_at?: string
         }
