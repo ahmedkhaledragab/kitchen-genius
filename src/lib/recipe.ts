@@ -1,5 +1,6 @@
 // Shared recipe shape used both by AI snapshots and DB rows.
 export type Difficulty = "easy" | "medium" | "hard";
+export type RecipeSource = "local" | "ai";
 
 export interface Recipe {
   id?: string;
@@ -14,6 +15,8 @@ export interface Recipe {
   cuisine?: string;
   language?: string;
   image_url?: string | null;
+  /** Where the recipe came from: "local" = served from DB, "ai" = generated. */
+  source?: RecipeSource;
 }
 
 export interface FavoriteRow {
