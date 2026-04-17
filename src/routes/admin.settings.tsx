@@ -46,6 +46,7 @@ function AdminSettingsPage() {
   const [keywordsEn, setKeywordsEn] = useState("");
   const [ogImageUrl, setOgImageUrl] = useState<string | null>(null);
   const [twitterHandle, setTwitterHandle] = useState("");
+  const [primaryColor, setPrimaryColor] = useState<string>("#22c55e");
 
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -73,6 +74,7 @@ function AdminSettingsPage() {
     setKeywordsEn(settings.keywords_en ?? "");
     setOgImageUrl(settings.og_image_url);
     setTwitterHandle(settings.twitter_handle ?? "");
+    setPrimaryColor(settings.primary_color ?? "#22c55e");
   }, [settings]);
 
   if (loading) return null;
@@ -151,6 +153,7 @@ function AdminSettingsPage() {
         keywords_en: keywordsEn.trim() || null,
         og_image_url: ogImageUrl,
         twitter_handle: cleanedTwitter,
+        primary_color: primaryColor || null,
         logo_url: logoUrl,
         favicon_url: faviconUrl,
         updated_by: user?.id ?? null,
@@ -295,6 +298,51 @@ function AdminSettingsPage() {
             )}
           </div>
         </div>
+      </Card>
+
+      {/* Branding — primary color */}
+      <Card className="mt-4 rounded-3xl border-border/60 p-5">
+        <Label className="text-sm font-bold">{t.admin.siteSettings.brandingSection}</Label>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {t.admin.siteSettings.brandingSubtitle}
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-3">
+            <input
+              type="color"
+              value={primaryColor}
+              onChange={(e) => setPrimaryColor(e.target.value)}
+              className="h-12 w-12 cursor-pointer rounded-xl border border-border/60 bg-transparent"
+              aria-label={t.admin.siteSettings.primaryColor}
+            />
+            <Input
+              value={primaryColor}
+              onChange={(e) => setPrimaryColor(e.target.value)}
+              placeholder="#22c55e"
+              className="w-32 rounded-xl font-mono uppercase"
+              dir="ltr"
+              maxLength={7}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span
+              className="inline-block h-10 w-10 rounded-full border border-border/60"
+              style={{ backgroundColor: primaryColor }}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="rounded-xl"
+              onClick={() => setPrimaryColor("#22c55e")}
+            >
+              {t.admin.siteSettings.resetColor}
+            </Button>
+          </div>
+        </div>
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          {t.admin.siteSettings.primaryColorHint}
+        </p>
       </Card>
 
       {/* Names + taglines */}

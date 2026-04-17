@@ -182,6 +182,7 @@ export type Database = {
           keywords_en: string | null
           logo_url: string | null
           og_image_url: string | null
+          primary_color: string | null
           singleton: boolean
           site_name_ar: string
           site_name_en: string
@@ -201,6 +202,7 @@ export type Database = {
           keywords_en?: string | null
           logo_url?: string | null
           og_image_url?: string | null
+          primary_color?: string | null
           singleton?: boolean
           site_name_ar?: string
           site_name_en?: string
@@ -220,6 +222,7 @@ export type Database = {
           keywords_en?: string | null
           logo_url?: string | null
           og_image_url?: string | null
+          primary_color?: string | null
           singleton?: boolean
           site_name_ar?: string
           site_name_en?: string

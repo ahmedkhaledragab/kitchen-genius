@@ -221,6 +221,11 @@ const arDict = {
         sitemapHint: "بتتجدد تلقائياً مع كل وصفة جديدة",
         viewSitemap: "عرض sitemap.xml",
         viewRobots: "عرض robots.txt",
+        brandingSection: "هوية الموقع (Branding)",
+        brandingSubtitle: "غيّري اللون الأساسي للموقع كله من هنا",
+        primaryColor: "اللون الأساسي",
+        primaryColorHint: "اللون ده هيتطبق على الأزرار والروابط والتفاصيل في كل الصفحات",
+        resetColor: "إرجاع للون الافتراضي",
       },
     },
     common: {
@@ -451,6 +456,11 @@ const enDict = {
         sitemapHint: "Auto-updates with every new recipe",
         viewSitemap: "View sitemap.xml",
         viewRobots: "View robots.txt",
+        brandingSection: "Site branding",
+        brandingSubtitle: "Change the primary color used across the entire site",
+        primaryColor: "Primary color",
+        primaryColorHint: "Applied to buttons, links, and accents on every page",
+        resetColor: "Reset to default",
       },
     },
     common: {
