@@ -46,7 +46,10 @@ function AuthPage() {
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { display_name: name || email.split("@")[0] },
+            data: {
+              display_name: name || email.split("@")[0],
+              phone: phone.trim() || null,
+            },
           },
         });
         if (error) {
