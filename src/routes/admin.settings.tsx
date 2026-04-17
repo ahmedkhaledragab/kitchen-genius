@@ -524,6 +524,7 @@ function AdminSettingsPage() {
         </div>
       </Card>
 
+      <div className="mt-5 flex justify-end">
         <Button
           type="button"
           onClick={save}
