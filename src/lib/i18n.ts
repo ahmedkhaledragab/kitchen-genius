@@ -207,6 +207,16 @@ const arDict = {
         backToAdmin: "رجوع للوحة التحكم",
       },
     },
+    common: {
+      loading: "جاري التحميل...",
+      error: "حدث خطأ، حاول تاني.",
+      cancel: "إلغاء",
+      confirm: "تأكيد",
+      language: "اللغة",
+    },
+} as const;
+
+const enDict = {
     appName: "What's in your kitchen?",
     tagline: "Type what you have, get cookable recipes in seconds 🍳",
     nav: {
