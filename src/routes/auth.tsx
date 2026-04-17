@@ -77,16 +77,25 @@ function AuthPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-stretch px-4 pt-10 pb-20">
-      <Link to="/" className="mx-auto mb-6 inline-flex items-center gap-2">
-        <span className="grid h-12 w-12 place-items-center rounded-2xl gradient-primary text-primary-foreground shadow-soft">
-          <ChefHat className="h-6 w-6" />
-        </span>
+    <div className="mx-auto flex max-w-md flex-col items-stretch px-4 pt-6 pb-20">
+      <Link
+        to="/"
+        className="mx-auto mb-5 block aspect-[16/9] w-full max-w-sm overflow-hidden rounded-3xl shadow-card ring-1 ring-border/60"
+      >
+        <img
+          src={authHero}
+          alt=""
+          width={1280}
+          height={720}
+          className="h-full w-full object-cover"
+        />
       </Link>
 
       <Card className="rounded-3xl border-border/60 bg-card p-6 shadow-card">
         <h1 className="text-center text-2xl font-extrabold">{t.auth.welcome}</h1>
-        <p className="mt-1 text-center text-sm text-muted-foreground">{t.auth.welcomeSub}</p>
+        <p className="mt-1 text-center text-sm leading-relaxed text-muted-foreground">
+          {t.auth.welcomeSub}
+        </p>
 
         <Button
           type="button"
