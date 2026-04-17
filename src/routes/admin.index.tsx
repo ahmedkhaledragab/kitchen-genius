@@ -291,7 +291,7 @@ function AdminPage() {
   });
 
   return (
-    <div className="mx-auto max-w-6xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6">
+    <div className="pb-2">
       {/* Header */}
       <div>
         <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary">
@@ -301,67 +301,6 @@ function AdminPage() {
         <h1 className="mt-1 text-2xl font-black sm:text-3xl">
           <span className="gradient-text">{t.admin.title}</span>
         </h1>
-      </div>
-
-      {/* Quick navigation cards */}
-      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Link
-          to="/admin/users"
-          className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-soft transition hover:border-primary/40 hover:shadow-card"
-        >
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
-            <Users className="h-6 w-6" />
-          </span>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-extrabold">{t.admin.users.title}</p>
-            <p className="truncate text-xs text-muted-foreground">
-              {lang === "ar" ? "إدارة الحسابات والصلاحيات" : "Manage accounts & roles"}
-            </p>
-          </div>
-        </Link>
-
-        <Link
-          to="/admin/ingredients"
-          className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-soft transition hover:border-primary/40 hover:shadow-card"
-        >
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-accent/15 text-accent-foreground">
-            <ChefHat className="h-6 w-6" />
-          </span>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-extrabold">{t.admin.ingredientsCatalog.manageLink}</p>
-            <p className="truncate text-xs text-muted-foreground">
-              {lang === "ar" ? "كتالوج المكونات الذكي" : "Smart ingredients catalog"}
-            </p>
-          </div>
-        </Link>
-
-        <Link
-          to="/admin/settings"
-          className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-soft transition hover:border-primary/40 hover:shadow-card"
-        >
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-foreground/5 text-foreground">
-            <Settings className="h-6 w-6" />
-          </span>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-extrabold">{t.admin.siteSettings.manageLink}</p>
-            <p className="truncate text-xs text-muted-foreground">{t.admin.siteSettings.subtitle}</p>
-          </div>
-        </Link>
-
-        <a
-          href="#recipes-section"
-          className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-soft transition hover:border-primary/40 hover:shadow-card"
-        >
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-destructive/10 text-destructive">
-            <Sparkles className="h-6 w-6" />
-          </span>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-extrabold">{t.admin.tabRecipes}</p>
-            <p className="truncate text-xs text-muted-foreground">
-              {lang === "ar" ? "تحرير وحذف الوصفات" : "Edit & delete recipes"}
-            </p>
-          </div>
-        </a>
       </div>
 
       {/* Stats */}
