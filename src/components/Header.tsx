@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { ChefHat, Heart, User as UserIcon, Shield, Globe2, LogOut } from "lucide-react";
+import { Heart, User as UserIcon, Shield, Globe2, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.png";
 
 export function Header() {
   const { user, isAdmin, signOut } = useAuth();
