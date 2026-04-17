@@ -313,17 +313,6 @@ function AdminUsersPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <div className="hidden">
-        <Select>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="x">x</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
     </div>
   );
 }
