@@ -31,11 +31,11 @@ export function Header() {
         <Link to="/" className="flex min-w-0 items-center gap-2 group">
           <img
             src={logo}
-            alt={t.appName}
+            alt={siteName}
             className="h-14 w-14 shrink-0 object-contain transition-transform group-hover:scale-105 sm:h-16 sm:w-16"
           />
           <span className="hidden truncate text-base font-extrabold tracking-tight md:inline">
-            {t.appName}
+            {siteName}
           </span>
         </Link>
 
@@ -114,8 +114,8 @@ export function Header() {
             <SheetContent side={lang === "ar" ? "right" : "left"} className="w-72">
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2">
-                  <img src={logo} alt={t.appName} className="h-9 w-9 object-contain" />
-                  <span className="truncate">{t.appName}</span>
+                  <img src={logo} alt={siteName} className="h-9 w-9 object-contain" />
+                  <span className="truncate">{siteName}</span>
                 </SheetTitle>
               </SheetHeader>
 
