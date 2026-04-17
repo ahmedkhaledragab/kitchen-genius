@@ -292,30 +292,62 @@ function AdminPage() {
   return (
     <div className="mx-auto max-w-6xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6">
       {/* Header */}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary">
-            <LayoutDashboard className="h-3 w-3" />
-            ADMIN
+      <div>
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-bold text-primary">
+          <LayoutDashboard className="h-3 w-3" />
+          ADMIN
+        </div>
+        <h1 className="mt-1 text-2xl font-black sm:text-3xl">
+          <span className="gradient-text">{t.admin.title}</span>
+        </h1>
+      </div>
+
+      {/* Quick navigation cards */}
+      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <Link
+          to="/admin/users"
+          className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-soft transition hover:border-primary/40 hover:shadow-card"
+        >
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+            <Users className="h-6 w-6" />
+          </span>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-extrabold">{t.admin.users.title}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {lang === "ar" ? "إدارة الحسابات والصلاحيات" : "Manage accounts & roles"}
+            </p>
           </div>
-          <h1 className="mt-1 text-2xl font-black sm:text-3xl">
-            <span className="gradient-text">{t.admin.title}</span>
-          </h1>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline" className="rounded-xl">
-            <Link to="/admin/ingredients">
-              <ChefHat className="me-1 h-4 w-4" />
-              {t.admin.ingredientsCatalog.manageLink}
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="rounded-xl">
-            <Link to="/admin/users">
-              <Users className="me-1 h-4 w-4" />
-              {t.admin.users.title}
-            </Link>
-          </Button>
-        </div>
+        </Link>
+
+        <Link
+          to="/admin/ingredients"
+          className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-soft transition hover:border-primary/40 hover:shadow-card"
+        >
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-accent/15 text-accent-foreground">
+            <ChefHat className="h-6 w-6" />
+          </span>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-extrabold">{t.admin.ingredientsCatalog.manageLink}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {lang === "ar" ? "كتالوج المكونات الذكي" : "Smart ingredients catalog"}
+            </p>
+          </div>
+        </Link>
+
+        <a
+          href="#recipes-section"
+          className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-soft transition hover:border-primary/40 hover:shadow-card"
+        >
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-destructive/10 text-destructive">
+            <Sparkles className="h-6 w-6" />
+          </span>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-extrabold">{t.admin.tabRecipes}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {lang === "ar" ? "تحرير وحذف الوصفات" : "Edit & delete recipes"}
+            </p>
+          </div>
+        </a>
       </div>
 
       {/* Stats */}
@@ -329,7 +361,7 @@ function AdminPage() {
       </div>
 
       {/* Chart */}
-      <div className="mt-5">
+      <div id="recipes-section" className="mt-5 scroll-mt-4">
         <GenerationsChart />
       </div>
 
