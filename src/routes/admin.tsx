@@ -518,6 +518,159 @@ function AdminPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="h-4 w-4 text-primary" />
+              {t.admin.edit}
+            </DialogTitle>
+          </DialogHeader>
+          {editing && (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold">{t.admin.title_field}</label>
+                <Input
+                  value={editing.title}
+                  onChange={(e) => setEditing({ ...editing, title: e.target.value })}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold">{t.admin.desc}</label>
+                <Input
+                  value={editing.description}
+                  onChange={(e) => setEditing({ ...editing, description: e.target.value })}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold">{lang === "ar" ? "رابط الصورة" : "Image URL"}</label>
+                <Input
+                  value={editing.image_url}
+                  onChange={(e) => setEditing({ ...editing, image_url: e.target.value })}
+                  className="mt-1 rounded-xl"
+                  placeholder="/recipes/xxx.png"
+                />
+                {editing.image_url && (
+                  <img
+                    src={editing.image_url}
+                    alt=""
+                    className="mt-2 h-24 w-full rounded-xl object-cover"
+                    onError={(e) => ((e.currentTarget.style.display = "none"))}
+                  />
+                )}
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold">{t.admin.ingredients}</label>
+                <Textarea
+                  rows={3}
+                  value={editing.ingredients}
+                  onChange={(e) => setEditing({ ...editing, ingredients: e.target.value })}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold">{t.admin.steps}</label>
+                <Textarea
+                  rows={5}
+                  value={editing.steps}
+                  onChange={(e) => setEditing({ ...editing, steps: e.target.value })}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold">{t.admin.time}</label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={editing.estimated_time_minutes}
+                  onChange={(e) =>
+                    setEditing({ ...editing, estimated_time_minutes: Number(e.target.value) })
+                  }
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold">{t.admin.difficulty}</label>
+                <Select
+                  value={editing.difficulty}
+                  onValueChange={(v) => setEditing({ ...editing, difficulty: v as Difficulty })}
+                >
+                  <SelectTrigger className="mt-1 rounded-xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="easy">{t.recipe.easy}</SelectItem>
+                    <SelectItem value="medium">{t.recipe.medium}</SelectItem>
+                    <SelectItem value="hard">{t.recipe.hard}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold">{t.admin.tags}</label>
+                <Input
+                  value={editing.tags}
+                  onChange={(e) => setEditing({ ...editing, tags: e.target.value })}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold">{t.admin.cuisine}</label>
+                <Input
+                  value={editing.cuisine}
+                  onChange={(e) => setEditing({ ...editing, cuisine: e.target.value })}
+                  className="mt-1 rounded-xl"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-semibold">{t.admin.language}</label>
+                <Select
+                  value={editing.language}
+                  onValueChange={(v) => setEditing({ ...editing, language: v })}
+                >
+                  <SelectTrigger className="mt-1 rounded-xl">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ar">العربية</SelectItem>
+                    <SelectItem value="en">English</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-xl"
+              onClick={() => setEditing(null)}
+              disabled={savingEdit}
+            >
+              <X className="me-1 h-4 w-4" />
+              {t.admin.cancel}
+            </Button>
+            <Button
+              type="button"
+              className="rounded-xl gradient-primary text-primary-foreground"
+              onClick={saveEdit}
+              disabled={savingEdit}
+            >
+              {savingEdit ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <Check className="me-1 h-4 w-4" />
+                  {t.admin.update}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
