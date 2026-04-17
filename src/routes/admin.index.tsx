@@ -44,7 +44,7 @@ import {
 import { GenerationsChart } from "@/components/admin/GenerationsChart";
 import type { Difficulty } from "@/lib/recipe";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/admin/")({
   head: () => ({
     meta: [{ title: "لوحة التحكم — من اللي عندك؟" }],
   }),
