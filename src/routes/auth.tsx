@@ -111,15 +111,29 @@ function AuthPage() {
 
         <form onSubmit={submit} className="space-y-3">
           {mode === "signup" && (
-            <div>
-              <label className="text-xs font-semibold">{t.auth.name}</label>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-1 rounded-xl"
-                placeholder={t.auth.name}
-              />
-            </div>
+            <>
+              <div>
+                <label className="text-xs font-semibold">{t.auth.name}</label>
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-1 rounded-xl"
+                  placeholder={t.auth.name}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold">{t.profile.phoneOptional}</label>
+                <Input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  maxLength={20}
+                  className="mt-1 rounded-xl"
+                  placeholder={t.profile.phonePlaceholder}
+                  dir="ltr"
+                />
+              </div>
+            </>
           )}
           <div>
             <label className="text-xs font-semibold">{t.auth.email}</label>
