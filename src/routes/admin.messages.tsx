@@ -11,6 +11,9 @@ import {
   CheckCircle2,
   Archive,
   RefreshCw,
+  UserCircle2,
+  ShieldCheck,
+  CalendarDays,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
@@ -53,6 +56,16 @@ export const Route = createFileRoute("/admin/messages")({
 });
 
 type MessageStatus = "new" | "read" | "replied" | "archived";
+
+type AccountProfile = {
+  id: string;
+  display_name: string | null;
+  email: string | null;
+  phone: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  is_active: boolean;
+};
 
 type ContactMessage = {
   id: string;
@@ -98,6 +111,7 @@ function AdminMessagesPage() {
   const ar = lang === "ar";
 
   const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [profiles, setProfiles] = useState<Record<string, AccountProfile>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<MessageStatus | "all">(
@@ -119,8 +133,30 @@ function AdminMessagesPage() {
     if (error) {
       console.error(error);
       toast.error(ar ? "فشل تحميل الرسائل" : "Failed to load messages");
+      setLoading(false);
+      return;
+    }
+    const list = (data ?? []) as ContactMessage[];
+    setMessages(list);
+
+    // Fetch linked account profiles
+    const userIds = Array.from(
+      new Set(list.map((m) => m.user_id).filter((id): id is string => !!id)),
+    );
+    if (userIds.length > 0) {
+      const { data: profs, error: profErr } = await supabase
+        .from("profiles")
+        .select("id, display_name, email, phone, avatar_url, created_at, is_active")
+        .in("id", userIds);
+      if (!profErr && profs) {
+        const map: Record<string, AccountProfile> = {};
+        (profs as AccountProfile[]).forEach((p) => {
+          map[p.id] = p;
+        });
+        setProfiles(map);
+      }
     } else {
-      setMessages((data ?? []) as ContactMessage[]);
+      setProfiles({});
     }
     setLoading(false);
   };
@@ -351,6 +387,7 @@ function AdminMessagesPage() {
         <div className="space-y-2">
           {filtered.map((m) => {
             const meta = STATUS_META[m.status];
+            const acc = m.user_id ? profiles[m.user_id] : null;
             return (
               <button
                 key={m.id}
@@ -371,6 +408,19 @@ function AdminMessagesPage() {
                         <Badge variant="outline" className={`text-[10px] ${meta.className}`}>
                           {meta[ar ? "ar" : "en"]}
                         </Badge>
+                        {acc ? (
+                          <Badge
+                            variant="outline"
+                            className="border-emerald-500/30 bg-emerald-500/10 text-[10px] text-emerald-700"
+                          >
+                            <ShieldCheck className="me-0.5 h-3 w-3" />
+                            {ar ? "حساب مسجّل" : "Registered"}
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-[10px] text-muted-foreground">
+                            {ar ? "زائر" : "Guest"}
+                          </Badge>
+                        )}
                       </div>
                       <p className="mt-0.5 truncate text-xs text-muted-foreground">
                         {m.email}
@@ -434,6 +484,80 @@ function AdminMessagesPage() {
                     {selected.message}
                   </p>
                 </Card>
+
+                {/* Account info — only when message was sent by a logged-in user */}
+                {selected.user_id && (() => {
+                  const acc = profiles[selected.user_id];
+                  return (
+                    <Card className="rounded-2xl border-emerald-500/30 bg-emerald-500/5 p-4">
+                      <div className="mb-3 flex items-center gap-1.5 text-xs font-extrabold text-emerald-700">
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                        {ar ? "بيانات الحساب المسجّل" : "Registered account info"}
+                      </div>
+                      {acc ? (
+                        <div className="flex items-start gap-3">
+                          {acc.avatar_url ? (
+                            <img
+                              src={acc.avatar_url}
+                              alt={acc.display_name ?? "user"}
+                              className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-emerald-500/30"
+                            />
+                          ) : (
+                            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-emerald-500/15 text-emerald-700">
+                              <UserCircle2 className="h-7 w-7" />
+                            </span>
+                          )}
+                          <div className="min-w-0 flex-1 space-y-1.5 text-xs">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="text-sm font-extrabold">
+                                {acc.display_name || (ar ? "بدون اسم" : "No name")}
+                              </p>
+                              {!acc.is_active && (
+                                <Badge
+                                  variant="outline"
+                                  className="border-destructive/40 bg-destructive/10 text-[10px] text-destructive"
+                                >
+                                  {ar ? "محظور" : "Banned"}
+                                </Badge>
+                              )}
+                            </div>
+                            {acc.email && (
+                              <a
+                                href={`mailto:${acc.email}`}
+                                className="flex items-center gap-1.5 font-semibold text-primary hover:underline"
+                              >
+                                <Mail className="h-3.5 w-3.5 shrink-0" />
+                                <span className="truncate">{acc.email}</span>
+                              </a>
+                            )}
+                            {acc.phone && (
+                              <a
+                                href={`tel:${acc.phone}`}
+                                className="flex items-center gap-1.5 font-semibold text-primary hover:underline"
+                              >
+                                <Phone className="h-3.5 w-3.5 shrink-0" />
+                                <span className="truncate" dir="ltr">{acc.phone}</span>
+                              </a>
+                            )}
+                            <p className="flex items-center gap-1.5 text-muted-foreground">
+                              <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                              {ar ? "اشترك" : "Joined"} {formatTime(acc.created_at)}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground/80" dir="ltr">
+                              ID: {acc.id}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">
+                          {ar
+                            ? "الحساب اتحذف أو مش متاح."
+                            : "Account no longer available."}
+                        </p>
+                      )}
+                    </Card>
+                  );
+                })()}
 
                 <div>
                   <label className="text-xs font-bold">
