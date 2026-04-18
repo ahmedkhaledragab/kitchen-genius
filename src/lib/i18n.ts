@@ -76,7 +76,6 @@ const arDict = {
       perks: {
         recipes: "🍳 وصفات بمكوناتك",
         favorites: "❤️ احفظي مفضلتك",
-        fridge: "📸 صوّري ثلاجتك",
       },
     },
     profile: {
@@ -264,8 +263,6 @@ const enDict = {
       excludePlaceholder: "e.g. chili",
       cookBtn: "Let's cook 🍳",
       generating: "Cooking up some ideas...",
-      uploadFridge: "Snap your fridge (experimental)",
-      uploadHint: "Upload a photo and we'll try to detect ingredients",
       filters: "Quick filters",
       filterQuick: "Quick (under 20 min)",
       filterBudget: "Budget-friendly",
@@ -316,7 +313,6 @@ const enDict = {
       perks: {
         recipes: "🍳 Recipes from your ingredients",
         favorites: "❤️ Save your favorites",
-        fridge: "📸 Snap your fridge",
       },
     },
     profile: {
@@ -376,7 +372,6 @@ const enDict = {
         search: "Search by email or name...",
         joined: "Joined",
         recipes: "Recipes today",
-        fridge: "Fridge today",
         role: "Role",
         status: "Status",
         active: "Active",
@@ -391,7 +386,6 @@ const enDict = {
         editLimit: "Edit limit",
         newLimit: "New limit",
         recipesLimit: "Recipes limit (daily)",
-        fridgeLimit: "Fridge images limit (daily)",
         confirm: "Confirm",
         cancel: "Cancel",
         empty: "No users yet.",
