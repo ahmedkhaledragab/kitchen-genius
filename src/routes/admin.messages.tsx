@@ -111,6 +111,7 @@ function AdminMessagesPage() {
   const ar = lang === "ar";
 
   const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [profiles, setProfiles] = useState<Record<string, AccountProfile>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<MessageStatus | "all">(
@@ -132,8 +133,30 @@ function AdminMessagesPage() {
     if (error) {
       console.error(error);
       toast.error(ar ? "فشل تحميل الرسائل" : "Failed to load messages");
+      setLoading(false);
+      return;
+    }
+    const list = (data ?? []) as ContactMessage[];
+    setMessages(list);
+
+    // Fetch linked account profiles
+    const userIds = Array.from(
+      new Set(list.map((m) => m.user_id).filter((id): id is string => !!id)),
+    );
+    if (userIds.length > 0) {
+      const { data: profs, error: profErr } = await supabase
+        .from("profiles")
+        .select("id, display_name, email, phone, avatar_url, created_at, is_active")
+        .in("id", userIds);
+      if (!profErr && profs) {
+        const map: Record<string, AccountProfile> = {};
+        (profs as AccountProfile[]).forEach((p) => {
+          map[p.id] = p;
+        });
+        setProfiles(map);
+      }
     } else {
-      setMessages((data ?? []) as ContactMessage[]);
+      setProfiles({});
     }
     setLoading(false);
   };
