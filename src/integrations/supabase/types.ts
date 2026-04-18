@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_messages: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string | null
+          status: Database["public"]["Enums"]["message_status"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone?: string | null
+          status?: Database["public"]["Enums"]["message_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string | null
+          status?: Database["public"]["Enums"]["message_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -433,6 +472,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user"
       difficulty_level: "easy" | "medium" | "hard"
+      message_status: "new" | "read" | "replied" | "archived"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -562,6 +602,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "user"],
       difficulty_level: ["easy", "medium", "hard"],
+      message_status: ["new", "read", "replied", "archived"],
     },
   },
 } as const
