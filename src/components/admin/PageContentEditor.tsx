@@ -29,6 +29,13 @@ const PAGE_TITLES: Record<PageKey, { ar: string; en: string }> = {
   contact: { ar: "صفحة تواصل معنا", en: "Contact page" },
 };
 
+const PAGE_PATHS: Record<PageKey, string> = {
+  home: "/",
+  about: "/about",
+  features: "/features",
+  contact: "/contact",
+};
+
 export function PageContentEditor({ pageKey }: { pageKey: PageKey }) {
   const { lang } = useLang();
   const ar = lang === "ar";
