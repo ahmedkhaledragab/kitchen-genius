@@ -90,19 +90,33 @@ function ContactPage() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !message.trim()) {
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPhone = phone.trim();
+    const trimmedMessage = message.trim();
+
+    if (!trimmedName || !trimmedEmail || !trimmedMessage) {
       toast.error(ar ? "املي كل الخانات يا قمر 🌸" : "Fill in all fields lovely 🌸");
       return;
     }
+    // Light phone validation (optional field)
+    if (trimmedPhone && !/^[\d+\-\s()]{6,20}$/.test(trimmedPhone)) {
+      toast.error(ar ? "رقم الهاتف مش صحيح 📞" : "Invalid phone number 📞");
+      return;
+    }
     setBusy(true);
-    const subject = encodeURIComponent(ar ? `رسالة من ${name}` : `Message from ${name}`);
+    const subject = encodeURIComponent(ar ? `رسالة من ${trimmedName}` : `Message from ${trimmedName}`);
+    const phoneLine = trimmedPhone
+      ? `\n${ar ? "الهاتف" : "Phone"}: ${trimmedPhone}`
+      : "";
     const body = encodeURIComponent(
-      `${ar ? "الاسم" : "Name"}: ${name}\n${ar ? "الإيميل" : "Email"}: ${email}\n\n${message}`,
+      `${ar ? "الاسم" : "Name"}: ${trimmedName}\n${ar ? "الإيميل" : "Email"}: ${trimmedEmail}${phoneLine}\n\n${trimmedMessage}`,
     );
     window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
     setTimeout(() => {
