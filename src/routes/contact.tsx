@@ -47,11 +47,29 @@ function pickIcon(title?: string) {
   const t = (title ?? "").toLowerCase();
   if (t.includes("face")) return { Icon: Facebook, color: "text-[#1877F2] bg-[#1877F2]/10" };
   if (t.includes("insta")) return { Icon: Instagram, color: "text-[#d62976] bg-[#d62976]/10" };
+  if (t.includes("whats") || t.includes("واتس"))
+    return { Icon: MessageCircle, color: "text-[#25D366] bg-[#25D366]/10" };
   if (t.includes("mail") || t.includes("إيميل") || t.includes("بريد"))
     return { Icon: Mail, color: "text-primary bg-primary/10" };
   if (t.includes("phone") || t.includes("tel") || t.includes("هاتف") || t.includes("تليفون"))
     return { Icon: Phone, color: "text-emerald-600 bg-emerald-500/10" };
   return { Icon: Globe, color: "text-muted-foreground bg-muted" };
+}
+
+function buildWhatsAppHref(raw: string): string | null {
+  const v = raw.trim();
+  if (!v) return null;
+  if (/^https?:\/\//i.test(v)) return v;
+  const digits = v.replace(/\D/g, "");
+  if (digits.length < 6) return null;
+  return `https://wa.me/${digits}`;
+}
+
+function prettyHandle(url: string): string {
+  return url
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .replace(/\/$/, "");
 }
 
 function ContactPage() {
