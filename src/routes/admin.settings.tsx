@@ -55,6 +55,9 @@ function AdminSettingsPage() {
   const [instagramUrl, setInstagramUrl] = useState("");
   const [whatsappUrl, setWhatsappUrl] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+  const [tiktokUrl, setTiktokUrl] = useState("");
+  const [telegramUrl, setTelegramUrl] = useState("");
+  const [twitterUrl, setTwitterUrl] = useState("");
 
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -87,6 +90,9 @@ function AdminSettingsPage() {
     setInstagramUrl(settings.instagram_url ?? "");
     setWhatsappUrl(settings.whatsapp_url ?? "");
     setContactEmail(settings.contact_email ?? "");
+    setTiktokUrl(settings.tiktok_url ?? "");
+    setTelegramUrl(settings.telegram_url ?? "");
+    setTwitterUrl(settings.twitter_url ?? "");
   }, [settings]);
 
   if (loading) return null;
@@ -172,6 +178,9 @@ function AdminSettingsPage() {
         instagram_url: instagramUrl.trim() || null,
         whatsapp_url: whatsappUrl.trim() || null,
         contact_email: contactEmail.trim() || null,
+        tiktok_url: tiktokUrl.trim() || null,
+        telegram_url: telegramUrl.trim() || null,
+        twitter_url: twitterUrl.trim() || null,
         updated_by: user?.id ?? null,
       })
       .eq("singleton", true);
