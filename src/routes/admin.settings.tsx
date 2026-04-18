@@ -8,6 +8,7 @@ import {
   Upload,
   Search,
   ExternalLink,
+  Share2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -48,6 +49,11 @@ function AdminSettingsPage() {
   const [twitterHandle, setTwitterHandle] = useState("");
   const [primaryColor, setPrimaryColor] = useState<string>("#22c55e");
 
+  // Social links
+  const [facebookUrl, setFacebookUrl] = useState("");
+  const [instagramUrl, setInstagramUrl] = useState("");
+  const [whatsappUrl, setWhatsappUrl] = useState("");
+
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingFav, setUploadingFav] = useState(false);
@@ -75,6 +81,9 @@ function AdminSettingsPage() {
     setOgImageUrl(settings.og_image_url);
     setTwitterHandle(settings.twitter_handle ?? "");
     setPrimaryColor(settings.primary_color ?? "#22c55e");
+    setFacebookUrl(settings.facebook_url ?? "");
+    setInstagramUrl(settings.instagram_url ?? "");
+    setWhatsappUrl(settings.whatsapp_url ?? "");
   }, [settings]);
 
   if (loading) return null;
