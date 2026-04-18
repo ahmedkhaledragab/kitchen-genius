@@ -1,7 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Pencil, Plus, Trash2, Tags, ChefHat } from "lucide-react";
+import { Loader2, Pencil, Plus, Trash2, Tags, ChefHat, GripVertical } from "lucide-react";
 import { toast } from "sonner";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -39,11 +55,21 @@ type CategoryRow = {
   slug: string;
   name_ar: string;
   name_en: string;
+  icon: string | null;
   sort_order: number;
   is_active: boolean;
 };
 
 type TableName = "ingredient_categories" | "recipe_cuisines";
+
+const SUGGESTED_EMOJIS = [
+  "🥬","🥩","🥛","🌾","🍅","🥕","🧄","🧅","🌶️","🌽","🥔","🍆","🥒","🥦","🥑",
+  "🍎","🍌","🍇","🍊","🍓","🍋","🥭","🍍","🥥","🍑",
+  "🍞","🧀","🥚","🍳","🥓","🍗","🍖","🐟","🦐","🦀",
+  "🍝","🍕","🍔","🌮","🌯","🥗","🍜","🍲","🍛","🍱",
+  "🍰","🧁","🍪","🍩","🍫","🍯","☕","🍵",
+  "🇪🇬","🇮🇹","🇨🇳","🇯🇵","🇮🇳","🇲🇽","🇫🇷","🇹🇷","🇱🇧","🇸🇦",
+];
 
 function slugify(s: string) {
   return s
@@ -69,8 +95,8 @@ function AdminCategoriesPage() {
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {isAr
-              ? "تصنيفات المكونات وتصنيفات الوصفات في مكان واحد."
-              : "Manage ingredient categories and recipe cuisines in one place."}
+              ? "اسحبي وأفلتي لإعادة الترتيب 💕"
+              : "Drag and drop to reorder."}
           </p>
         </div>
       </div>
@@ -125,6 +151,11 @@ function CategoryManager({
   const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState<CategoryRow | null>(null);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+  );
+
   async function load() {
     setLoading(true);
     const { data, error } = await supabase
@@ -146,6 +177,31 @@ function CategoryManager({
   }, [table]);
 
   const empty = useMemo(() => !loading && (rows?.length ?? 0) === 0, [loading, rows]);
+
+  async function handleDragEnd(e: DragEndEvent) {
+    const { active, over } = e;
+    if (!over || active.id === over.id || !rows) return;
+    const oldIdx = rows.findIndex((r) => r.id === active.id);
+    const newIdx = rows.findIndex((r) => r.id === over.id);
+    if (oldIdx < 0 || newIdx < 0) return;
+
+    const reordered = arrayMove(rows, oldIdx, newIdx).map((r, i) => ({
+      ...r,
+      sort_order: i,
+    }));
+    setRows(reordered); // optimistic
+
+    // Persist new sort_order for each row
+    const updates = reordered.map((r) =>
+      supabase.from(table).update({ sort_order: r.sort_order }).eq("id", r.id),
+    );
+    const results = await Promise.all(updates);
+    const failed = results.find((r) => r.error);
+    if (failed?.error) {
+      toast.error(isAr ? "ما قدرناش نحفظ الترتيب 💔" : "Couldn't save order");
+      load();
+    }
+  }
 
   return (
     <Card className="rounded-3xl p-4 sm:p-5">
@@ -172,56 +228,35 @@ function CategoryManager({
           {isAr ? "ما فيش حاجة لسه — ابدأي بإضافة صنف." : "Nothing yet — add your first one."}
         </div>
       ) : (
-        <ul className="divide-y divide-border/60">
-          {rows!.map((r) => (
-            <li
-              key={r.id}
-              className="flex items-center gap-3 py-2.5"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="truncate text-sm font-bold">
-                    {isAr ? r.name_ar : r.name_en}
-                  </p>
-                  {!r.is_active && (
-                    <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                      {isAr ? "موقوف" : "inactive"}
-                    </span>
-                  )}
-                </div>
-                <p className="truncate text-xs text-muted-foreground">
-                  {isAr ? r.name_en : r.name_ar} · {r.slug} · #{r.sort_order}
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-full"
-                onClick={() => setEditing(r)}
-                aria-label="edit"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-full text-destructive hover:text-destructive"
-                onClick={() => setDeleting(r)}
-                aria-label="delete"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </li>
-          ))}
-        </ul>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={rows!.map((r) => r.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <ul className="divide-y divide-border/60">
+              {rows!.map((r) => (
+                <SortableRow
+                  key={r.id}
+                  row={r}
+                  isAr={isAr}
+                  onEdit={() => setEditing(r)}
+                  onDelete={() => setDeleting(r)}
+                />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
       )}
 
       {(adding || editing) && (
         <CategoryDialog
           table={table}
           row={editing}
+          rowsCount={rows?.length ?? 0}
           onClose={() => {
             setAdding(false);
             setEditing(null);
@@ -276,14 +311,93 @@ function CategoryManager({
   );
 }
 
+function SortableRow({
+  row,
+  isAr,
+  onEdit,
+  onDelete,
+}: {
+  row: CategoryRow;
+  isAr: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: row.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-2 py-2.5"
+    >
+      <button
+        type="button"
+        className="touch-none rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+        aria-label="drag"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-lg">
+        {row.icon || "🏷️"}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="truncate text-sm font-bold">
+            {isAr ? row.name_ar : row.name_en}
+          </p>
+          {!row.is_active && (
+            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground">
+              {isAr ? "موقوف" : "inactive"}
+            </span>
+          )}
+        </div>
+        <p className="truncate text-xs text-muted-foreground">
+          {isAr ? row.name_en : row.name_ar} · {row.slug}
+        </p>
+      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 rounded-full"
+        onClick={onEdit}
+        aria-label="edit"
+      >
+        <Pencil className="h-4 w-4" />
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 rounded-full text-destructive hover:text-destructive"
+        onClick={onDelete}
+        aria-label="delete"
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    </li>
+  );
+}
+
 function CategoryDialog({
   table,
   row,
+  rowsCount,
   onClose,
   onSaved,
 }: {
   table: TableName;
   row: CategoryRow | null;
+  rowsCount: number;
   onClose: () => void;
   onSaved: () => void;
 }) {
@@ -294,7 +408,7 @@ function CategoryDialog({
   const [nameAr, setNameAr] = useState(row?.name_ar ?? "");
   const [nameEn, setNameEn] = useState(row?.name_en ?? "");
   const [slug, setSlug] = useState(row?.slug ?? "");
-  const [sortOrder, setSortOrder] = useState(row?.sort_order ?? 0);
+  const [icon, setIcon] = useState(row?.icon ?? "");
   const [isActive, setIsActive] = useState(row?.is_active ?? true);
   const [saving, setSaving] = useState(false);
 
@@ -314,8 +428,9 @@ function CategoryDialog({
       name_ar: nameAr.trim(),
       name_en: nameEn.trim(),
       slug: slugify(slug),
-      sort_order: Number(sortOrder) || 0,
+      icon: icon.trim() || null,
       is_active: isActive,
+      ...(isEdit ? {} : { sort_order: rowsCount }),
     };
     const { error } = isEdit
       ? await supabase.from(table).update(payload).eq("id", row!.id)
@@ -339,7 +454,7 @@ function CategoryDialog({
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="rounded-3xl">
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-3xl">
         <DialogHeader>
           <DialogTitle>
             {isEdit
@@ -353,6 +468,37 @@ function CategoryDialog({
         </DialogHeader>
 
         <div className="grid gap-3 py-2">
+          <div className="grid gap-1.5">
+            <Label>{isAr ? "الأيقونة" : "Icon"}</Label>
+            <div className="flex items-center gap-2">
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary/10 text-2xl">
+                {icon || "🏷️"}
+              </span>
+              <Input
+                value={icon}
+                onChange={(e) => setIcon(e.target.value)}
+                placeholder="🥬"
+                maxLength={4}
+                dir="ltr"
+                className="text-center text-lg"
+              />
+            </div>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {SUGGESTED_EMOJIS.map((e) => (
+                <button
+                  key={e}
+                  type="button"
+                  onClick={() => setIcon(e)}
+                  className={`grid h-8 w-8 place-items-center rounded-lg text-base hover:bg-muted ${
+                    icon === e ? "bg-primary/15 ring-1 ring-primary" : ""
+                  }`}
+                >
+                  {e}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="grid gap-1.5">
             <Label htmlFor="name_ar">{isAr ? "الاسم بالعربي" : "Arabic name"}</Label>
             <Input
@@ -381,26 +527,11 @@ function CategoryDialog({
               placeholder="vegetables"
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="grid gap-1.5">
-              <Label htmlFor="sort">{isAr ? "الترتيب" : "Sort order"}</Label>
-              <Input
-                id="sort"
-                type="number"
-                value={sortOrder}
-                onChange={(e) => setSortOrder(Number(e.target.value))}
-              />
-            </div>
-            <div className="flex items-end gap-2 pb-1.5">
-              <Switch
-                id="active"
-                checked={isActive}
-                onCheckedChange={setIsActive}
-              />
-              <Label htmlFor="active" className="cursor-pointer">
-                {isAr ? "نشط" : "Active"}
-              </Label>
-            </div>
+          <div className="flex items-center gap-2">
+            <Switch id="active" checked={isActive} onCheckedChange={setIsActive} />
+            <Label htmlFor="active" className="cursor-pointer">
+              {isAr ? "نشط" : "Active"}
+            </Label>
           </div>
         </div>
 

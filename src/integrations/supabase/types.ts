@@ -49,6 +49,7 @@ export type Database = {
       ingredient_categories: {
         Row: {
           created_at: string
+          icon: string | null
           id: string
           is_active: boolean
           name_ar: string
@@ -59,6 +60,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          icon?: string | null
           id?: string
           is_active?: boolean
           name_ar: string
@@ -69,6 +71,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          icon?: string | null
           id?: string
           is_active?: boolean
           name_ar?: string
@@ -151,6 +154,7 @@ export type Database = {
       recipe_cuisines: {
         Row: {
           created_at: string
+          icon: string | null
           id: string
           is_active: boolean
           name_ar: string
@@ -161,6 +165,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          icon?: string | null
           id?: string
           is_active?: boolean
           name_ar: string
@@ -171,6 +176,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          icon?: string | null
           id?: string
           is_active?: boolean
           name_ar?: string
