@@ -74,6 +74,15 @@ export function RecipeDetail({ recipe, onClose, onToggleFavorite, isFavorite, ca
                 <Flame className="me-1 h-3 w-3" />
                 {diffLabel}
               </Badge>
+              {cuisineLabel && (
+                <Badge
+                  variant="secondary"
+                  className="rounded-full bg-secondary text-secondary-foreground border-0"
+                >
+                  {cuisine?.icon ? <span className="me-1">{cuisine.icon}</span> : null}
+                  {cuisineLabel}
+                </Badge>
+              )}
               {recipe.tags?.slice(0, 4).map((x) => (
                 <Badge key={x} variant="outline" className="rounded-full border-border/70 text-muted-foreground">
                   #{x}
