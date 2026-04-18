@@ -79,14 +79,9 @@ export function Footer() {
             <span className="text-muted-foreground">
               {lang === "ar" ? "بواسطة" : "by"}
             </span>
-            <a
-              href="https://www.instagram.com/naria.oo"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-extrabold text-foreground underline-offset-4 transition hover:underline"
-            >
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text font-extrabold text-transparent">
               Manar Elsheikh
-            </a>
+            </span>
           </div>
 
           {hasAnySocial && (
