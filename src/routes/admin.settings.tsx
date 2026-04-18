@@ -568,6 +568,39 @@ function AdminSettingsPage() {
         </div>
       </Card>
 
+      {/* Contact email */}
+      <Card className="mt-4 rounded-3xl border-border/60 p-5">
+        <div className="flex items-center gap-2">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+            <Mail className="h-4 w-4" />
+          </span>
+          <div>
+            <p className="text-sm font-bold">
+              {lang === "ar" ? "البريد الإلكتروني للتواصل" : "Contact email"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {lang === "ar"
+                ? "هيظهر في صفحة /contact كأيقونة إيميل قابلة للضغط."
+                : "Shown on the /contact page as a clickable email channel."}
+            </p>
+          </div>
+        </div>
+        <div className="mt-4">
+          <Label htmlFor="contact_email" className="text-sm font-bold">
+            {lang === "ar" ? "الإيميل" : "Email"}
+          </Label>
+          <Input
+            id="contact_email"
+            type="email"
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
+            placeholder="hello@example.com"
+            className="mt-1.5 max-w-md rounded-xl"
+            dir="ltr"
+          />
+        </div>
+      </Card>
+
       {/* Social media links */}
       <Card className="mt-4 rounded-3xl border-border/60 p-5">
         <div className="flex items-center gap-2">
