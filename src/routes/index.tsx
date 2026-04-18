@@ -292,6 +292,7 @@ function HomePage() {
                 onClick={() => removeIngredient(ing)}
                 className="group inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/20"
               >
+                {iconByName[ing] && <span aria-hidden>{iconByName[ing]}</span>}
                 {ing}
                 <X className="h-3 w-3 opacity-60 group-hover:opacity-100" />
               </button>
@@ -308,9 +309,14 @@ function HomePage() {
                   key={s}
                   type="button"
                   onClick={() => addIngredient(s)}
-                  className="rounded-full border border-dashed border-border bg-background px-3 py-1 text-xs text-muted-foreground transition hover:border-primary hover:bg-primary/5 hover:text-primary"
+                  className="inline-flex items-center gap-1 rounded-full border border-dashed border-border bg-background px-3 py-1 text-xs text-muted-foreground transition hover:border-primary hover:bg-primary/5 hover:text-primary"
                 >
-                  + {s}
+                  {iconByName[s] ? (
+                    <span aria-hidden>{iconByName[s]}</span>
+                  ) : (
+                    <span aria-hidden>+</span>
+                  )}
+                  {s}
                 </button>
               ))}
             </div>
