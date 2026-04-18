@@ -49,6 +49,7 @@ function HomePage() {
   const { user } = useAuth();
   const { isFavorite, toggle } = useFavorites();
   const navigate = useNavigate();
+  const { content: c } = usePageContent("home");
 
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [excluded, setExcluded] = useState<string[]>([]);
