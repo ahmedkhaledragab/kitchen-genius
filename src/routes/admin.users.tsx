@@ -34,8 +34,6 @@ interface AdminUserRow {
   created_at: string;
   recipes_today: number;
   recipes_limit: number;
-  fridge_today: number;
-  fridge_limit: number;
 }
 
 function AdminUsersPage() {
@@ -47,7 +45,7 @@ function AdminUsersPage() {
   const [busy, setBusy] = useState(false);
   const [query, setQuery] = useState("");
 
-  const [editing, setEditing] = useState<{ user: AdminUserRow; feature: "generate_recipes" | "detect_ingredients" } | null>(null);
+  const [editing, setEditing] = useState<{ user: AdminUserRow } | null>(null);
   const [newLimit, setNewLimit] = useState<number>(10);
 
   const [createOpen, setCreateOpen] = useState(false);
@@ -123,16 +121,16 @@ function AdminUsersPage() {
     }
   };
 
-  const openLimitEditor = (u: AdminUserRow, feature: "generate_recipes" | "detect_ingredients") => {
-    setEditing({ user: u, feature });
-    setNewLimit(feature === "generate_recipes" ? u.recipes_limit : u.fridge_limit);
+  const openLimitEditor = (u: AdminUserRow) => {
+    setEditing({ user: u });
+    setNewLimit(u.recipes_limit);
   };
 
   const saveLimit = async () => {
     if (!editing) return;
     const { error } = await supabase.rpc("admin_set_user_limit", {
       _user_id: editing.user.id,
-      _feature: editing.feature,
+      _feature: "generate_recipes",
       _new_limit: Math.max(0, Math.floor(newLimit || 0)),
     });
     if (error) toast.error(error.message);
@@ -247,18 +245,10 @@ function AdminUsersPage() {
                     <div className="mt-2 flex flex-wrap gap-2 text-xs">
                       <button
                         type="button"
-                        onClick={() => openLimitEditor(u, "generate_recipes")}
+                        onClick={() => openLimitEditor(u)}
                         className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background px-2 py-1 hover:bg-accent"
                       >
                         🍳 {t.admin.users.recipes}: <b>{u.recipes_today}</b>/{u.recipes_limit}
-                        <Pencil className="h-3 w-3 text-muted-foreground" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => openLimitEditor(u, "detect_ingredients")}
-                        className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background px-2 py-1 hover:bg-accent"
-                      >
-                        📸 {t.admin.users.fridge}: <b>{u.fridge_today}</b>/{u.fridge_limit}
                         <Pencil className="h-3 w-3 text-muted-foreground" />
                       </button>
                     </div>
@@ -320,11 +310,7 @@ function AdminUsersPage() {
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent className="rounded-2xl">
           <DialogHeader>
-            <DialogTitle>
-              {editing?.feature === "generate_recipes"
-                ? t.admin.users.recipesLimit
-                : t.admin.users.fridgeLimit}
-            </DialogTitle>
+            <DialogTitle>{t.admin.users.recipesLimit}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">

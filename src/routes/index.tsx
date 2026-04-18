@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Sparkles, X, Image as ImageIcon, Loader2, ChefHat } from "lucide-react";
+import { Plus, Sparkles, X, Loader2, ChefHat } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/hooks/useFavorites";
-import { generateRecipes, detectIngredientsFromImage } from "@/lib/api";
+import { generateRecipes } from "@/lib/api";
 import { COMMON_INGREDIENTS_AR, COMMON_INGREDIENTS_EN } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import type { Recipe } from "@/lib/recipe";
@@ -52,8 +52,6 @@ function HomePage() {
   const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[] | null>(null);
   const [openRecipe, setOpenRecipe] = useState<Recipe | null>(null);
-  const [imageBusy, setImageBusy] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
 
   // Live ingredient suggestions from the admin-managed catalog (with fallback
   // to the hardcoded list if the catalog is empty or fails to load).
@@ -186,46 +184,6 @@ function HomePage() {
     }, 100);
   };
 
-  const handleImage = async (file: File) => {
-    if (!user) {
-      toast.info(
-        lang === "ar"
-          ? "سجّلي دخول يا حلوة وهنبص على ثلاجتك سوا 💕📸"
-          : "Sign in first sweetie, then we'll peek inside your fridge together 💕📸"
-      );
-      navigate({ to: "/auth" });
-      return;
-    }
-    setImageBusy(true);
-    try {
-      const reader = new FileReader();
-      const dataUrl: string = await new Promise((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-      const res = await detectIngredientsFromImage({ imageBase64: dataUrl, language: lang });
-      if ("error" in res) {
-        toast.error(t.common.error);
-      } else {
-        const fresh = (res.ingredients || []).filter(
-          (i) => !ingredients.includes(i) && !excluded.includes(i),
-        );
-        setIngredients((prev) => [...prev, ...fresh]);
-        toast.success(
-          fresh.length > 0
-            ? lang === "ar"
-              ? `لقّينا ${fresh.length} مكونات في ثلاجتك 💖`
-              : `Found ${fresh.length} ingredients in your fridge 💖`
-            : lang === "ar"
-              ? "ملقيناش مكونات جديدة 🌸"
-              : "No new ingredients found 🌸"
-        );
-      }
-    } finally {
-      setImageBusy(false);
-    }
-  };
 
   const handleToggleFavorite = (r: Recipe) => {
     if (!user) {
