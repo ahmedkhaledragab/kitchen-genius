@@ -677,6 +677,45 @@ function AdminSettingsPage() {
                 : "Enter a phone number in international format (e.g. +201234567890) or a full community link. Leave empty to hide the icon."}
             </p>
           </div>
+          <div>
+            <Label htmlFor="tk" className="text-sm font-bold">
+              TikTok
+            </Label>
+            <Input
+              id="tk"
+              value={tiktokUrl}
+              onChange={(e) => setTiktokUrl(e.target.value)}
+              placeholder="https://www.tiktok.com/@yourhandle"
+              className="mt-1.5 rounded-xl"
+              dir="ltr"
+            />
+          </div>
+          <div>
+            <Label htmlFor="tg" className="text-sm font-bold">
+              Telegram
+            </Label>
+            <Input
+              id="tg"
+              value={telegramUrl}
+              onChange={(e) => setTelegramUrl(e.target.value)}
+              placeholder="https://t.me/yourhandle"
+              className="mt-1.5 rounded-xl"
+              dir="ltr"
+            />
+          </div>
+          <div>
+            <Label htmlFor="tw_url" className="text-sm font-bold">
+              Twitter / X
+            </Label>
+            <Input
+              id="tw_url"
+              value={twitterUrl}
+              onChange={(e) => setTwitterUrl(e.target.value)}
+              placeholder="https://x.com/yourhandle"
+              className="mt-1.5 rounded-xl"
+              dir="ltr"
+            />
+          </div>
         </div>
       </Card>
 
