@@ -10,6 +10,8 @@ import {
   Loader2,
   Phone,
   Globe,
+  Music2,
+  Twitter,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLang } from "@/contexts/LanguageContext";
@@ -49,6 +51,12 @@ function pickIcon(title?: string) {
   if (t.includes("insta")) return { Icon: Instagram, color: "text-[#d62976] bg-[#d62976]/10" };
   if (t.includes("whats") || t.includes("واتس"))
     return { Icon: MessageCircle, color: "text-[#25D366] bg-[#25D366]/10" };
+  if (t.includes("tiktok") || t.includes("تيك"))
+    return { Icon: Music2, color: "text-foreground bg-foreground/10" };
+  if (t.includes("telegram") || t.includes("تيلي") || t.includes("تليجرام"))
+    return { Icon: Send, color: "text-[#229ED9] bg-[#229ED9]/10" };
+  if (t.includes("twitter") || t.includes("x.com") || t === "x" || t.includes("تويتر"))
+    return { Icon: Twitter, color: "text-foreground bg-foreground/10" };
   if (t.includes("mail") || t.includes("إيميل") || t.includes("بريد"))
     return { Icon: Mail, color: "text-primary bg-primary/10" };
   if (t.includes("phone") || t.includes("tel") || t.includes("هاتف") || t.includes("تليفون"))
@@ -98,6 +106,9 @@ function ContactPage() {
   const facebookUrl = settings.facebook_url?.trim() || "";
   const instagramUrl = settings.instagram_url?.trim() || "";
   const whatsappHref = settings.whatsapp_url ? buildWhatsAppHref(settings.whatsapp_url) : null;
+  const tiktokUrl = settings.tiktok_url?.trim() || "";
+  const telegramUrl = settings.telegram_url?.trim() || "";
+  const twitterUrl = settings.twitter_url?.trim() || "";
 
   const autoChannels: PageItem[] = [
     { title: ar ? "الإيميل" : "Email", desc: contactEmail, icon: `mailto:${contactEmail}` },
@@ -115,6 +126,21 @@ function ContactPage() {
             icon: whatsappHref,
           },
         ]
+      : []),
+    ...(tiktokUrl
+      ? [{ title: "TikTok", desc: prettyHandle(tiktokUrl), icon: tiktokUrl }]
+      : []),
+    ...(telegramUrl
+      ? [
+          {
+            title: ar ? "تيليجرام" : "Telegram",
+            desc: prettyHandle(telegramUrl),
+            icon: telegramUrl,
+          },
+        ]
+      : []),
+    ...(twitterUrl
+      ? [{ title: "Twitter", desc: prettyHandle(twitterUrl), icon: twitterUrl }]
       : []),
   ];
 

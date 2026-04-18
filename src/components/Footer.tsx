@@ -1,5 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, Sparkles, Facebook, Instagram, MessageCircle } from "lucide-react";
+import {
+  Heart,
+  Sparkles,
+  Facebook,
+  Instagram,
+  MessageCircle,
+  Music2,
+  Send,
+  Twitter,
+} from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
@@ -26,6 +35,12 @@ export function Footer() {
   const facebookHref = settings.facebook_url?.trim() || null;
   const instagramHref = settings.instagram_url?.trim() || null;
   const whatsappHref = settings.whatsapp_url ? buildWhatsAppHref(settings.whatsapp_url) : null;
+  const tiktokHref = settings.tiktok_url?.trim() || null;
+  const telegramHref = settings.telegram_url?.trim() || null;
+  const twitterHref = settings.twitter_url?.trim() || null;
+
+  const hasAnySocial =
+    facebookHref || instagramHref || whatsappHref || tiktokHref || telegramHref || twitterHref;
 
   return (
     <footer className="relative mt-12 border-t border-border/60 bg-gradient-to-br from-primary/5 via-background to-accent/5">
@@ -54,7 +69,7 @@ export function Footer() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           <div className="group inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-3.5 py-1.5 text-xs font-semibold shadow-sm backdrop-blur">
             <Sparkles className="h-3.5 w-3.5 text-primary transition-transform group-hover:rotate-12" />
             <span className="text-muted-foreground">
@@ -69,8 +84,8 @@ export function Footer() {
             </span>
           </div>
 
-          {(facebookHref || instagramHref || whatsappHref) && (
-            <div className="flex items-center gap-1.5">
+          {hasAnySocial && (
+            <div className="flex flex-wrap items-center justify-center gap-1.5">
               {facebookHref && (
                 <a
                   href={facebookHref}
@@ -104,6 +119,42 @@ export function Footer() {
                   className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-[#25D366] text-white shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <MessageCircle className="h-4 w-4" />
+                </a>
+              )}
+
+              {tiktokHref && (
+                <a
+                  href={tiktokHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="TikTok"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-black text-white shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <Music2 className="h-4 w-4" />
+                </a>
+              )}
+
+              {telegramHref && (
+                <a
+                  href={telegramHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Telegram"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-[#229ED9] text-white shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <Send className="h-4 w-4" />
+                </a>
+              )}
+
+              {twitterHref && (
+                <a
+                  href={twitterHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Twitter / X"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-black text-white shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <Twitter className="h-4 w-4" />
                 </a>
               )}
             </div>
