@@ -13,6 +13,7 @@ import {
   Star,
   Mail,
   Inbox,
+  Home,
 } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -78,6 +79,11 @@ function AdminLayout() {
       to: "/admin/users" as const,
       icon: Users,
       label: lang === "ar" ? "المستخدمين" : "Users",
+    },
+    {
+      to: "/admin/content/home" as const,
+      icon: Home,
+      label: lang === "ar" ? "الصفحة الرئيسية" : "Home page",
     },
     {
       to: "/admin/content/about" as const,

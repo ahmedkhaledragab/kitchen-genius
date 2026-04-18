@@ -17,6 +17,12 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Recipe } from "@/lib/recipe";
 import { RecipeCard } from "@/components/RecipeCard";
 import { RecipeDetail } from "@/components/RecipeDetail";
+import { usePageContent } from "@/hooks/usePageContent";
+
+const pick = (custom: string | undefined, fallback: string): string => {
+  const v = (custom ?? "").trim();
+  return v.length > 0 ? v : fallback;
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -43,6 +49,7 @@ function HomePage() {
   const { user } = useAuth();
   const { isFavorite, toggle } = useFavorites();
   const navigate = useNavigate();
+  const { content: c } = usePageContent("home");
 
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [excluded, setExcluded] = useState<string[]>([]);
@@ -153,7 +160,7 @@ function HomePage() {
 
   const handleCook = async () => {
     if (ingredients.length === 0) {
-      toast.error(t.home.noIngredients);
+      toast.error(pick(c.home_no_ingredients, t.home.noIngredients));
       return;
     }
     if (!user) {
@@ -204,25 +211,25 @@ function HomePage() {
         >
           <div className="inline-flex items-center gap-2 rounded-full bg-card/70 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
             <Sparkles className="h-3.5 w-3.5" />
-            مدعوم بالذكاء الاصطناعي
+            {pick(c.hero_badge, lang === "ar" ? "مدعوم بالذكاء الاصطناعي" : "AI-powered")}
           </div>
           <h1 className="mt-3 text-3xl font-black leading-tight sm:text-5xl">
-            <span className="gradient-text">{t.home.heroTitle}</span>
+            <span className="gradient-text">{pick(c.hero_title, t.home.heroTitle)}</span>
           </h1>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
-            {t.home.heroSub}
+            {pick(c.hero_sub, t.home.heroSub)}
           </p>
         </motion.div>
       </section>
 
       {/* Ingredients input */}
       <Card className="mt-6 rounded-3xl border-border/60 bg-card p-5 shadow-card">
-        <label className="text-sm font-bold">{t.home.ingredientsLabel}</label>
+        <label className="text-sm font-bold">{pick(c.home_ingredients_label, t.home.ingredientsLabel)}</label>
         <div className="mt-2 flex gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={t.home.ingredientsPlaceholder}
+            placeholder={pick(c.home_ingredients_placeholder, t.home.ingredientsPlaceholder)}
             className="rounded-xl"
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -237,7 +244,7 @@ function HomePage() {
             className="rounded-xl gradient-primary text-primary-foreground hover:opacity-95"
           >
             <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">{t.home.addBtn}</span>
+            <span className="hidden sm:inline">{pick(c.home_add_btn, t.home.addBtn)}</span>
           </Button>
         </div>
 
@@ -260,7 +267,7 @@ function HomePage() {
 
         {suggestions.length > 0 && (
           <div className="mt-4">
-            <p className="text-xs font-semibold text-muted-foreground">{t.home.suggestions}</p>
+            <p className="text-xs font-semibold text-muted-foreground">{pick(c.home_suggestions_title, t.home.suggestions)}</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {suggestions.map((s) => (
                 <button
@@ -283,12 +290,12 @@ function HomePage() {
 
         {/* Exclude */}
         <div className="mt-5">
-          <label className="text-sm font-bold">{t.home.excludeLabel}</label>
+          <label className="text-sm font-bold">{pick(c.home_exclude_label, t.home.excludeLabel)}</label>
           <div className="mt-2 flex gap-2">
             <Input
               value={excludeInput}
               onChange={(e) => setExcludeInput(e.target.value)}
-              placeholder={t.home.excludePlaceholder}
+              placeholder={pick(c.home_exclude_placeholder, t.home.excludePlaceholder)}
               className="rounded-xl"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -325,10 +332,20 @@ function HomePage() {
 
         {/* Filters */}
         <div className="mt-5">
-          <p className="text-sm font-bold">{t.home.filters}</p>
+          <p className="text-sm font-bold">{pick(c.home_filters_title, t.home.filters)}</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {FILTERS.map((f) => {
               const active = activeFilters.includes(f.key);
+              const customByKey: Record<string, string | undefined> = {
+                quick: c.home_filter_quick,
+                budget: c.home_filter_budget,
+                healthy: c.home_filter_healthy,
+                arabic: c.home_filter_arab,
+              };
+              const label = pick(
+                customByKey[f.key],
+                t.home[f.labelKey as keyof typeof t.home] as string,
+              );
               return (
                 <button
                   key={f.key}
@@ -340,7 +357,7 @@ function HomePage() {
                       : "border-border bg-background text-muted-foreground hover:border-primary hover:text-primary"
                   }`}
                 >
-                  {t.home[f.labelKey as keyof typeof t.home]}
+                  {label}
                 </button>
               );
             })}
@@ -357,12 +374,12 @@ function HomePage() {
           {loading ? (
             <>
               <Loader2 className="me-1 h-5 w-5 animate-spin" />
-              {t.home.generating}
+              {pick(c.home_generating, t.home.generating)}
             </>
           ) : (
             <>
               <ChefHat className="me-1 h-5 w-5" />
-              {t.home.cookBtn}
+              {pick(c.home_cook_btn, t.home.cookBtn)}
             </>
           )}
         </Button>
@@ -372,13 +389,13 @@ function HomePage() {
       <section id="results" className="mt-8">
         {recipes && recipes.length === 0 && (
           <p className="rounded-2xl bg-muted p-6 text-center text-sm text-muted-foreground">
-            {t.home.noResults}
+            {pick(c.home_no_results, t.home.noResults)}
           </p>
         )}
         {recipes && recipes.length > 0 && (
           <>
             <div className="mb-3 flex items-center gap-2">
-              <h2 className="text-lg font-extrabold">{t.home.results}</h2>
+              <h2 className="text-lg font-extrabold">{pick(c.home_results_title, t.home.results)}</h2>
               <Badge variant="secondary" className="rounded-full bg-primary/10 text-primary border-0">
                 {recipes.length}
               </Badge>
