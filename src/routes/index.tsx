@@ -336,6 +336,16 @@ function HomePage() {
           <div className="mt-2 flex flex-wrap gap-1.5">
             {FILTERS.map((f) => {
               const active = activeFilters.includes(f.key);
+              const customByKey: Record<string, string | undefined> = {
+                quick: c.home_filter_quick,
+                budget: c.home_filter_budget,
+                healthy: c.home_filter_healthy,
+                arabic: c.home_filter_arab,
+              };
+              const label = pick(
+                customByKey[f.key],
+                t.home[f.labelKey as keyof typeof t.home] as string,
+              );
               return (
                 <button
                   key={f.key}
@@ -347,7 +357,7 @@ function HomePage() {
                       : "border-border bg-background text-muted-foreground hover:border-primary hover:text-primary"
                   }`}
                 >
-                  {t.home[f.labelKey as keyof typeof t.home]}
+                  {label}
                 </button>
               );
             })}
