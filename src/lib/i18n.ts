@@ -12,6 +12,9 @@ const arDict = {
       login: "تسجيل دخول",
       logout: "خروج",
       signup: "حساب جديد",
+      about: "من نحن",
+      features: "مميزاتنا",
+      contact: "تواصلي معانا",
     },
     home: {
       heroTitle: "من اللي عندك؟ 👀",
@@ -251,6 +254,9 @@ const enDict = {
       login: "Sign in",
       logout: "Sign out",
       signup: "Sign up",
+      about: "About",
+      features: "Features",
+      contact: "Contact",
     },
     home: {
       heroTitle: "What's in your kitchen? 👀",
