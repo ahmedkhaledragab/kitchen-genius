@@ -106,6 +106,9 @@ function ContactPage() {
   const facebookUrl = settings.facebook_url?.trim() || "";
   const instagramUrl = settings.instagram_url?.trim() || "";
   const whatsappHref = settings.whatsapp_url ? buildWhatsAppHref(settings.whatsapp_url) : null;
+  const tiktokUrl = settings.tiktok_url?.trim() || "";
+  const telegramUrl = settings.telegram_url?.trim() || "";
+  const twitterUrl = settings.twitter_url?.trim() || "";
 
   const autoChannels: PageItem[] = [
     { title: ar ? "الإيميل" : "Email", desc: contactEmail, icon: `mailto:${contactEmail}` },
@@ -123,6 +126,21 @@ function ContactPage() {
             icon: whatsappHref,
           },
         ]
+      : []),
+    ...(tiktokUrl
+      ? [{ title: "TikTok", desc: prettyHandle(tiktokUrl), icon: tiktokUrl }]
+      : []),
+    ...(telegramUrl
+      ? [
+          {
+            title: ar ? "تيليجرام" : "Telegram",
+            desc: prettyHandle(telegramUrl),
+            icon: telegramUrl,
+          },
+        ]
+      : []),
+    ...(twitterUrl
+      ? [{ title: "Twitter", desc: prettyHandle(twitterUrl), icon: twitterUrl }]
       : []),
   ];
 
