@@ -59,20 +59,44 @@ function HomePage() {
   // to the hardcoded list if the catalog is empty or fails to load).
   const [catalogAr, setCatalogAr] = useState<string[]>([]);
   const [catalogEn, setCatalogEn] = useState<string[]>([]);
+  // Map: ingredient name (ar or en) -> category icon emoji.
+  // Used to prefix suggestion chips with their food-group emoji 🥬🥚🥩 …
+  const [iconByName, setIconByName] = useState<Record<string, string>>({});
 
   useEffect(() => {
     let cancelled = false;
-    supabase
-      .from("ingredients_catalog")
-      .select("name_ar, name_en")
-      .eq("is_active", true)
-      .order("sort_order", { ascending: true })
-      .limit(500)
-      .then(({ data }) => {
-        if (cancelled || !data) return;
-        setCatalogAr(data.map((d) => d.name_ar));
-        setCatalogEn(data.map((d) => d.name_en));
-      });
+    (async () => {
+      const [{ data: ings }, { data: cats }] = await Promise.all([
+        supabase
+          .from("ingredients_catalog")
+          .select("name_ar, name_en, category")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true })
+          .limit(500),
+        supabase
+          .from("ingredient_categories")
+          .select("slug, icon")
+          .eq("is_active", true),
+      ]);
+      if (cancelled) return;
+      if (ings) {
+        setCatalogAr(ings.map((d) => d.name_ar));
+        setCatalogEn(ings.map((d) => d.name_en));
+      }
+      if (ings && cats) {
+        const iconBySlug: Record<string, string> = {};
+        for (const c of cats) if (c.icon) iconBySlug[c.slug] = c.icon;
+        const map: Record<string, string> = {};
+        for (const i of ings) {
+          const icon = i.category ? iconBySlug[i.category] : undefined;
+          if (icon) {
+            map[i.name_ar] = icon;
+            map[i.name_en] = icon;
+          }
+        }
+        setIconByName(map);
+      }
+    })();
     return () => {
       cancelled = true;
     };
@@ -268,6 +292,7 @@ function HomePage() {
                 onClick={() => removeIngredient(ing)}
                 className="group inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/20"
               >
+                {iconByName[ing] && <span aria-hidden>{iconByName[ing]}</span>}
                 {ing}
                 <X className="h-3 w-3 opacity-60 group-hover:opacity-100" />
               </button>
@@ -284,9 +309,14 @@ function HomePage() {
                   key={s}
                   type="button"
                   onClick={() => addIngredient(s)}
-                  className="rounded-full border border-dashed border-border bg-background px-3 py-1 text-xs text-muted-foreground transition hover:border-primary hover:bg-primary/5 hover:text-primary"
+                  className="inline-flex items-center gap-1 rounded-full border border-dashed border-border bg-background px-3 py-1 text-xs text-muted-foreground transition hover:border-primary hover:bg-primary/5 hover:text-primary"
                 >
-                  + {s}
+                  {iconByName[s] ? (
+                    <span aria-hidden>{iconByName[s]}</span>
+                  ) : (
+                    <span aria-hidden>+</span>
+                  )}
+                  {s}
                 </button>
               ))}
             </div>

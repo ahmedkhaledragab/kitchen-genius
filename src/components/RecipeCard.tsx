@@ -4,6 +4,7 @@ import { useLang } from "@/contexts/LanguageContext";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useCategoriesCatalog } from "@/hooks/useCategoriesCatalog";
 import type { Recipe } from "@/lib/recipe";
 
 interface Props {
@@ -17,7 +18,14 @@ interface Props {
 const difficultyDots = { easy: 1, medium: 2, hard: 3 } as const;
 
 export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite, index = 0 }: Props) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const { bySlug: cuisineBySlug } = useCategoriesCatalog("recipe_cuisines");
+  const cuisine = recipe.cuisine ? cuisineBySlug.get(recipe.cuisine) : undefined;
+  const cuisineLabel = cuisine
+    ? lang === "ar"
+      ? cuisine.name_ar
+      : cuisine.name_en
+    : recipe.cuisine ?? "";
   const dots = difficultyDots[recipe.difficulty] ?? 1;
   const diffLabel =
     recipe.difficulty === "easy"
@@ -117,6 +125,15 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite, index
               ))}
             </span>
           </Badge>
+          {cuisineLabel && (
+            <Badge
+              variant="secondary"
+              className="rounded-full border-0 bg-secondary text-secondary-foreground"
+            >
+              {cuisine?.icon ? <span className="me-1">{cuisine.icon}</span> : null}
+              {cuisineLabel}
+            </Badge>
+          )}
           {recipe.tags?.slice(0, 2).map((tag) => (
             <Badge key={tag} variant="outline" className="rounded-full border-border/70 text-muted-foreground">
               #{tag}
