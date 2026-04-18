@@ -39,6 +39,7 @@ const DEFAULTS: SiteSettings = {
   facebook_url: null,
   instagram_url: null,
   whatsapp_url: null,
+  contact_email: null,
 };
 
 interface SiteSettingsContextValue {
@@ -58,7 +59,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase
       .from("site_settings")
       .select(
-        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color, facebook_url, instagram_url, whatsapp_url"
+        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color, facebook_url, instagram_url, whatsapp_url, contact_email"
       )
       .limit(1)
       .maybeSingle();
@@ -80,6 +81,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
         facebook_url: (data as { facebook_url?: string | null }).facebook_url ?? null,
         instagram_url: (data as { instagram_url?: string | null }).instagram_url ?? null,
         whatsapp_url: (data as { whatsapp_url?: string | null }).whatsapp_url ?? null,
+        contact_email: (data as { contact_email?: string | null }).contact_email ?? null,
       });
     }
     setLoading(false);
