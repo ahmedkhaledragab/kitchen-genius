@@ -111,7 +111,6 @@ function ContactPage() {
   const twitterUrl = settings.twitter_url?.trim() || "";
 
   const autoChannels: PageItem[] = [
-    { title: ar ? "الإيميل" : "Email", desc: contactEmail, icon: `mailto:${contactEmail}` },
     ...(facebookUrl
       ? [{ title: "Facebook", desc: prettyHandle(facebookUrl), icon: facebookUrl }]
       : []),
