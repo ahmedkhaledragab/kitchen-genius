@@ -181,16 +181,68 @@ export function Header() {
                 )}
                 {isAdmin && (
                   <>
+                    <div className="my-2 h-px bg-border" />
+                    <p className="px-3 pb-1 pt-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      {lang === "ar" ? "لوحة الأدمن" : "Admin"}
+                    </p>
                     <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
                       <Link to="/admin">
-                        <Shield className="me-2 h-4 w-4" />
-                        {t.nav.admin}
+                        <LayoutDashboard className="me-2 h-4 w-4" />
+                        {lang === "ar" ? "لوحة التحكم" : "Dashboard"}
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                      <Link to="/admin/recipes">
+                        <ChefHat className="me-2 h-4 w-4" />
+                        {lang === "ar" ? "الوصفات" : "Recipes"}
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                      <Link to="/admin/ingredients">
+                        <Sparkles className="me-2 h-4 w-4" />
+                        {lang === "ar" ? "المكونات" : "Ingredients"}
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                      <Link to="/admin/categories">
+                        <Tags className="me-2 h-4 w-4" />
+                        {lang === "ar" ? "الأصناف" : "Categories"}
                       </Link>
                     </Button>
                     <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
                       <Link to="/admin/users">
-                        <Shield className="me-2 h-4 w-4" />
-                        {lang === "ar" ? "إدارة المستخدمين" : "Users"}
+                        <Users className="me-2 h-4 w-4" />
+                        {lang === "ar" ? "المستخدمين" : "Users"}
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                      <Link to="/admin/content/about">
+                        <Info className="me-2 h-4 w-4" />
+                        {lang === "ar" ? "صفحة من نحن" : "About page"}
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                      <Link to="/admin/content/features">
+                        <Star className="me-2 h-4 w-4" />
+                        {lang === "ar" ? "صفحة المميزات" : "Features page"}
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                      <Link to="/admin/content/contact">
+                        <Mail className="me-2 h-4 w-4" />
+                        {lang === "ar" ? "صفحة تواصل معنا" : "Contact page"}
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                      <Link to="/admin/messages">
+                        <Inbox className="me-2 h-4 w-4" />
+                        {lang === "ar" ? "الرسائل" : "Messages"}
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                      <Link to="/admin/settings">
+                        <SettingsIcon className="me-2 h-4 w-4" />
+                        {lang === "ar" ? "إعدادات الموقع" : "Site settings"}
                       </Link>
                     </Button>
                   </>
