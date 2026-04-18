@@ -26,6 +26,7 @@ import { Route as AdminRecipesRouteImport } from './routes/admin.recipes'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminIngredientsRouteImport } from './routes/admin.ingredients'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminContentHomeRouteImport } from './routes/admin.content.home'
 import { Route as AdminContentFeaturesRouteImport } from './routes/admin.content.features'
 import { Route as AdminContentContactRouteImport } from './routes/admin.content.contact'
 import { Route as AdminContentAboutRouteImport } from './routes/admin.content.about'
@@ -115,6 +116,11 @@ const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminContentHomeRoute = AdminContentHomeRouteImport.update({
+  id: '/content/home',
+  path: '/content/home',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminContentFeaturesRoute = AdminContentFeaturesRouteImport.update({
   id: '/content/features',
   path: '/content/features',
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/admin/content/about': typeof AdminContentAboutRoute
   '/admin/content/contact': typeof AdminContentContactRoute
   '/admin/content/features': typeof AdminContentFeaturesRoute
+  '/admin/content/home': typeof AdminContentHomeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/admin/content/about': typeof AdminContentAboutRoute
   '/admin/content/contact': typeof AdminContentContactRoute
   '/admin/content/features': typeof AdminContentFeaturesRoute
+  '/admin/content/home': typeof AdminContentHomeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/admin/content/about': typeof AdminContentAboutRoute
   '/admin/content/contact': typeof AdminContentContactRoute
   '/admin/content/features': typeof AdminContentFeaturesRoute
+  '/admin/content/home': typeof AdminContentHomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
     | '/admin/content/about'
     | '/admin/content/contact'
     | '/admin/content/features'
+    | '/admin/content/home'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -241,6 +251,7 @@ export interface FileRouteTypes {
     | '/admin/content/about'
     | '/admin/content/contact'
     | '/admin/content/features'
+    | '/admin/content/home'
   id:
     | '__root__'
     | '/'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/admin/content/about'
     | '/admin/content/contact'
     | '/admin/content/features'
+    | '/admin/content/home'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -399,6 +411,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/content/home': {
+      id: '/admin/content/home'
+      path: '/content/home'
+      fullPath: '/admin/content/home'
+      preLoaderRoute: typeof AdminContentHomeRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/content/features': {
       id: '/admin/content/features'
       path: '/content/features'
@@ -434,6 +453,7 @@ interface AdminRouteChildren {
   AdminContentAboutRoute: typeof AdminContentAboutRoute
   AdminContentContactRoute: typeof AdminContentContactRoute
   AdminContentFeaturesRoute: typeof AdminContentFeaturesRoute
+  AdminContentHomeRoute: typeof AdminContentHomeRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -447,6 +467,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminContentAboutRoute: AdminContentAboutRoute,
   AdminContentContactRoute: AdminContentContactRoute,
   AdminContentFeaturesRoute: AdminContentFeaturesRoute,
+  AdminContentHomeRoute: AdminContentHomeRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -466,3 +487,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
