@@ -314,8 +314,10 @@ export type Database = {
         Row: {
           description_ar: string | null
           description_en: string | null
+          facebook_url: string | null
           favicon_url: string | null
           id: string
+          instagram_url: string | null
           keywords_ar: string | null
           keywords_en: string | null
           logo_url: string | null
@@ -330,12 +332,15 @@ export type Database = {
           twitter_handle: string | null
           updated_at: string
           updated_by: string | null
+          whatsapp_url: string | null
         }
         Insert: {
           description_ar?: string | null
           description_en?: string | null
+          facebook_url?: string | null
           favicon_url?: string | null
           id?: string
+          instagram_url?: string | null
           keywords_ar?: string | null
           keywords_en?: string | null
           logo_url?: string | null
@@ -350,12 +355,15 @@ export type Database = {
           twitter_handle?: string | null
           updated_at?: string
           updated_by?: string | null
+          whatsapp_url?: string | null
         }
         Update: {
           description_ar?: string | null
           description_en?: string | null
+          facebook_url?: string | null
           favicon_url?: string | null
           id?: string
+          instagram_url?: string | null
           keywords_ar?: string | null
           keywords_en?: string | null
           logo_url?: string | null
@@ -370,6 +378,7 @@ export type Database = {
           twitter_handle?: string | null
           updated_at?: string
           updated_by?: string | null
+          whatsapp_url?: string | null
         }
         Relationships: []
       }
