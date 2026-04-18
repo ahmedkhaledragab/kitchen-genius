@@ -173,26 +173,36 @@ function ContactPage() {
       )}
       <section className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {channels.map((c, i) => {
-          const href = c.icon || "#"; // we store href in `icon` field
+          const href = c.icon || ""; // we store href in `icon` field
           const { Icon, color } = pickIcon(c.title);
           const isExternal = href.startsWith("http");
+          const CardInner = (
+            <Card className="h-full rounded-3xl border-border/60 bg-card p-5 shadow-card transition-all group-hover:-translate-y-0.5 group-hover:shadow-warm">
+              <div className={`grid h-10 w-10 place-items-center rounded-2xl ${color}`}>
+                <Icon className="h-5 w-5" />
+              </div>
+              <h3 className="mt-3 text-sm font-extrabold">{c.title}</h3>
+              <p className="mt-0.5 truncate text-xs font-semibold text-foreground/70">
+                {c.desc}
+              </p>
+            </Card>
+          );
+          if (!href) {
+            return (
+              <div key={`${c.title}-${i}`} className="group block">
+                {CardInner}
+              </div>
+            );
+          }
           return (
             <a
               key={`${c.title}-${i}`}
               href={href}
               target={isExternal ? "_blank" : undefined}
               rel="noopener noreferrer"
-              className="group block"
+              className="group block no-underline"
             >
-              <Card className="h-full rounded-3xl border-border/60 bg-card p-5 shadow-card transition-all group-hover:-translate-y-0.5 group-hover:shadow-warm">
-                <div className={`grid h-10 w-10 place-items-center rounded-2xl ${color}`}>
-                  <Icon className="h-5 w-5" />
-                </div>
-                <h3 className="mt-3 text-sm font-extrabold">{c.title}</h3>
-                <p className="mt-0.5 truncate text-xs font-semibold text-primary">
-                  {c.desc}
-                </p>
-              </Card>
+              {CardInner}
             </a>
           );
         })}
