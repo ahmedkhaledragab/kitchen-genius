@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useLang } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,6 +57,7 @@ function ContactPage() {
   const { lang } = useLang();
   const ar = lang === "ar";
   const { content } = usePageContent("contact");
+  const { user } = useAuth();
 
   const contactEmail = content.contact_email || DEFAULT_EMAIL;
 
@@ -94,7 +97,7 @@ function ContactPage() {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
@@ -105,28 +108,41 @@ function ContactPage() {
       toast.error(ar ? "املي كل الخانات يا قمر 🌸" : "Fill in all fields lovely 🌸");
       return;
     }
-    // Light phone validation (optional field)
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      toast.error(ar ? "الإيميل مش صحيح 📧" : "Invalid email 📧");
+      return;
+    }
     if (trimmedPhone && !/^[\d+\-\s()]{6,20}$/.test(trimmedPhone)) {
       toast.error(ar ? "رقم الهاتف مش صحيح 📞" : "Invalid phone number 📞");
       return;
     }
     setBusy(true);
-    const subject = encodeURIComponent(ar ? `رسالة من ${trimmedName}` : `Message from ${trimmedName}`);
-    const phoneLine = trimmedPhone
-      ? `\n${ar ? "الهاتف" : "Phone"}: ${trimmedPhone}`
-      : "";
-    const body = encodeURIComponent(
-      `${ar ? "الاسم" : "Name"}: ${trimmedName}\n${ar ? "الإيميل" : "Email"}: ${trimmedEmail}${phoneLine}\n\n${trimmedMessage}`,
-    );
-    window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
-    setTimeout(() => {
-      setBusy(false);
+    try {
+      const { error } = await supabase.from("contact_messages").insert({
+        name: trimmedName,
+        email: trimmedEmail,
+        phone: trimmedPhone || null,
+        message: trimmedMessage,
+        user_id: user?.id ?? null,
+      });
+      if (error) throw error;
       toast.success(
         ar
-          ? "فتحنالك برنامج الإيميل، ابعتي الرسالة وهنرد عليكي بسرعة 💕"
-          : "Opened your email app — send and we'll reply soon 💕",
+          ? "وصلتنا رسالتك بأمان 💕 هنرد عليكي في أقرب وقت"
+          : "Got your message safely 💕 We'll reply soon",
       );
-    }, 600);
+      setName("");
+      setEmail("");
+      setPhone("");
+      setMessage("");
+    } catch (err) {
+      console.error("contact_messages insert failed", err);
+      toast.error(
+        ar ? "حصل خطأ، جرّبي تاني بعد لحظات 🙏" : "Something went wrong, try again 🙏",
+      );
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
