@@ -485,6 +485,80 @@ function AdminMessagesPage() {
                   </p>
                 </Card>
 
+                {/* Account info — only when message was sent by a logged-in user */}
+                {selected.user_id && (() => {
+                  const acc = profiles[selected.user_id];
+                  return (
+                    <Card className="rounded-2xl border-emerald-500/30 bg-emerald-500/5 p-4">
+                      <div className="mb-3 flex items-center gap-1.5 text-xs font-extrabold text-emerald-700">
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                        {ar ? "بيانات الحساب المسجّل" : "Registered account info"}
+                      </div>
+                      {acc ? (
+                        <div className="flex items-start gap-3">
+                          {acc.avatar_url ? (
+                            <img
+                              src={acc.avatar_url}
+                              alt={acc.display_name ?? "user"}
+                              className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-emerald-500/30"
+                            />
+                          ) : (
+                            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-emerald-500/15 text-emerald-700">
+                              <UserCircle2 className="h-7 w-7" />
+                            </span>
+                          )}
+                          <div className="min-w-0 flex-1 space-y-1.5 text-xs">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="text-sm font-extrabold">
+                                {acc.display_name || (ar ? "بدون اسم" : "No name")}
+                              </p>
+                              {!acc.is_active && (
+                                <Badge
+                                  variant="outline"
+                                  className="border-destructive/40 bg-destructive/10 text-[10px] text-destructive"
+                                >
+                                  {ar ? "محظور" : "Banned"}
+                                </Badge>
+                              )}
+                            </div>
+                            {acc.email && (
+                              <a
+                                href={`mailto:${acc.email}`}
+                                className="flex items-center gap-1.5 font-semibold text-primary hover:underline"
+                              >
+                                <Mail className="h-3.5 w-3.5 shrink-0" />
+                                <span className="truncate">{acc.email}</span>
+                              </a>
+                            )}
+                            {acc.phone && (
+                              <a
+                                href={`tel:${acc.phone}`}
+                                className="flex items-center gap-1.5 font-semibold text-primary hover:underline"
+                              >
+                                <Phone className="h-3.5 w-3.5 shrink-0" />
+                                <span className="truncate" dir="ltr">{acc.phone}</span>
+                              </a>
+                            )}
+                            <p className="flex items-center gap-1.5 text-muted-foreground">
+                              <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                              {ar ? "اشترك" : "Joined"} {formatTime(acc.created_at)}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground/80" dir="ltr">
+                              ID: {acc.id}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">
+                          {ar
+                            ? "الحساب اتحذف أو مش متاح."
+                            : "Account no longer available."}
+                        </p>
+                      )}
+                    </Card>
+                  );
+                })()}
+
                 <div>
                   <label className="text-xs font-bold">
                     {ar ? "ملاحظات داخلية (للأدمن فقط)" : "Internal notes (admin only)"}
