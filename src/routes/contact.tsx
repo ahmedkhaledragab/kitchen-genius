@@ -14,6 +14,7 @@ import {
 import { toast } from "sonner";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,8 @@ function pickIcon(title?: string) {
   const t = (title ?? "").toLowerCase();
   if (t.includes("face")) return { Icon: Facebook, color: "text-[#1877F2] bg-[#1877F2]/10" };
   if (t.includes("insta")) return { Icon: Instagram, color: "text-[#d62976] bg-[#d62976]/10" };
+  if (t.includes("whats") || t.includes("واتس"))
+    return { Icon: MessageCircle, color: "text-[#25D366] bg-[#25D366]/10" };
   if (t.includes("mail") || t.includes("إيميل") || t.includes("بريد"))
     return { Icon: Mail, color: "text-primary bg-primary/10" };
   if (t.includes("phone") || t.includes("tel") || t.includes("هاتف") || t.includes("تليفون"))
@@ -53,10 +56,27 @@ function pickIcon(title?: string) {
   return { Icon: Globe, color: "text-muted-foreground bg-muted" };
 }
 
+function buildWhatsAppHref(raw: string): string | null {
+  const v = raw.trim();
+  if (!v) return null;
+  if (/^https?:\/\//i.test(v)) return v;
+  const digits = v.replace(/\D/g, "");
+  if (digits.length < 6) return null;
+  return `https://wa.me/${digits}`;
+}
+
+function prettyHandle(url: string): string {
+  return url
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .replace(/\/$/, "");
+}
+
 function ContactPage() {
   const { lang } = useLang();
   const ar = lang === "ar";
   const { content } = usePageContent("contact");
+  const { settings } = useSiteSettings();
   const { user } = useAuth();
 
   const contactEmail = content.contact_email || DEFAULT_EMAIL;
@@ -74,22 +94,33 @@ function ContactPage() {
     content.form_sub ??
     (ar ? "املي البيانات وهنرد عليكي بأقرب وقت." : "Fill in your details and we'll reply soon.");
 
-  const defaultChannels: PageItem[] = [
+  // Build channels from site_settings (admin-managed). Each channel only shows if its URL is set.
+  const facebookUrl = settings.facebook_url?.trim() || "";
+  const instagramUrl = settings.instagram_url?.trim() || "";
+  const whatsappHref = settings.whatsapp_url ? buildWhatsAppHref(settings.whatsapp_url) : null;
+
+  const autoChannels: PageItem[] = [
     { title: ar ? "الإيميل" : "Email", desc: contactEmail, icon: `mailto:${contactEmail}` },
-    {
-      title: "Facebook",
-      desc: "facebook.com/share/1B99gicE7g",
-      icon: "https://www.facebook.com/share/1B99gicE7g/",
-    },
-    {
-      title: "Instagram",
-      desc: "@naria.oo",
-      icon: "https://www.instagram.com/naria.oo",
-    },
+    ...(facebookUrl
+      ? [{ title: "Facebook", desc: prettyHandle(facebookUrl), icon: facebookUrl }]
+      : []),
+    ...(instagramUrl
+      ? [{ title: "Instagram", desc: prettyHandle(instagramUrl), icon: instagramUrl }]
+      : []),
+    ...(whatsappHref
+      ? [
+          {
+            title: ar ? "واتساب" : "WhatsApp",
+            desc: prettyHandle(whatsappHref),
+            icon: whatsappHref,
+          },
+        ]
+      : []),
   ];
 
+  // Admin can override via pages_content.channels; otherwise use auto from site_settings.
   const channels =
-    content.channels && content.channels.length > 0 ? content.channels : defaultChannels;
+    content.channels && content.channels.length > 0 ? content.channels : autoChannels;
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
