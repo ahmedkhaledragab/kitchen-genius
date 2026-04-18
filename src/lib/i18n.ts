@@ -26,7 +26,6 @@ const arDict = {
       excludePlaceholder: "مثال: فلفل حار",
       cookBtn: "يلا نطبخ 🍳",
       generating: "بنحضرلك وصفات...",
-      generating: "بنحضرلك وصفات...",
       filters: "فلاتر سريعة",
       filterQuick: "وجبة سريعة (أقل من 20 دقيقة)",
       filterBudget: "اقتصادي",
