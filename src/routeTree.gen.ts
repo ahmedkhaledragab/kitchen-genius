@@ -21,6 +21,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRecipesRouteImport } from './routes/admin.recipes'
 import { Route as AdminIngredientsRouteImport } from './routes/admin.ingredients'
+import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -82,6 +83,11 @@ const AdminIngredientsRoute = AdminIngredientsRouteImport.update({
   path: '/ingredients',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/recipes': typeof RecipesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -104,6 +111,7 @@ export interface FileRoutesByTo {
   '/recipes': typeof RecipesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -119,6 +127,7 @@ export interface FileRoutesById {
   '/recipes': typeof RecipesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/categories': typeof AdminCategoriesRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/recipes'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/admin/categories'
     | '/admin/ingredients'
     | '/admin/recipes'
     | '/admin/settings'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/recipes'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/admin/categories'
     | '/admin/ingredients'
     | '/admin/recipes'
     | '/admin/settings'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/recipes'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/admin/categories'
     | '/admin/ingredients'
     | '/admin/recipes'
     | '/admin/settings'
@@ -265,10 +277,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIngredientsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminIngredientsRoute: typeof AdminIngredientsRoute
   AdminRecipesRoute: typeof AdminRecipesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -277,6 +297,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminCategoriesRoute: AdminCategoriesRoute,
   AdminIngredientsRoute: AdminIngredientsRoute,
   AdminRecipesRoute: AdminRecipesRoute,
   AdminSettingsRoute: AdminSettingsRoute,

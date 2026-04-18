@@ -8,6 +8,7 @@ import {
   Menu,
   X,
   Sparkles,
+  Tags,
 } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -63,6 +64,11 @@ function AdminLayout() {
       to: "/admin/ingredients" as const,
       icon: Sparkles,
       label: lang === "ar" ? "المكونات" : "Ingredients",
+    },
+    {
+      to: "/admin/categories" as const,
+      icon: Tags,
+      label: lang === "ar" ? "الأصناف" : "Categories",
     },
     {
       to: "/admin/users" as const,
