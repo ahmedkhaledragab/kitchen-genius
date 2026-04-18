@@ -160,7 +160,7 @@ function HomePage() {
 
   const handleCook = async () => {
     if (ingredients.length === 0) {
-      toast.error(t.home.noIngredients);
+      toast.error(pick(c.home_no_ingredients, t.home.noIngredients));
       return;
     }
     if (!user) {
@@ -374,12 +374,12 @@ function HomePage() {
           {loading ? (
             <>
               <Loader2 className="me-1 h-5 w-5 animate-spin" />
-              {t.home.generating}
+              {pick(c.home_generating, t.home.generating)}
             </>
           ) : (
             <>
               <ChefHat className="me-1 h-5 w-5" />
-              {t.home.cookBtn}
+              {pick(c.home_cook_btn, t.home.cookBtn)}
             </>
           )}
         </Button>
@@ -389,13 +389,13 @@ function HomePage() {
       <section id="results" className="mt-8">
         {recipes && recipes.length === 0 && (
           <p className="rounded-2xl bg-muted p-6 text-center text-sm text-muted-foreground">
-            {t.home.noResults}
+            {pick(c.home_no_results, t.home.noResults)}
           </p>
         )}
         {recipes && recipes.length > 0 && (
           <>
             <div className="mb-3 flex items-center gap-2">
-              <h2 className="text-lg font-extrabold">{t.home.results}</h2>
+              <h2 className="text-lg font-extrabold">{pick(c.home_results_title, t.home.results)}</h2>
               <Badge variant="secondary" className="rounded-full bg-primary/10 text-primary border-0">
                 {recipes.length}
               </Badge>
