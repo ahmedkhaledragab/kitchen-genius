@@ -23,6 +23,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRecipesRouteImport } from './routes/admin.recipes'
+import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminIngredientsRouteImport } from './routes/admin.ingredients'
 import { Route as AdminContentRouteImport } from './routes/admin.content'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
@@ -97,6 +98,11 @@ const AdminRecipesRoute = AdminRecipesRouteImport.update({
   path: '/recipes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminMessagesRoute = AdminMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminIngredientsRoute = AdminIngredientsRouteImport.update({
   id: '/ingredients',
   path: '/ingredients',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
+  '/admin/messages': typeof AdminMessagesRoute
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
+  '/admin/messages': typeof AdminMessagesRoute
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/content': typeof AdminContentRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
+  '/admin/messages': typeof AdminMessagesRoute
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/content'
     | '/admin/ingredients'
+    | '/admin/messages'
     | '/admin/recipes'
     | '/admin/settings'
     | '/admin/users'
@@ -204,6 +214,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/content'
     | '/admin/ingredients'
+    | '/admin/messages'
     | '/admin/recipes'
     | '/admin/settings'
     | '/admin/users'
@@ -223,6 +234,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/content'
     | '/admin/ingredients'
+    | '/admin/messages'
     | '/admin/recipes'
     | '/admin/settings'
     | '/admin/users'
@@ -342,6 +354,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRecipesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/ingredients': {
       id: '/admin/ingredients'
       path: '/ingredients'
@@ -370,6 +389,7 @@ interface AdminRouteChildren {
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminContentRoute: typeof AdminContentRoute
   AdminIngredientsRoute: typeof AdminIngredientsRoute
+  AdminMessagesRoute: typeof AdminMessagesRoute
   AdminRecipesRoute: typeof AdminRecipesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -380,6 +400,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminContentRoute: AdminContentRoute,
   AdminIngredientsRoute: AdminIngredientsRoute,
+  AdminMessagesRoute: AdminMessagesRoute,
   AdminRecipesRoute: AdminRecipesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
