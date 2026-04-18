@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, Save, Plus, Trash2, FileText } from "lucide-react";
+import { Loader2, Save, Plus, Trash2, FileText, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 import { useLang } from "@/contexts/LanguageContext";
