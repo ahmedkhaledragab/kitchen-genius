@@ -89,26 +89,54 @@ function ContactPage() {
       : "Any question, suggestion, or just a hello — we'd love to hear from you. Pick whatever works for you.");
 
   const formTitle = content.form_title ?? (ar ? "ابعتيلنا رسالة 💕" : "Send us a message 💕");
+  const { lang } = useLang();
+  const ar = lang === "ar";
+  const { content } = usePageContent("contact");
+  const { settings } = useSiteSettings();
+  const { user } = useAuth();
+
+  const contactEmail = content.contact_email || DEFAULT_EMAIL;
+
+  const heroBadge = content.hero_badge ?? (ar ? "إحنا هنا" : "We're here");
+  const heroTitle = content.hero_title ?? (ar ? "تواصلي معانا 💌" : "Get in touch 💌");
+  const heroSub =
+    content.hero_sub ??
+    (ar
+      ? "أي سؤال، اقتراح، أو حتى مجرد سلام — يسعدنا نسمع منك. اختاري الطريقة اللي تناسبك."
+      : "Any question, suggestion, or just a hello — we'd love to hear from you. Pick whatever works for you.");
+
+  const formTitle = content.form_title ?? (ar ? "ابعتيلنا رسالة 💕" : "Send us a message 💕");
   const formSub =
     content.form_sub ??
     (ar ? "املي البيانات وهنرد عليكي بأقرب وقت." : "Fill in your details and we'll reply soon.");
 
-  const defaultChannels: PageItem[] = [
+  // Build channels from site_settings (admin-managed). Each channel only shows if its URL is set.
+  const facebookUrl = settings.facebook_url?.trim() || "";
+  const instagramUrl = settings.instagram_url?.trim() || "";
+  const whatsappHref = settings.whatsapp_url ? buildWhatsAppHref(settings.whatsapp_url) : null;
+
+  const autoChannels: PageItem[] = [
     { title: ar ? "الإيميل" : "Email", desc: contactEmail, icon: `mailto:${contactEmail}` },
-    {
-      title: "Facebook",
-      desc: "facebook.com/share/1B99gicE7g",
-      icon: "https://www.facebook.com/share/1B99gicE7g/",
-    },
-    {
-      title: "Instagram",
-      desc: "@naria.oo",
-      icon: "https://www.instagram.com/naria.oo",
-    },
+    ...(facebookUrl
+      ? [{ title: "Facebook", desc: prettyHandle(facebookUrl), icon: facebookUrl }]
+      : []),
+    ...(instagramUrl
+      ? [{ title: "Instagram", desc: prettyHandle(instagramUrl), icon: instagramUrl }]
+      : []),
+    ...(whatsappHref
+      ? [
+          {
+            title: ar ? "واتساب" : "WhatsApp",
+            desc: prettyHandle(whatsappHref),
+            icon: whatsappHref,
+          },
+        ]
+      : []),
   ];
 
+  // Admin can override via pages_content.channels; otherwise use auto from site_settings.
   const channels =
-    content.channels && content.channels.length > 0 ? content.channels : defaultChannels;
+    content.channels && content.channels.length > 0 ? content.channels : autoChannels;
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
