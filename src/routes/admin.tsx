@@ -10,6 +10,7 @@ import {
   Sparkles,
   Tags,
   FileText,
+  Inbox,
 } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -80,6 +81,11 @@ function AdminLayout() {
       to: "/admin/content" as const,
       icon: FileText,
       label: lang === "ar" ? "محتوى الصفحات" : "Pages content",
+    },
+    {
+      to: "/admin/messages" as const,
+      icon: Inbox,
+      label: lang === "ar" ? "الرسائل" : "Messages",
     },
     {
       to: "/admin/settings" as const,
