@@ -208,6 +208,23 @@ function ContactPage() {
             />
           </div>
           <div>
+            <label className="text-sm font-bold">
+              {ar ? "رقم الهاتف" : "Phone"}{" "}
+              <span className="font-normal text-muted-foreground">
+                ({ar ? "اختياري" : "optional"})
+              </span>
+            </label>
+            <Input
+              type="tel"
+              inputMode="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder={ar ? "مثال: 010xxxxxxxx" : "e.g. +20 10xxxxxxxx"}
+              maxLength={20}
+              className="mt-1.5 rounded-xl"
+            />
+          </div>
+          <div>
             <label className="text-sm font-bold">{ar ? "رسالتك" : "Your message"}</label>
             <Textarea
               value={message}
