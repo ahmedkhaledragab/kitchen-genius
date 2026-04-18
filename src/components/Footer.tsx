@@ -52,25 +52,27 @@ export function Footer() {
             {/* Non-clickable on purpose */}
           </div>
 
-          <a
-            href="https://www.facebook.com/share/1B99gicE7g/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Facebook"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-background/70 text-[#1877F2] shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-[#1877F2]/40 hover:shadow-md"
-          >
-            <Facebook className="h-4 w-4" />
-          </a>
+          <div className="flex items-center gap-1.5">
+            <a
+              href="https://www.facebook.com/share/1B99gicE7g/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-background/70 text-[#1877F2] shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-[#1877F2]/40 hover:shadow-md"
+            >
+              <Facebook className="h-4 w-4" />
+            </a>
 
-          <a
-            href="https://www.instagram.com/naria.oo"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#4f5bd5] text-white shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <Instagram className="h-4 w-4" />
-          </a>
+            <a
+              href="https://www.instagram.com/naria.oo"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#4f5bd5] text-white shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <Instagram className="h-4 w-4" />
+            </a>
+          </div>
         </div>
       </div>
     </footer>
