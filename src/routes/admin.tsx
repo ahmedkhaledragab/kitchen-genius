@@ -13,6 +13,7 @@ import {
   Star,
   Mail,
   Inbox,
+  Home,
 } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
