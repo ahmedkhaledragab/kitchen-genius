@@ -202,6 +202,146 @@ function PageEditor({
         </Field>
       </Section>
 
+      {pageKey === "home" && (
+        <>
+          <Section title={ar ? "خانة المكونات" : "Ingredients input"}>
+            <Field label={ar ? "عنوان الخانة" : "Field label"}>
+              <Input
+                value={content.home_ingredients_label ?? ""}
+                onChange={(e) => onUpdate({ home_ingredients_label: e.target.value })}
+                className="rounded-xl"
+                placeholder={ar ? "اكتب المكونات" : "Type ingredients"}
+              />
+            </Field>
+            <Field label={ar ? "النص الإرشادي (placeholder)" : "Placeholder text"}>
+              <Input
+                value={content.home_ingredients_placeholder ?? ""}
+                onChange={(e) => onUpdate({ home_ingredients_placeholder: e.target.value })}
+                className="rounded-xl"
+                placeholder={ar ? "مثال: بيض، طماطم، جبنة..." : "e.g. eggs, tomato, cheese..."}
+              />
+            </Field>
+            <Field label={ar ? "زر الإضافة" : "Add button"}>
+              <Input
+                value={content.home_add_btn ?? ""}
+                onChange={(e) => onUpdate({ home_add_btn: e.target.value })}
+                className="rounded-xl"
+                placeholder={ar ? "أضف" : "Add"}
+              />
+            </Field>
+            <Field label={ar ? "عنوان الاقتراحات" : "Suggestions title"}>
+              <Input
+                value={content.home_suggestions_title ?? ""}
+                onChange={(e) => onUpdate({ home_suggestions_title: e.target.value })}
+                className="rounded-xl"
+                placeholder={ar ? "اقتراحات" : "Suggestions"}
+              />
+            </Field>
+          </Section>
+
+          <Section title={ar ? "خانة الاستبعاد" : "Exclude input"}>
+            <Field label={ar ? "عنوان الخانة" : "Field label"}>
+              <Input
+                value={content.home_exclude_label ?? ""}
+                onChange={(e) => onUpdate({ home_exclude_label: e.target.value })}
+                className="rounded-xl"
+                placeholder={ar ? "مكونات تحب تستبعدها" : "Ingredients to exclude"}
+              />
+            </Field>
+            <Field label={ar ? "النص الإرشادي (placeholder)" : "Placeholder text"}>
+              <Input
+                value={content.home_exclude_placeholder ?? ""}
+                onChange={(e) => onUpdate({ home_exclude_placeholder: e.target.value })}
+                className="rounded-xl"
+                placeholder={ar ? "مثال: فلفل حار" : "e.g. chili"}
+              />
+            </Field>
+          </Section>
+
+          <Section title={ar ? "الفلاتر السريعة" : "Quick filters"}>
+            <Field label={ar ? "عنوان القسم" : "Section title"}>
+              <Input
+                value={content.home_filters_title ?? ""}
+                onChange={(e) => onUpdate({ home_filters_title: e.target.value })}
+                className="rounded-xl"
+                placeholder={ar ? "فلاتر سريعة" : "Quick filters"}
+              />
+            </Field>
+            <Field label={ar ? "وجبة سريعة" : "Quick meal"}>
+              <Input
+                value={content.home_filter_quick ?? ""}
+                onChange={(e) => onUpdate({ home_filter_quick: e.target.value })}
+                className="rounded-xl"
+              />
+            </Field>
+            <Field label={ar ? "اقتصادي" : "Budget"}>
+              <Input
+                value={content.home_filter_budget ?? ""}
+                onChange={(e) => onUpdate({ home_filter_budget: e.target.value })}
+                className="rounded-xl"
+              />
+            </Field>
+            <Field label={ar ? "صحي / دايت" : "Healthy"}>
+              <Input
+                value={content.home_filter_healthy ?? ""}
+                onChange={(e) => onUpdate({ home_filter_healthy: e.target.value })}
+                className="rounded-xl"
+              />
+            </Field>
+            <Field label={ar ? "أكلات عربية" : "Arabic dishes"}>
+              <Input
+                value={content.home_filter_arab ?? ""}
+                onChange={(e) => onUpdate({ home_filter_arab: e.target.value })}
+                className="rounded-xl"
+              />
+            </Field>
+          </Section>
+
+          <Section title={ar ? "زر التوليد ورسائل الحالة" : "Generate button & states"}>
+            <Field label={ar ? "نص زر التوليد" : "Generate button label"}>
+              <Input
+                value={content.home_cook_btn ?? ""}
+                onChange={(e) => onUpdate({ home_cook_btn: e.target.value })}
+                className="rounded-xl"
+                placeholder={ar ? "يلا نطبخ 🍳" : "Let's cook 🍳"}
+              />
+            </Field>
+            <Field label={ar ? "أثناء التحميل" : "While generating"}>
+              <Input
+                value={content.home_generating ?? ""}
+                onChange={(e) => onUpdate({ home_generating: e.target.value })}
+                className="rounded-xl"
+                placeholder={ar ? "بنحضرلك وصفات..." : "Cooking up recipes..."}
+              />
+            </Field>
+            <Field label={ar ? "عنوان النتائج" : "Results title"}>
+              <Input
+                value={content.home_results_title ?? ""}
+                onChange={(e) => onUpdate({ home_results_title: e.target.value })}
+                className="rounded-xl"
+                placeholder={ar ? "الوصفات المقترحة" : "Suggested recipes"}
+              />
+            </Field>
+            <Field label={ar ? "رسالة لما مفيش نتائج" : "No results message"}>
+              <Textarea
+                value={content.home_no_results ?? ""}
+                onChange={(e) => onUpdate({ home_no_results: e.target.value })}
+                rows={2}
+                className="rounded-xl"
+              />
+            </Field>
+            <Field label={ar ? "رسالة لو محدش حط مكونات" : "Empty ingredients warning"}>
+              <Textarea
+                value={content.home_no_ingredients ?? ""}
+                onChange={(e) => onUpdate({ home_no_ingredients: e.target.value })}
+                rows={2}
+                className="rounded-xl"
+              />
+            </Field>
+          </Section>
+        </>
+      )}
+
       {pageKey === "about" && (
         <>
           <Section title={ar ? "المهمة" : "Mission"}>
