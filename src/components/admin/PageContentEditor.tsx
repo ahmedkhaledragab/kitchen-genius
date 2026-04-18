@@ -23,6 +23,7 @@ const LANGS: LangKey[] = ["ar", "en"];
 const empty = (): PageContent => ({});
 
 const PAGE_TITLES: Record<PageKey, { ar: string; en: string }> = {
+  home: { ar: "الصفحة الرئيسية", en: "Home page" },
   about: { ar: "صفحة من نحن", en: "About page" },
   features: { ar: "صفحة المميزات", en: "Features page" },
   contact: { ar: "صفحة تواصل معنا", en: "Contact page" },
