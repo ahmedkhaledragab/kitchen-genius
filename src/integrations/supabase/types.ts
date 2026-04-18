@@ -330,7 +330,10 @@ export type Database = {
           site_url: string | null
           tagline_ar: string | null
           tagline_en: string | null
+          telegram_url: string | null
+          tiktok_url: string | null
           twitter_handle: string | null
+          twitter_url: string | null
           updated_at: string
           updated_by: string | null
           whatsapp_url: string | null
@@ -354,7 +357,10 @@ export type Database = {
           site_url?: string | null
           tagline_ar?: string | null
           tagline_en?: string | null
+          telegram_url?: string | null
+          tiktok_url?: string | null
           twitter_handle?: string | null
+          twitter_url?: string | null
           updated_at?: string
           updated_by?: string | null
           whatsapp_url?: string | null
@@ -378,7 +384,10 @@ export type Database = {
           site_url?: string | null
           tagline_ar?: string | null
           tagline_en?: string | null
+          telegram_url?: string | null
+          tiktok_url?: string | null
           twitter_handle?: string | null
+          twitter_url?: string | null
           updated_at?: string
           updated_by?: string | null
           whatsapp_url?: string | null
