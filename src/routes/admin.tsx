@@ -80,6 +80,11 @@ function AdminLayout() {
       label: lang === "ar" ? "المستخدمين" : "Users",
     },
     {
+      to: "/admin/content/home" as const,
+      icon: Home,
+      label: lang === "ar" ? "الصفحة الرئيسية" : "Home page",
+    },
+    {
       to: "/admin/content/about" as const,
       icon: Info,
       label: lang === "ar" ? "صفحة من نحن" : "About page",
