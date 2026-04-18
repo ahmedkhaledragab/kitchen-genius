@@ -76,22 +76,6 @@ function ContactPage() {
   const { lang } = useLang();
   const ar = lang === "ar";
   const { content } = usePageContent("contact");
-  const { user } = useAuth();
-
-  const contactEmail = content.contact_email || DEFAULT_EMAIL;
-
-  const heroBadge = content.hero_badge ?? (ar ? "إحنا هنا" : "We're here");
-  const heroTitle = content.hero_title ?? (ar ? "تواصلي معانا 💌" : "Get in touch 💌");
-  const heroSub =
-    content.hero_sub ??
-    (ar
-      ? "أي سؤال، اقتراح، أو حتى مجرد سلام — يسعدنا نسمع منك. اختاري الطريقة اللي تناسبك."
-      : "Any question, suggestion, or just a hello — we'd love to hear from you. Pick whatever works for you.");
-
-  const formTitle = content.form_title ?? (ar ? "ابعتيلنا رسالة 💕" : "Send us a message 💕");
-  const { lang } = useLang();
-  const ar = lang === "ar";
-  const { content } = usePageContent("contact");
   const { settings } = useSiteSettings();
   const { user } = useAuth();
 
