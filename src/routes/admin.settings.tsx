@@ -564,7 +564,76 @@ function AdminSettingsPage() {
         </div>
       </Card>
 
-      {/* Sitemap info */}
+      {/* Social media links */}
+      <Card className="mt-4 rounded-3xl border-border/60 p-5">
+        <div className="flex items-center gap-2">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+            <Share2 className="h-4 w-4" />
+          </span>
+          <div>
+            <p className="text-sm font-bold">
+              {lang === "ar" ? "روابط السوشيال ميديا" : "Social media links"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {lang === "ar"
+                ? "هتظهر كأيقونات في الفوتر. سيبي اللي مش عايزاه فاضي وهيختفي."
+                : "Shown as icons in the footer. Leave any field empty to hide its icon."}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-4">
+          <div>
+            <Label htmlFor="fb" className="text-sm font-bold">
+              Facebook
+            </Label>
+            <Input
+              id="fb"
+              value={facebookUrl}
+              onChange={(e) => setFacebookUrl(e.target.value)}
+              placeholder="https://www.facebook.com/yourpage"
+              className="mt-1.5 rounded-xl"
+              dir="ltr"
+            />
+          </div>
+          <div>
+            <Label htmlFor="ig" className="text-sm font-bold">
+              Instagram
+            </Label>
+            <Input
+              id="ig"
+              value={instagramUrl}
+              onChange={(e) => setInstagramUrl(e.target.value)}
+              placeholder="https://www.instagram.com/yourhandle"
+              className="mt-1.5 rounded-xl"
+              dir="ltr"
+            />
+          </div>
+          <div>
+            <Label htmlFor="wa" className="text-sm font-bold">
+              WhatsApp
+            </Label>
+            <Input
+              id="wa"
+              value={whatsappUrl}
+              onChange={(e) => setWhatsappUrl(e.target.value)}
+              placeholder={
+                lang === "ar"
+                  ? "رقم الواتساب أو رابط مجتمع (https://chat.whatsapp.com/...)"
+                  : "Phone number or community link (https://chat.whatsapp.com/...)"
+              }
+              className="mt-1.5 rounded-xl"
+              dir="ltr"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {lang === "ar"
+                ? "اكتبي رقم بصيغة دولية (مثال: +201234567890) أو رابط مجتمع كامل. سيبيها فاضية لو مش عايزة الأيقونة."
+                : "Enter a phone number in international format (e.g. +201234567890) or a full community link. Leave empty to hide the icon."}
+            </p>
+          </div>
+        </div>
+      </Card>
+
       <Card className="mt-4 rounded-3xl border-border/60 bg-muted/30 p-5">
         <p className="text-sm font-bold">{t.admin.siteSettings.sitemapInfo}</p>
         <p className="mt-1 text-xs text-muted-foreground">{t.admin.siteSettings.sitemapHint}</p>
