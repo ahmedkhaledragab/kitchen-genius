@@ -19,6 +19,7 @@ export interface SiteSettings {
   facebook_url: string | null;
   instagram_url: string | null;
   whatsapp_url: string | null;
+  contact_email: string | null;
 }
 
 const DEFAULTS: SiteSettings = {
