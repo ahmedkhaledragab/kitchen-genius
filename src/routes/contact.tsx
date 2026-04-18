@@ -79,7 +79,7 @@ function ContactPage() {
   const { settings } = useSiteSettings();
   const { user } = useAuth();
 
-  const contactEmail = content.contact_email || DEFAULT_EMAIL;
+  const contactEmail = settings.contact_email || content.contact_email || DEFAULT_EMAIL;
 
   const heroBadge = content.hero_badge ?? (ar ? "إحنا هنا" : "We're here");
   const heroTitle = content.hero_title ?? (ar ? "تواصلي معانا 💌" : "Get in touch 💌");
