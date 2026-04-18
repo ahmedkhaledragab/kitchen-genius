@@ -227,20 +227,17 @@ function ContactPage() {
       {content.channels_title && (
         <h2 className="mt-6 text-lg font-extrabold sm:text-xl">{content.channels_title}</h2>
       )}
-      <section className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <section className="mt-6 grid grid-cols-3 gap-3 sm:grid-cols-4">
         {channels.map((c, i) => {
           const href = c.icon || ""; // we store href in `icon` field
           const { Icon, color } = pickIcon(c.title);
           const isExternal = href.startsWith("http");
           const CardInner = (
-            <Card className="h-full rounded-3xl border-border/60 bg-card p-5 shadow-card transition-all group-hover:-translate-y-0.5 group-hover:shadow-warm">
-              <div className={`grid h-10 w-10 place-items-center rounded-2xl ${color}`}>
-                <Icon className="h-5 w-5" />
+            <Card className="flex aspect-square h-full flex-col items-center justify-center gap-2 rounded-2xl border-border/60 bg-card p-3 shadow-card transition-all group-hover:-translate-y-0.5 group-hover:shadow-warm">
+              <div className={`grid h-12 w-12 place-items-center rounded-2xl ${color}`}>
+                <Icon className="h-6 w-6" />
               </div>
-              <h3 className="mt-3 text-sm font-extrabold">{c.title}</h3>
-              <p className="mt-0.5 truncate text-xs font-semibold text-foreground/70">
-                {c.desc}
-              </p>
+              <h3 className="text-center text-xs font-extrabold">{c.title}</h3>
             </Card>
           );
           if (!href) {
@@ -256,6 +253,7 @@ function ContactPage() {
               href={href}
               target={isExternal ? "_blank" : undefined}
               rel="noopener noreferrer"
+              aria-label={c.title}
               className="group block no-underline"
             >
               {CardInner}
