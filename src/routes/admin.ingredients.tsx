@@ -10,6 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useCategoriesCatalog } from "@/hooks/useCategoriesCatalog";
 
 export const Route = createFileRoute("/admin/ingredients")({
   head: () => ({
@@ -39,6 +47,8 @@ function AdminIngredientsPage() {
   const { t, lang } = useLang();
   const navigate = useNavigate();
   const tx = t.admin.ingredientsCatalog;
+
+  const { items: catOptions } = useCategoriesCatalog("ingredient_categories");
 
   const [items, setItems] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(true);
@@ -255,12 +265,25 @@ function AdminIngredientsPage() {
             </div>
             <div>
               <label className="text-xs font-semibold">{tx.category}</label>
-              <Input
-                value={newDraft.category}
-                onChange={(e) => setNewDraft((d) => ({ ...d, category: e.target.value }))}
-                placeholder="vegetables, meat, ..."
-                className="mt-1 rounded-xl"
-              />
+              <Select
+                value={newDraft.category || "__none__"}
+                onValueChange={(v) =>
+                  setNewDraft((d) => ({ ...d, category: v === "__none__" ? "" : v }))
+                }
+              >
+                <SelectTrigger className="mt-1 rounded-xl">
+                  <SelectValue placeholder={lang === "ar" ? "اختاري" : "Select"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">{lang === "ar" ? "بدون" : "None"}</SelectItem>
+                  {catOptions.map((c) => (
+                    <SelectItem key={c.id} value={c.slug}>
+                      {c.icon ? `${c.icon} ` : ""}
+                      {lang === "ar" ? c.name_ar : c.name_en}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="text-xs font-semibold">{tx.sortOrder}</label>
@@ -410,15 +433,40 @@ function AdminIngredientsPage() {
                       </td>
                       <td className="hidden px-3 py-2 text-xs text-muted-foreground sm:table-cell">
                         {isEditing && editDraft ? (
-                          <Input
-                            value={editDraft.category}
-                            onChange={(e) =>
-                              setEditDraft((d) => (d ? { ...d, category: e.target.value } : d))
+                          <Select
+                            value={editDraft.category || "__none__"}
+                            onValueChange={(v) =>
+                              setEditDraft((d) =>
+                                d ? { ...d, category: v === "__none__" ? "" : v } : d,
+                              )
                             }
-                            className="h-8 rounded-lg"
-                          />
+                          >
+                            <SelectTrigger className="h-8 rounded-lg">
+                              <SelectValue placeholder={lang === "ar" ? "اختاري" : "Select"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="__none__">
+                                {lang === "ar" ? "بدون" : "None"}
+                              </SelectItem>
+                              {catOptions.map((c) => (
+                                <SelectItem key={c.id} value={c.slug}>
+                                  {c.icon ? `${c.icon} ` : ""}
+                                  {lang === "ar" ? c.name_ar : c.name_en}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : it.category ? (
+                          (() => {
+                            const found = catOptions.find((c) => c.slug === it.category);
+                            return found
+                              ? `${found.icon ? found.icon + " " : ""}${
+                                  lang === "ar" ? found.name_ar : found.name_en
+                                }`
+                              : it.category;
+                          })()
                         ) : (
-                          it.category ?? "—"
+                          "—"
                         )}
                       </td>
                       <td className="hidden px-3 py-2 text-center text-xs text-muted-foreground sm:table-cell">

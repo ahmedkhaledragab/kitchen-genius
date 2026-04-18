@@ -35,6 +35,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { Difficulty } from "@/lib/recipe";
+import { useCategoriesCatalog } from "@/hooks/useCategoriesCatalog";
 
 export const Route = createFileRoute("/admin/recipes")({
   head: () => ({
@@ -76,6 +77,7 @@ function AdminRecipesPage() {
   const { user, isAdmin, loading } = useAuth();
   const { t, lang } = useLang();
   const navigate = useNavigate();
+  const { items: cuisineOptions } = useCategoriesCatalog("recipe_cuisines");
 
   const [list, setList] = useState<RecipeRow[]>([]);
   const [busy, setBusy] = useState(false);
@@ -472,11 +474,25 @@ function AdminRecipesPage() {
               </div>
               <div>
                 <label className="text-xs font-semibold">{t.admin.cuisine}</label>
-                <Input
-                  value={form.cuisine}
-                  onChange={(e) => setForm((f) => ({ ...f, cuisine: e.target.value }))}
-                  className="mt-1 rounded-xl"
-                />
+                <Select
+                  value={form.cuisine || "__none__"}
+                  onValueChange={(v) =>
+                    setForm((f) => ({ ...f, cuisine: v === "__none__" ? "" : v }))
+                  }
+                >
+                  <SelectTrigger className="mt-1 rounded-xl">
+                    <SelectValue placeholder={lang === "ar" ? "اختاري" : "Select"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">{lang === "ar" ? "بدون" : "None"}</SelectItem>
+                    {cuisineOptions.map((c) => (
+                      <SelectItem key={c.id} value={c.slug}>
+                        {c.icon ? `${c.icon} ` : ""}
+                        {lang === "ar" ? c.name_ar : c.name_en}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="text-xs font-semibold">{t.admin.language}</label>
@@ -633,11 +649,25 @@ function AdminRecipesPage() {
               </div>
               <div>
                 <label className="text-xs font-semibold">{t.admin.cuisine}</label>
-                <Input
-                  value={editing.cuisine}
-                  onChange={(e) => setEditing({ ...editing, cuisine: e.target.value })}
-                  className="mt-1 rounded-xl"
-                />
+                <Select
+                  value={editing.cuisine || "__none__"}
+                  onValueChange={(v) =>
+                    setEditing({ ...editing, cuisine: v === "__none__" ? "" : v })
+                  }
+                >
+                  <SelectTrigger className="mt-1 rounded-xl">
+                    <SelectValue placeholder={lang === "ar" ? "اختاري" : "Select"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">{lang === "ar" ? "بدون" : "None"}</SelectItem>
+                    {cuisineOptions.map((c) => (
+                      <SelectItem key={c.id} value={c.slug}>
+                        {c.icon ? `${c.icon} ` : ""}
+                        {lang === "ar" ? c.name_ar : c.name_en}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="sm:col-span-2">
                 <label className="text-xs font-semibold">{t.admin.language}</label>
