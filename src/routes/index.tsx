@@ -224,12 +224,12 @@ function HomePage() {
 
       {/* Ingredients input */}
       <Card className="mt-6 rounded-3xl border-border/60 bg-card p-5 shadow-card">
-        <label className="text-sm font-bold">{t.home.ingredientsLabel}</label>
+        <label className="text-sm font-bold">{pick(c.home_ingredients_label, t.home.ingredientsLabel)}</label>
         <div className="mt-2 flex gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={t.home.ingredientsPlaceholder}
+            placeholder={pick(c.home_ingredients_placeholder, t.home.ingredientsPlaceholder)}
             className="rounded-xl"
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -244,7 +244,7 @@ function HomePage() {
             className="rounded-xl gradient-primary text-primary-foreground hover:opacity-95"
           >
             <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">{t.home.addBtn}</span>
+            <span className="hidden sm:inline">{pick(c.home_add_btn, t.home.addBtn)}</span>
           </Button>
         </div>
 
@@ -267,7 +267,7 @@ function HomePage() {
 
         {suggestions.length > 0 && (
           <div className="mt-4">
-            <p className="text-xs font-semibold text-muted-foreground">{t.home.suggestions}</p>
+            <p className="text-xs font-semibold text-muted-foreground">{pick(c.home_suggestions_title, t.home.suggestions)}</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {suggestions.map((s) => (
                 <button
@@ -290,12 +290,12 @@ function HomePage() {
 
         {/* Exclude */}
         <div className="mt-5">
-          <label className="text-sm font-bold">{t.home.excludeLabel}</label>
+          <label className="text-sm font-bold">{pick(c.home_exclude_label, t.home.excludeLabel)}</label>
           <div className="mt-2 flex gap-2">
             <Input
               value={excludeInput}
               onChange={(e) => setExcludeInput(e.target.value)}
-              placeholder={t.home.excludePlaceholder}
+              placeholder={pick(c.home_exclude_placeholder, t.home.excludePlaceholder)}
               className="rounded-xl"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -332,7 +332,7 @@ function HomePage() {
 
         {/* Filters */}
         <div className="mt-5">
-          <p className="text-sm font-bold">{t.home.filters}</p>
+          <p className="text-sm font-bold">{pick(c.home_filters_title, t.home.filters)}</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {FILTERS.map((f) => {
               const active = activeFilters.includes(f.key);
