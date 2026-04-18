@@ -16,6 +16,9 @@ export interface SiteSettings {
   og_image_url: string | null;
   twitter_handle: string | null;
   primary_color: string | null;
+  facebook_url: string | null;
+  instagram_url: string | null;
+  whatsapp_url: string | null;
 }
 
 const DEFAULTS: SiteSettings = {
@@ -32,6 +35,9 @@ const DEFAULTS: SiteSettings = {
   og_image_url: null,
   twitter_handle: null,
   primary_color: null,
+  facebook_url: null,
+  instagram_url: null,
+  whatsapp_url: null,
 };
 
 interface SiteSettingsContextValue {
@@ -51,7 +57,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase
       .from("site_settings")
       .select(
-        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color"
+        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color, facebook_url, instagram_url, whatsapp_url"
       )
       .limit(1)
       .maybeSingle();
@@ -70,6 +76,9 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
         og_image_url: data.og_image_url,
         twitter_handle: data.twitter_handle,
         primary_color: (data as { primary_color?: string | null }).primary_color ?? null,
+        facebook_url: (data as { facebook_url?: string | null }).facebook_url ?? null,
+        instagram_url: (data as { instagram_url?: string | null }).instagram_url ?? null,
+        whatsapp_url: (data as { whatsapp_url?: string | null }).whatsapp_url ?? null,
       });
     }
     setLoading(false);
