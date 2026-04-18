@@ -135,6 +135,24 @@ export function Header() {
                     {t.nav.home}
                   </Link>
                 </Button>
+                <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                  <Link to="/features">
+                    <Sparkles className="me-2 h-4 w-4" />
+                    {t.nav.features}
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                  <Link to="/about">
+                    <Info className="me-2 h-4 w-4" />
+                    {t.nav.about}
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                  <Link to="/contact">
+                    <MessageCircle className="me-2 h-4 w-4" />
+                    {t.nav.contact}
+                  </Link>
+                </Button>
                 {user && (
                   <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
                     <Link to="/profile">
