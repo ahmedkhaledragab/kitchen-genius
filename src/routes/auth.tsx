@@ -177,15 +177,12 @@ function AuthPage() {
           </Button>
         </form>
 
-        <div className="mt-5 grid grid-cols-3 gap-2">
+        <div className="mt-5 grid grid-cols-2 gap-2">
           <div className="rounded-2xl border border-border/60 bg-secondary/40 p-3 text-center text-[11px] font-semibold leading-tight text-foreground/80">
             {t.auth.perks.recipes}
           </div>
           <div className="rounded-2xl border border-border/60 bg-secondary/40 p-3 text-center text-[11px] font-semibold leading-tight text-foreground/80">
             {t.auth.perks.favorites}
-          </div>
-          <div className="rounded-2xl border border-border/60 bg-secondary/40 p-3 text-center text-[11px] font-semibold leading-tight text-foreground/80">
-            {t.auth.perks.fridge}
           </div>
         </div>
 

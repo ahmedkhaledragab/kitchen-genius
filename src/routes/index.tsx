@@ -389,30 +389,6 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Image upload */}
-        <div className="mt-5 rounded-2xl border border-dashed border-border bg-muted/40 p-4 text-center">
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) handleImage(f);
-              e.target.value = "";
-            }}
-          />
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={imageBusy}
-            className="inline-flex items-center gap-2 rounded-xl bg-card px-4 py-2 text-sm font-semibold text-foreground shadow-card hover:bg-secondary"
-          >
-            {imageBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
-            {t.home.uploadFridge}
-          </button>
-          <p className="mt-1.5 text-[11px] text-muted-foreground">{t.home.uploadHint}</p>
-        </div>
 
         <Button
           type="button"
