@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, Save, Plus, Trash2, FileText } from "lucide-react";
+import { Loader2, Save, Plus, Trash2, FileText, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 import { useLang } from "@/contexts/LanguageContext";
@@ -27,6 +27,13 @@ const PAGE_TITLES: Record<PageKey, { ar: string; en: string }> = {
   about: { ar: "صفحة من نحن", en: "About page" },
   features: { ar: "صفحة المميزات", en: "Features page" },
   contact: { ar: "صفحة تواصل معنا", en: "Contact page" },
+};
+
+const PAGE_PATHS: Record<PageKey, string> = {
+  home: "/",
+  about: "/about",
+  features: "/features",
+  contact: "/contact",
 };
 
 export function PageContentEditor({ pageKey }: { pageKey: PageKey }) {
@@ -121,18 +128,35 @@ export function PageContentEditor({ pageKey }: { pageKey: PageKey }) {
             </p>
           </div>
         </div>
-        <Button
-          onClick={handleSave}
-          disabled={busy}
-          className="rounded-xl gradient-primary text-primary-foreground"
-        >
-          {busy ? (
-            <Loader2 className="me-1 h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="me-1 h-4 w-4" />
-          )}
-          {ar ? "حفظ التغييرات" : "Save changes"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-xl"
+          >
+            <a
+              href={PAGE_PATHS[pageKey]}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={ar ? "معاينة الصفحة" : "Preview page"}
+            >
+              <ExternalLink className="me-1 h-4 w-4" />
+              {ar ? "معاينة الصفحة" : "Preview page"}
+            </a>
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={busy}
+            className="rounded-xl gradient-primary text-primary-foreground"
+          >
+            {busy ? (
+              <Loader2 className="me-1 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="me-1 h-4 w-4" />
+            )}
+            {ar ? "حفظ التغييرات" : "Save changes"}
+          </Button>
+        </div>
       </div>
 
       <Tabs value={activeLang} onValueChange={(v) => setActiveLang(v as LangKey)}>
