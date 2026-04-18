@@ -59,20 +59,44 @@ function HomePage() {
   // to the hardcoded list if the catalog is empty or fails to load).
   const [catalogAr, setCatalogAr] = useState<string[]>([]);
   const [catalogEn, setCatalogEn] = useState<string[]>([]);
+  // Map: ingredient name (ar or en) -> category icon emoji.
+  // Used to prefix suggestion chips with their food-group emoji 🥬🥚🥩 …
+  const [iconByName, setIconByName] = useState<Record<string, string>>({});
 
   useEffect(() => {
     let cancelled = false;
-    supabase
-      .from("ingredients_catalog")
-      .select("name_ar, name_en")
-      .eq("is_active", true)
-      .order("sort_order", { ascending: true })
-      .limit(500)
-      .then(({ data }) => {
-        if (cancelled || !data) return;
-        setCatalogAr(data.map((d) => d.name_ar));
-        setCatalogEn(data.map((d) => d.name_en));
-      });
+    (async () => {
+      const [{ data: ings }, { data: cats }] = await Promise.all([
+        supabase
+          .from("ingredients_catalog")
+          .select("name_ar, name_en, category")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true })
+          .limit(500),
+        supabase
+          .from("ingredient_categories")
+          .select("slug, icon")
+          .eq("is_active", true),
+      ]);
+      if (cancelled) return;
+      if (ings) {
+        setCatalogAr(ings.map((d) => d.name_ar));
+        setCatalogEn(ings.map((d) => d.name_en));
+      }
+      if (ings && cats) {
+        const iconBySlug: Record<string, string> = {};
+        for (const c of cats) if (c.icon) iconBySlug[c.slug] = c.icon;
+        const map: Record<string, string> = {};
+        for (const i of ings) {
+          const icon = i.category ? iconBySlug[i.category] : undefined;
+          if (icon) {
+            map[i.name_ar] = icon;
+            map[i.name_en] = icon;
+          }
+        }
+        setIconByName(map);
+      }
+    })();
     return () => {
       cancelled = true;
     };
