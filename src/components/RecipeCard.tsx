@@ -125,6 +125,15 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite, index
               ))}
             </span>
           </Badge>
+          {cuisineLabel && (
+            <Badge
+              variant="secondary"
+              className="rounded-full border-0 bg-secondary text-secondary-foreground"
+            >
+              {cuisine?.icon ? <span className="me-1">{cuisine.icon}</span> : null}
+              {cuisineLabel}
+            </Badge>
+          )}
           {recipe.tags?.slice(0, 2).map((tag) => (
             <Badge key={tag} variant="outline" className="rounded-full border-border/70 text-muted-foreground">
               #{tag}
