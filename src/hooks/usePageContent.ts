@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLang } from "@/contexts/LanguageContext";
 
-export type PageKey = "about" | "features" | "contact";
+export type PageKey = "about" | "features" | "contact" | "home";
 
 export type PageItem = { title?: string; desc?: string; icon?: string };
 export type PageCTA = { label?: string; href?: string };
@@ -29,6 +29,24 @@ export type PageContent = {
   contact_email?: string;
   form_title?: string;
   form_sub?: string;
+
+  // home page (الصفحة الرئيسية)
+  home_ingredients_label?: string;
+  home_ingredients_placeholder?: string;
+  home_add_btn?: string;
+  home_exclude_label?: string;
+  home_exclude_placeholder?: string;
+  home_filters_title?: string;
+  home_filter_quick?: string;
+  home_filter_budget?: string;
+  home_filter_healthy?: string;
+  home_filter_arab?: string;
+  home_suggestions_title?: string;
+  home_cook_btn?: string;
+  home_generating?: string;
+  home_results_title?: string;
+  home_no_results?: string;
+  home_no_ingredients?: string;
 
   // shared CTA block
   cta_title?: string;
