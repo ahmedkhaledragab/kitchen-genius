@@ -165,6 +165,9 @@ function AdminSettingsPage() {
         primary_color: primaryColor || null,
         logo_url: logoUrl,
         favicon_url: faviconUrl,
+        facebook_url: facebookUrl.trim() || null,
+        instagram_url: instagramUrl.trim() || null,
+        whatsapp_url: whatsappUrl.trim() || null,
         updated_by: user?.id ?? null,
       })
       .eq("singleton", true);
