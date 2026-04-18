@@ -387,6 +387,7 @@ function AdminMessagesPage() {
         <div className="space-y-2">
           {filtered.map((m) => {
             const meta = STATUS_META[m.status];
+            const acc = m.user_id ? profiles[m.user_id] : null;
             return (
               <button
                 key={m.id}
@@ -407,6 +408,19 @@ function AdminMessagesPage() {
                         <Badge variant="outline" className={`text-[10px] ${meta.className}`}>
                           {meta[ar ? "ar" : "en"]}
                         </Badge>
+                        {acc ? (
+                          <Badge
+                            variant="outline"
+                            className="border-emerald-500/30 bg-emerald-500/10 text-[10px] text-emerald-700"
+                          >
+                            <ShieldCheck className="me-0.5 h-3 w-3" />
+                            {ar ? "حساب مسجّل" : "Registered"}
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-[10px] text-muted-foreground">
+                            {ar ? "زائر" : "Guest"}
+                          </Badge>
+                        )}
                       </div>
                       <p className="mt-0.5 truncate text-xs text-muted-foreground">
                         {m.email}
