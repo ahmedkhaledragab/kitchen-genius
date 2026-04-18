@@ -17,6 +17,12 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Recipe } from "@/lib/recipe";
 import { RecipeCard } from "@/components/RecipeCard";
 import { RecipeDetail } from "@/components/RecipeDetail";
+import { usePageContent } from "@/hooks/usePageContent";
+
+const pick = (custom: string | undefined, fallback: string): string => {
+  const v = (custom ?? "").trim();
+  return v.length > 0 ? v : fallback;
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
