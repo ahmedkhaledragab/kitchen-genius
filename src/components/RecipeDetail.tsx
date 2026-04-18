@@ -3,6 +3,7 @@ import { Clock, Flame, Heart, X } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useCategoriesCatalog } from "@/hooks/useCategoriesCatalog";
 import type { Recipe } from "@/lib/recipe";
 
 interface Props {
@@ -14,8 +15,15 @@ interface Props {
 }
 
 export function RecipeDetail({ recipe, onClose, onToggleFavorite, isFavorite, canFavorite }: Props) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const { bySlug: cuisineBySlug } = useCategoriesCatalog("recipe_cuisines");
   if (!recipe) return null;
+  const cuisine = recipe.cuisine ? cuisineBySlug.get(recipe.cuisine) : undefined;
+  const cuisineLabel = cuisine
+    ? lang === "ar"
+      ? cuisine.name_ar
+      : cuisine.name_en
+    : recipe.cuisine ?? "";
   const diffLabel =
     recipe.difficulty === "easy"
       ? t.recipe.easy
