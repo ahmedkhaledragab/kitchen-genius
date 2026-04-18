@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface CategoryOption {
@@ -35,5 +35,13 @@ export function useCategoriesCatalog(
     };
   }, [table]);
 
-  return { items, loading };
+  // Lookup helpers so consumers can resolve a slug back to its display data
+  // (icon + localized name) without re-deriving the map themselves.
+  const bySlug = useMemo(() => {
+    const map = new Map<string, CategoryOption>();
+    for (const it of items) map.set(it.slug, it);
+    return map;
+  }, [items]);
+
+  return { items, loading, bySlug };
 }
