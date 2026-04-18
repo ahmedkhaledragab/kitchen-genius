@@ -211,13 +211,13 @@ function HomePage() {
         >
           <div className="inline-flex items-center gap-2 rounded-full bg-card/70 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
             <Sparkles className="h-3.5 w-3.5" />
-            مدعوم بالذكاء الاصطناعي
+            {pick(c.hero_badge, lang === "ar" ? "مدعوم بالذكاء الاصطناعي" : "AI-powered")}
           </div>
           <h1 className="mt-3 text-3xl font-black leading-tight sm:text-5xl">
-            <span className="gradient-text">{t.home.heroTitle}</span>
+            <span className="gradient-text">{pick(c.hero_title, t.home.heroTitle)}</span>
           </h1>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
-            {t.home.heroSub}
+            {pick(c.hero_sub, t.home.heroSub)}
           </p>
         </motion.div>
       </section>
