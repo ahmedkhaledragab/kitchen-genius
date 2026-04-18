@@ -1,15 +1,30 @@
+import { Link } from "@tanstack/react-router";
 import { Heart, Sparkles, Facebook, Instagram } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 export function Footer() {
-  const { lang } = useLang();
+  const { t, lang } = useLang();
   const { settings } = useSiteSettings();
   const year = new Date().getFullYear();
   const siteName = lang === "ar" ? settings.site_name_ar : settings.site_name_en;
 
   return (
     <footer className="relative mt-12 border-t border-border/60 bg-gradient-to-br from-primary/5 via-background to-accent/5">
+      <nav className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-5 gap-y-2 px-4 pt-6 text-xs font-semibold text-muted-foreground">
+        <Link to="/" className="transition hover:text-primary">
+          {t.nav.home}
+        </Link>
+        <Link to="/features" className="transition hover:text-primary">
+          {t.nav.features}
+        </Link>
+        <Link to="/about" className="transition hover:text-primary">
+          {t.nav.about}
+        </Link>
+        <Link to="/contact" className="transition hover:text-primary">
+          {t.nav.contact}
+        </Link>
+      </nav>
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {settings.logo_url && (
