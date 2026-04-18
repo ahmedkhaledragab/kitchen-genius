@@ -20,6 +20,9 @@ export interface SiteSettings {
   instagram_url: string | null;
   whatsapp_url: string | null;
   contact_email: string | null;
+  tiktok_url: string | null;
+  telegram_url: string | null;
+  twitter_url: string | null;
 }
 
 const DEFAULTS: SiteSettings = {
@@ -40,6 +43,9 @@ const DEFAULTS: SiteSettings = {
   instagram_url: null,
   whatsapp_url: null,
   contact_email: null,
+  tiktok_url: null,
+  telegram_url: null,
+  twitter_url: null,
 };
 
 interface SiteSettingsContextValue {
@@ -59,7 +65,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase
       .from("site_settings")
       .select(
-        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color, facebook_url, instagram_url, whatsapp_url, contact_email"
+        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color, facebook_url, instagram_url, whatsapp_url, contact_email, tiktok_url, telegram_url, twitter_url"
       )
       .limit(1)
       .maybeSingle();
@@ -82,6 +88,9 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
         instagram_url: (data as { instagram_url?: string | null }).instagram_url ?? null,
         whatsapp_url: (data as { whatsapp_url?: string | null }).whatsapp_url ?? null,
         contact_email: (data as { contact_email?: string | null }).contact_email ?? null,
+        tiktok_url: (data as { tiktok_url?: string | null }).tiktok_url ?? null,
+        telegram_url: (data as { telegram_url?: string | null }).telegram_url ?? null,
+        twitter_url: (data as { twitter_url?: string | null }).twitter_url ?? null,
       });
     }
     setLoading(false);
