@@ -424,18 +424,6 @@ function PageEditor({
 
       {pageKey === "contact" && (
         <>
-          <Section title={ar ? "إيميل التواصل" : "Contact email"}>
-            <Field label={ar ? "الإيميل" : "Email"}>
-              <Input
-                type="email"
-                value={content.contact_email ?? ""}
-                onChange={(e) => onUpdate({ contact_email: e.target.value })}
-                className="rounded-xl"
-                placeholder="hello@example.com"
-              />
-            </Field>
-          </Section>
-
           <Section title={ar ? "قنوات التواصل" : "Channels"}>
             <Field label={ar ? "عنوان القسم (اختياري)" : "Section title (optional)"}>
               <Input
@@ -444,10 +432,10 @@ function PageEditor({
                 className="rounded-xl"
               />
             </Field>
-            <p className="text-xs text-muted-foreground">
+            <p className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
               {ar
-                ? "كل قناة: العنوان (Email/Facebook/Instagram)، النص الظاهر، والرابط."
-                : "Each channel: title (Email/Facebook/Instagram), label and link."}
+                ? "💡 الإيميل وروابط فيسبوك/إنستجرام/واتساب بتيجي تلقائياً من إعدادات الموقع. سيبي القائمة دي فاضية علشان نستخدمها، أو ضيفي قنوات إضافية هنا للتخصيص."
+                : "💡 Email and Facebook/Instagram/WhatsApp come automatically from Site Settings. Leave this list empty to use them, or add extra channels here to customize."}
             </p>
             <ItemList
               items={content.channels ?? []}

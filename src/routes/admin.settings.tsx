@@ -9,6 +9,7 @@ import {
   Search,
   ExternalLink,
   Share2,
+  Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -53,6 +54,7 @@ function AdminSettingsPage() {
   const [facebookUrl, setFacebookUrl] = useState("");
   const [instagramUrl, setInstagramUrl] = useState("");
   const [whatsappUrl, setWhatsappUrl] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
 
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -84,6 +86,7 @@ function AdminSettingsPage() {
     setFacebookUrl(settings.facebook_url ?? "");
     setInstagramUrl(settings.instagram_url ?? "");
     setWhatsappUrl(settings.whatsapp_url ?? "");
+    setContactEmail(settings.contact_email ?? "");
   }, [settings]);
 
   if (loading) return null;
@@ -168,6 +171,7 @@ function AdminSettingsPage() {
         facebook_url: facebookUrl.trim() || null,
         instagram_url: instagramUrl.trim() || null,
         whatsapp_url: whatsappUrl.trim() || null,
+        contact_email: contactEmail.trim() || null,
         updated_by: user?.id ?? null,
       })
       .eq("singleton", true);
@@ -561,6 +565,39 @@ function AdminSettingsPage() {
           <p className="mt-1 text-[11px] text-muted-foreground">
             {t.admin.siteSettings.twitterHandleHint}
           </p>
+        </div>
+      </Card>
+
+      {/* Contact email */}
+      <Card className="mt-4 rounded-3xl border-border/60 p-5">
+        <div className="flex items-center gap-2">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+            <Mail className="h-4 w-4" />
+          </span>
+          <div>
+            <p className="text-sm font-bold">
+              {lang === "ar" ? "البريد الإلكتروني للتواصل" : "Contact email"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {lang === "ar"
+                ? "هيظهر في صفحة /contact كأيقونة إيميل قابلة للضغط."
+                : "Shown on the /contact page as a clickable email channel."}
+            </p>
+          </div>
+        </div>
+        <div className="mt-4">
+          <Label htmlFor="contact_email" className="text-sm font-bold">
+            {lang === "ar" ? "الإيميل" : "Email"}
+          </Label>
+          <Input
+            id="contact_email"
+            type="email"
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
+            placeholder="hello@example.com"
+            className="mt-1.5 max-w-md rounded-xl"
+            dir="ltr"
+          />
         </div>
       </Card>
 

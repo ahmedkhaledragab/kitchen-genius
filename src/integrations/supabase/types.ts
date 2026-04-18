@@ -312,6 +312,7 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          contact_email: string | null
           description_ar: string | null
           description_en: string | null
           facebook_url: string | null
@@ -335,6 +336,7 @@ export type Database = {
           whatsapp_url: string | null
         }
         Insert: {
+          contact_email?: string | null
           description_ar?: string | null
           description_en?: string | null
           facebook_url?: string | null
@@ -358,6 +360,7 @@ export type Database = {
           whatsapp_url?: string | null
         }
         Update: {
+          contact_email?: string | null
           description_ar?: string | null
           description_en?: string | null
           facebook_url?: string | null
