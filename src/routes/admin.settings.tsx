@@ -9,6 +9,7 @@ import {
   Search,
   ExternalLink,
   Share2,
+  Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -53,6 +54,7 @@ function AdminSettingsPage() {
   const [facebookUrl, setFacebookUrl] = useState("");
   const [instagramUrl, setInstagramUrl] = useState("");
   const [whatsappUrl, setWhatsappUrl] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
 
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -84,6 +86,7 @@ function AdminSettingsPage() {
     setFacebookUrl(settings.facebook_url ?? "");
     setInstagramUrl(settings.instagram_url ?? "");
     setWhatsappUrl(settings.whatsapp_url ?? "");
+    setContactEmail(settings.contact_email ?? "");
   }, [settings]);
 
   if (loading) return null;
@@ -168,6 +171,7 @@ function AdminSettingsPage() {
         facebook_url: facebookUrl.trim() || null,
         instagram_url: instagramUrl.trim() || null,
         whatsapp_url: whatsappUrl.trim() || null,
+        contact_email: contactEmail.trim() || null,
         updated_by: user?.id ?? null,
       })
       .eq("singleton", true);
