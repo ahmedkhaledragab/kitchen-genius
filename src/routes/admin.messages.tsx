@@ -11,6 +11,9 @@ import {
   CheckCircle2,
   Archive,
   RefreshCw,
+  UserCircle2,
+  ShieldCheck,
+  CalendarDays,
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
@@ -53,6 +56,16 @@ export const Route = createFileRoute("/admin/messages")({
 });
 
 type MessageStatus = "new" | "read" | "replied" | "archived";
+
+type AccountProfile = {
+  id: string;
+  display_name: string | null;
+  email: string | null;
+  phone: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  is_active: boolean;
+};
 
 type ContactMessage = {
   id: string;
