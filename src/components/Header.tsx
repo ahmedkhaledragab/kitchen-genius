@@ -1,5 +1,23 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, Shield, Globe2, LogOut, Menu, Home, Info, Sparkles, MessageCircle } from "lucide-react";
+import {
+  Heart,
+  Shield,
+  Globe2,
+  LogOut,
+  Menu,
+  Home,
+  Info,
+  Sparkles,
+  MessageCircle,
+  ChefHat,
+  Tags,
+  Users,
+  Star,
+  Mail,
+  Inbox,
+  Settings as SettingsIcon,
+  LayoutDashboard,
+} from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LanguageContext";
