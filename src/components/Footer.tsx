@@ -49,6 +49,7 @@ export function Footer() {
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text font-extrabold text-transparent">
               Manar Elsheikh
             </span>
+            {/* Non-clickable on purpose */}
           </div>
 
           <a

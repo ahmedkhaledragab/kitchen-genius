@@ -115,6 +115,33 @@ export type Database = {
         }
         Relationships: []
       }
+      pages_content: {
+        Row: {
+          content_ar: Json
+          content_en: Json
+          id: string
+          page_key: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          content_ar?: Json
+          content_en?: Json
+          id?: string
+          page_key: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          content_ar?: Json
+          content_en?: Json
+          id?: string
+          page_key?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
