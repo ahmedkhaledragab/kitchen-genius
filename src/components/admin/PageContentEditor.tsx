@@ -1,4 +1,3 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, Save, Plus, Trash2, FileText } from "lucide-react";
 import { toast } from "sonner";
@@ -9,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   invalidatePageContent,
   type PageContent,
@@ -18,57 +17,51 @@ import {
   type PageKey,
 } from "@/hooks/usePageContent";
 
-export const Route = createFileRoute("/admin/content")({
-  component: AdminContentPage,
-});
-
 type LangKey = "ar" | "en";
-type AllContent = Record<PageKey, { ar: PageContent; en: PageContent }>;
-
-const PAGES: PageKey[] = ["about", "features", "contact"];
 const LANGS: LangKey[] = ["ar", "en"];
 
 const empty = (): PageContent => ({});
 
-function AdminContentPage() {
+const PAGE_TITLES: Record<PageKey, { ar: string; en: string }> = {
+  about: { ar: "صفحة من نحن", en: "About page" },
+  features: { ar: "صفحة المميزات", en: "Features page" },
+  contact: { ar: "صفحة تواصل معنا", en: "Contact page" },
+};
+
+export function PageContentEditor({ pageKey }: { pageKey: PageKey }) {
   const { lang } = useLang();
   const ar = lang === "ar";
 
-  const [data, setData] = useState<AllContent | null>(null);
-  const [activePage, setActivePage] = useState<PageKey>("about");
+  const [content, setContent] = useState<{ ar: PageContent; en: PageContent }>({
+    ar: empty(),
+    en: empty(),
+  });
   const [activeLang, setActiveLang] = useState<LangKey>("ar");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const { data: rows, error } = await supabase
+      setLoading(true);
+      const { data: row, error } = await supabase
         .from("pages_content")
-        .select("page_key, content_ar, content_en")
-        .in("page_key", PAGES);
+        .select("content_ar, content_en")
+        .eq("page_key", pageKey)
+        .maybeSingle();
       if (error) {
         toast.error(error.message);
         setLoading(false);
         return;
       }
-      const next: AllContent = {
-        about: { ar: empty(), en: empty() },
-        features: { ar: empty(), en: empty() },
-        contact: { ar: empty(), en: empty() },
-      };
-      rows?.forEach((r) => {
-        const k = r.page_key as PageKey;
-        next[k] = {
-          ar: ((r.content_ar as PageContent) || {}) ?? {},
-          en: ((r.content_en as PageContent) || {}) ?? {},
-        };
+      setContent({
+        ar: ((row?.content_ar as PageContent) || {}) ?? {},
+        en: ((row?.content_en as PageContent) || {}) ?? {},
       });
-      setData(next);
       setLoading(false);
     })();
-  }, []);
+  }, [pageKey]);
 
-  if (loading || !data) {
+  if (loading) {
     return (
       <div className="grid place-items-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -76,18 +69,13 @@ function AdminContentPage() {
     );
   }
 
-  const current = data[activePage][activeLang];
+  const current = content[activeLang];
+
   const update = (patch: Partial<PageContent>) => {
-    setData((d) => {
-      if (!d) return d;
-      return {
-        ...d,
-        [activePage]: {
-          ...d[activePage],
-          [activeLang]: { ...d[activePage][activeLang], ...patch },
-        },
-      };
-    });
+    setContent((c) => ({
+      ...c,
+      [activeLang]: { ...c[activeLang], ...patch },
+    }));
   };
 
   const updateList = <K extends "values" | "features" | "channels">(
@@ -98,16 +86,12 @@ function AdminContentPage() {
   const handleSave = async () => {
     setBusy(true);
     try {
-      const updates = PAGES.map((pk) =>
-        supabase
-          .from("pages_content")
-          .update({ content_ar: data[pk].ar, content_en: data[pk].en })
-          .eq("page_key", pk),
-      );
-      const results = await Promise.all(updates);
-      const firstErr = results.find((r) => r.error);
-      if (firstErr?.error) throw firstErr.error;
-      PAGES.forEach((p) => invalidatePageContent(p));
+      const { error } = await supabase
+        .from("pages_content")
+        .update({ content_ar: content.ar, content_en: content.en })
+        .eq("page_key", pageKey);
+      if (error) throw error;
+      invalidatePageContent(pageKey);
       toast.success(ar ? "اتحفظ تمام 💖" : "Saved 💖");
     } catch (e) {
       toast.error((e as Error).message);
@@ -115,6 +99,8 @@ function AdminContentPage() {
       setBusy(false);
     }
   };
+
+  const titles = PAGE_TITLES[pageKey];
 
   return (
     <div className="space-y-4">
@@ -125,12 +111,12 @@ function AdminContentPage() {
           </span>
           <div>
             <h1 className="text-lg font-extrabold sm:text-xl">
-              {ar ? "محتوى الصفحات" : "Pages content"}
+              {titles[ar ? "ar" : "en"]}
             </h1>
             <p className="text-xs text-muted-foreground">
               {ar
-                ? "عدّلي عناوين وفقرات صفحات من نحن، مميزاتنا، وتواصل معنا."
-                : "Edit titles, paragraphs, lists & CTAs for About, Features and Contact."}
+                ? "عدّلي العناوين والفقرات والعناصر بالعربي والإنجليزي."
+                : "Edit titles, paragraphs and lists in Arabic & English."}
             </p>
           </div>
         </div>
@@ -144,47 +130,29 @@ function AdminContentPage() {
           ) : (
             <Save className="me-1 h-4 w-4" />
           )}
-          {ar ? "حفظ كل التغييرات" : "Save all changes"}
+          {ar ? "حفظ التغييرات" : "Save changes"}
         </Button>
       </div>
 
-      <Tabs value={activePage} onValueChange={(v) => setActivePage(v as PageKey)}>
+      <Tabs value={activeLang} onValueChange={(v) => setActiveLang(v as LangKey)}>
         <TabsList className="rounded-xl">
-          <TabsTrigger value="about" className="rounded-lg">
-            {ar ? "من نحن" : "About"}
-          </TabsTrigger>
-          <TabsTrigger value="features" className="rounded-lg">
-            {ar ? "مميزاتنا" : "Features"}
-          </TabsTrigger>
-          <TabsTrigger value="contact" className="rounded-lg">
-            {ar ? "تواصل" : "Contact"}
-          </TabsTrigger>
+          {LANGS.map((l) => (
+            <TabsTrigger key={l} value={l} className="rounded-lg uppercase">
+              {l}
+            </TabsTrigger>
+          ))}
         </TabsList>
-
-        {PAGES.map((pk) => (
-          <TabsContent key={pk} value={pk} className="mt-4 space-y-4">
-            <Tabs value={activeLang} onValueChange={(v) => setActiveLang(v as LangKey)}>
-              <TabsList className="rounded-xl">
-                {LANGS.map((l) => (
-                  <TabsTrigger key={l} value={l} className="rounded-lg uppercase">
-                    {l}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-
-            <Card className="rounded-3xl border-border/60 p-5 sm:p-6">
-              <PageEditor
-                pageKey={pk}
-                content={current}
-                onUpdate={update}
-                onUpdateList={updateList}
-                ar={ar}
-              />
-            </Card>
-          </TabsContent>
-        ))}
       </Tabs>
+
+      <Card className="rounded-3xl border-border/60 p-5 sm:p-6">
+        <PageEditor
+          pageKey={pageKey}
+          content={current}
+          onUpdate={update}
+          onUpdateList={updateList}
+          ar={ar}
+        />
+      </Card>
     </div>
   );
 }

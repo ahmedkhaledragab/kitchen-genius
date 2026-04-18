@@ -9,7 +9,9 @@ import {
   X,
   Sparkles,
   Tags,
-  FileText,
+  Info,
+  Star,
+  Mail,
   Inbox,
 } from "lucide-react";
 
@@ -78,9 +80,19 @@ function AdminLayout() {
       label: lang === "ar" ? "المستخدمين" : "Users",
     },
     {
-      to: "/admin/content" as const,
-      icon: FileText,
-      label: lang === "ar" ? "محتوى الصفحات" : "Pages content",
+      to: "/admin/content/about" as const,
+      icon: Info,
+      label: lang === "ar" ? "صفحة من نحن" : "About page",
+    },
+    {
+      to: "/admin/content/features" as const,
+      icon: Star,
+      label: lang === "ar" ? "صفحة المميزات" : "Features page",
+    },
+    {
+      to: "/admin/content/contact" as const,
+      icon: Mail,
+      label: lang === "ar" ? "صفحة تواصل معنا" : "Contact page",
     },
     {
       to: "/admin/messages" as const,
