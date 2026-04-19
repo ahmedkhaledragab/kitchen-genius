@@ -85,11 +85,15 @@ function AdminUsersPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const now = Date.now();
+    const cutoff =
+      dateFilter === "7d" ? now - 7 * 86400000 : dateFilter === "30d" ? now - 30 * 86400000 : 0;
     return rows.filter((r) => {
       if (filter === "admin" && !r.is_admin) return false;
       if (filter === "user" && r.is_admin) return false;
       if (filter === "active" && !r.is_active) return false;
       if (filter === "banned" && r.is_active) return false;
+      if (cutoff && new Date(r.created_at).getTime() < cutoff) return false;
       if (!q) return true;
       return (
         (r.email ?? "").toLowerCase().includes(q) ||
@@ -97,7 +101,7 @@ function AdminUsersPage() {
         (r.phone ?? "").toLowerCase().includes(q)
       );
     });
-  }, [rows, query, filter]);
+  }, [rows, query, filter, dateFilter]);
 
   const exportCsv = () => {
     const headers = [
