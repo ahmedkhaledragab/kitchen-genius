@@ -771,8 +771,207 @@ function AdminSettingsPage() {
         </div>
       </Card>
 
-      <Card className="mt-4 rounded-3xl border-border/60 bg-muted/30 p-5">
-        <p className="text-sm font-bold">{t.admin.siteSettings.sitemapInfo}</p>
+      {/* PWA — Progressive Web App */}
+      <Card className="mt-4 rounded-3xl border-border/60 p-5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Smartphone className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="text-sm font-bold">
+                {lang === "ar" ? "تطبيق PWA" : "PWA app"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {lang === "ar"
+                  ? "خلّي الموقع يتثبّت كتطبيق على شاشة الموبايل والكمبيوتر."
+                  : "Let users install the site as an app on mobile and desktop."}
+              </p>
+            </div>
+          </div>
+          <Switch
+            checked={pwaEnabled}
+            onCheckedChange={setPwaEnabled}
+            aria-label="enable pwa"
+          />
+        </div>
+
+        {pwaEnabled && (
+          <>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="pwaShortAr" className="text-sm font-bold">
+                  {lang === "ar" ? "الاسم القصير (عربي)" : "Short name (AR)"}
+                </Label>
+                <Input
+                  id="pwaShortAr"
+                  value={pwaShortNameAr}
+                  onChange={(e) => setPwaShortNameAr(e.target.value)}
+                  placeholder={settings.site_name_ar.slice(0, 12)}
+                  maxLength={12}
+                  className="mt-1.5 rounded-xl"
+                  dir="rtl"
+                />
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {lang === "ar" ? "أقصى 12 حرف. هيظهر تحت الأيقونة." : "Max 12 chars. Shows under the icon."}
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="pwaShortEn" className="text-sm font-bold">
+                  {lang === "ar" ? "الاسم القصير (إنجليزي)" : "Short name (EN)"}
+                </Label>
+                <Input
+                  id="pwaShortEn"
+                  value={pwaShortNameEn}
+                  onChange={(e) => setPwaShortNameEn(e.target.value)}
+                  placeholder={settings.site_name_en.slice(0, 12)}
+                  maxLength={12}
+                  className="mt-1.5 rounded-xl"
+                  dir="ltr"
+                />
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label className="text-sm font-bold">
+                  {lang === "ar" ? "لون الثيم" : "Theme color"}
+                </Label>
+                <div className="mt-1.5 flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={pwaThemeColor}
+                    onChange={(e) => setPwaThemeColor(e.target.value)}
+                    className="h-12 w-12 cursor-pointer rounded-xl border border-border/60 bg-transparent"
+                  />
+                  <Input
+                    value={pwaThemeColor}
+                    onChange={(e) => setPwaThemeColor(e.target.value)}
+                    className="w-32 rounded-xl font-mono uppercase"
+                    dir="ltr"
+                    maxLength={7}
+                  />
+                </div>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {lang === "ar" ? "لون شريط العنوان في التطبيق." : "Address bar color when installed."}
+                </p>
+              </div>
+              <div>
+                <Label className="text-sm font-bold">
+                  {lang === "ar" ? "لون خلفية الفتح" : "Splash background"}
+                </Label>
+                <div className="mt-1.5 flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={pwaBgColor}
+                    onChange={(e) => setPwaBgColor(e.target.value)}
+                    className="h-12 w-12 cursor-pointer rounded-xl border border-border/60 bg-transparent"
+                  />
+                  <Input
+                    value={pwaBgColor}
+                    onChange={(e) => setPwaBgColor(e.target.value)}
+                    className="w-32 rounded-xl font-mono uppercase"
+                    dir="ltr"
+                    maxLength={7}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Icons */}
+            <div className="mt-5 space-y-4">
+              <p className="text-sm font-bold">
+                {lang === "ar" ? "أيقونات التطبيق" : "App icons"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {lang === "ar"
+                  ? "ارفعي صور PNG مربّعة. الأبعاد المثالية: 192×192 و 512×512."
+                  : "Upload square PNG images. Ideal sizes: 192×192 and 512×512."}
+              </p>
+
+              {/* 192 */}
+              <PwaIconRow
+                label="192 × 192"
+                hint={lang === "ar" ? "الأيقونة الأساسية للأندرويد." : "Primary Android icon."}
+                url={pwaIcon192}
+                uploading={uploadingPwa192}
+                onPick={(e) => onPickPwa(e, "192")}
+                onRemove={() => setPwaIcon192(null)}
+                inputRef={pwa192InputRef}
+                tUploading={t.admin.siteSettings.uploading}
+                tUpload={t.admin.siteSettings.upload}
+                tRemove={t.admin.siteSettings.remove}
+              />
+              {/* 512 */}
+              <PwaIconRow
+                label="512 × 512"
+                hint={lang === "ar" ? "تستخدم في شاشة الفتح والمتجر." : "Used on splash and stores."}
+                url={pwaIcon512}
+                uploading={uploadingPwa512}
+                onPick={(e) => onPickPwa(e, "512")}
+                onRemove={() => setPwaIcon512(null)}
+                inputRef={pwa512InputRef}
+                tUploading={t.admin.siteSettings.uploading}
+                tUpload={t.admin.siteSettings.upload}
+                tRemove={t.admin.siteSettings.remove}
+              />
+              {/* Apple */}
+              <PwaIconRow
+                label={lang === "ar" ? "Apple Touch (180×180)" : "Apple Touch (180×180)"}
+                hint={lang === "ar" ? "أيقونة iOS — مهمة جداً للآيفون." : "iOS icon — important for iPhone."}
+                url={pwaAppleIcon}
+                uploading={uploadingPwaApple}
+                onPick={(e) => onPickPwa(e, "apple")}
+                onRemove={() => setPwaAppleIcon(null)}
+                inputRef={pwaAppleInputRef}
+                tUploading={t.admin.siteSettings.uploading}
+                tUpload={t.admin.siteSettings.upload}
+                tRemove={t.admin.siteSettings.remove}
+              />
+            </div>
+
+            {/* Preview */}
+            <div className="mt-5 rounded-2xl border border-border/60 bg-muted/30 p-4">
+              <p className="mb-3 text-xs font-bold text-muted-foreground">
+                {lang === "ar" ? "معاينة" : "Preview"}
+              </p>
+              <div className="flex items-center gap-3">
+                <div
+                  className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl shadow-soft"
+                  style={{ backgroundColor: pwaBgColor }}
+                >
+                  {pwaIcon192 || pwaIcon512 ? (
+                    <img
+                      src={pwaIcon192 || pwaIcon512 || ""}
+                      alt="app icon"
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    <Smartphone className="h-6 w-6" style={{ color: pwaThemeColor }} />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-extrabold">
+                    {(lang === "ar" ? pwaShortNameAr : pwaShortNameEn) ||
+                      (lang === "ar" ? settings.site_name_ar : settings.site_name_en)}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {lang === "ar" ? settings.site_name_ar : settings.site_name_en}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <p className="mt-4 text-[11px] text-muted-foreground">
+              {lang === "ar"
+                ? "ملاحظة: تثبيت التطبيق يشتغل بس على الموقع المنشور (مش في معاينة Lovable)."
+                : "Note: Install only works on the published site (not the Lovable preview)."}
+            </p>
+          </>
+        )}
+      </Card>
+
+
         <p className="mt-1 text-xs text-muted-foreground">{t.admin.siteSettings.sitemapHint}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button asChild variant="outline" size="sm" className="rounded-xl">
