@@ -10,8 +10,10 @@ import {
   ExternalLink,
   Share2,
   Mail,
+  Smartphone,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LanguageContext";
@@ -59,6 +61,22 @@ function AdminSettingsPage() {
   const [telegramUrl, setTelegramUrl] = useState("");
   const [twitterUrl, setTwitterUrl] = useState("");
 
+  // PWA state
+  const [pwaEnabled, setPwaEnabled] = useState(false);
+  const [pwaShortNameAr, setPwaShortNameAr] = useState("");
+  const [pwaShortNameEn, setPwaShortNameEn] = useState("");
+  const [pwaThemeColor, setPwaThemeColor] = useState("#16a34a");
+  const [pwaBgColor, setPwaBgColor] = useState("#ffffff");
+  const [pwaIcon192, setPwaIcon192] = useState<string | null>(null);
+  const [pwaIcon512, setPwaIcon512] = useState<string | null>(null);
+  const [pwaAppleIcon, setPwaAppleIcon] = useState<string | null>(null);
+  const [uploadingPwa192, setUploadingPwa192] = useState(false);
+  const [uploadingPwa512, setUploadingPwa512] = useState(false);
+  const [uploadingPwaApple, setUploadingPwaApple] = useState(false);
+  const pwa192InputRef = useRef<HTMLInputElement>(null);
+  const pwa512InputRef = useRef<HTMLInputElement>(null);
+  const pwaAppleInputRef = useRef<HTMLInputElement>(null);
+
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingFav, setUploadingFav] = useState(false);
@@ -93,6 +111,14 @@ function AdminSettingsPage() {
     setTiktokUrl(settings.tiktok_url ?? "");
     setTelegramUrl(settings.telegram_url ?? "");
     setTwitterUrl(settings.twitter_url ?? "");
+    setPwaEnabled(settings.pwa_enabled ?? false);
+    setPwaShortNameAr(settings.pwa_short_name_ar ?? "");
+    setPwaShortNameEn(settings.pwa_short_name_en ?? "");
+    setPwaThemeColor(settings.pwa_theme_color ?? "#16a34a");
+    setPwaBgColor(settings.pwa_background_color ?? "#ffffff");
+    setPwaIcon192(settings.pwa_icon_192_url);
+    setPwaIcon512(settings.pwa_icon_512_url);
+    setPwaAppleIcon(settings.pwa_apple_touch_icon_url);
   }, [settings]);
 
   if (loading) return null;
