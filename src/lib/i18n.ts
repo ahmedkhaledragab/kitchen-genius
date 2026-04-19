@@ -59,8 +59,11 @@ const arDict = {
       days: "يوم",
       tabAll: "الكل",
       tabFollowing: "بتابعهم",
+      tabTrending: "الترند 🔥",
       followingEmpty: "تابعي ناس عشان تشوفي بوستاتهم هنا 💕",
       followingLoginPrompt: "سجّلي دخول علشان تشوفي بوستات اللي بتتابعيهم",
+      trendingEmpty: "لسه مفيش بوستات ترند الأسبوع ده 🔥",
+      trendingHint: "أكتر البوستات لايكات في آخر ٧ أيام",
     },
     home: {
       heroTitle: "من اللي عندك؟ 👀",
@@ -349,8 +352,11 @@ const enDict = {
       days: "d",
       tabAll: "All",
       tabFollowing: "Following",
+      tabTrending: "Trending 🔥",
       followingEmpty: "Follow people to see their posts here 💕",
       followingLoginPrompt: "Sign in to see posts from people you follow",
+      trendingEmpty: "No trending posts this week yet 🔥",
+      trendingHint: "Top liked posts in the last 7 days",
     },
     home: {
       heroTitle: "What's in your kitchen? 👀",
