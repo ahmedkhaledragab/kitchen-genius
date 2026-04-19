@@ -301,6 +301,7 @@ export function Header() {
                   </Button>
                 )}
               </div>
+              </div>
             </SheetContent>
           </Sheet>
         </div>
