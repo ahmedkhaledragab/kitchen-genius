@@ -97,7 +97,7 @@ function CommunityPage() {
   const [commentDraft, setCommentDraft] = useState<Record<string, string>>({});
 
   // feed tab
-  const [feedTab, setFeedTab] = useState<"all" | "following">("all");
+  const [feedTab, setFeedTab] = useState<"all" | "following" | "trending">("all");
   const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
 
   // report dialog
