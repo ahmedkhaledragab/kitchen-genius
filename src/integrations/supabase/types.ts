@@ -44,6 +44,7 @@ export type Database = {
           created_at: string
           id: string
           is_hidden: boolean
+          parent_comment_id: string | null
           post_id: string
           updated_at: string
           user_id: string
@@ -53,6 +54,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_hidden?: boolean
+          parent_comment_id?: string | null
           post_id: string
           updated_at?: string
           user_id: string
@@ -62,11 +64,19 @@ export type Database = {
           created_at?: string
           id?: string
           is_hidden?: boolean
+          parent_comment_id?: string | null
           post_id?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "community_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "community_comments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "community_comments_post_id_fkey"
             columns: ["post_id"]
@@ -98,6 +108,35 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "community_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_post_hashtags: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          tag: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          tag: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          tag?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_post_hashtags_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "community_posts"
@@ -152,6 +191,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      community_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          reaction: Database["public"]["Enums"]["reaction_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          reaction?: Database["public"]["Enums"]["reaction_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          reaction?: Database["public"]["Enums"]["reaction_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_reactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       community_reports: {
         Row: {
@@ -786,6 +857,16 @@ export type Database = {
         Args: { _default_limit?: number; _feature: string; _user_id: string }
         Returns: Json
       }
+      get_suggested_users: {
+        Args: { _limit?: number; _viewer_id: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          display_name: string
+          followers_count: number
+          id: string
+        }[]
+      }
       get_top_creators: {
         Args: { _limit?: number }
         Returns: {
@@ -796,6 +877,13 @@ export type Database = {
           id: string
           likes_count: number
           posts_count: number
+        }[]
+      }
+      get_trending_hashtags: {
+        Args: { _limit?: number }
+        Returns: {
+          posts_count: number
+          tag: string
         }[]
       }
       has_role: {
@@ -812,7 +900,8 @@ export type Database = {
       community_post_type: "recipe" | "post"
       difficulty_level: "easy" | "medium" | "hard"
       message_status: "new" | "read" | "replied" | "archived"
-      notification_type: "like" | "comment" | "follow"
+      notification_type: "like" | "comment" | "follow" | "mention"
+      reaction_type: "like" | "love" | "haha" | "wow" | "sad"
       report_status: "pending" | "reviewed" | "dismissed" | "actioned"
     }
     CompositeTypes: {
@@ -945,7 +1034,8 @@ export const Constants = {
       community_post_type: ["recipe", "post"],
       difficulty_level: ["easy", "medium", "hard"],
       message_status: ["new", "read", "replied", "archived"],
-      notification_type: ["like", "comment", "follow"],
+      notification_type: ["like", "comment", "follow", "mention"],
+      reaction_type: ["like", "love", "haha", "wow", "sad"],
       report_status: ["pending", "reviewed", "dismissed", "actioned"],
     },
   },
