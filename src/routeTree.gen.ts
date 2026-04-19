@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TopCreatorsRouteImport } from './routes/top-creators'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as RecipesRouteImport } from './routes/recipes'
@@ -34,6 +35,11 @@ import { Route as AdminContentFeaturesRouteImport } from './routes/admin.content
 import { Route as AdminContentContactRouteImport } from './routes/admin.content.contact'
 import { Route as AdminContentAboutRouteImport } from './routes/admin.content.about'
 
+const TopCreatorsRoute = TopCreatorsRouteImport.update({
+  id: '/top-creators',
+  path: '/top-creators',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/recipes': typeof RecipesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/top-creators': typeof TopCreatorsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/community': typeof AdminCommunityRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/recipes': typeof RecipesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/top-creators': typeof TopCreatorsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/community': typeof AdminCommunityRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/recipes': typeof RecipesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/top-creators': typeof TopCreatorsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/community': typeof AdminCommunityRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/recipes'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/top-creators'
     | '/admin/categories'
     | '/admin/community'
     | '/admin/ingredients'
@@ -272,6 +282,7 @@ export interface FileRouteTypes {
     | '/recipes'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/top-creators'
     | '/admin/categories'
     | '/admin/community'
     | '/admin/ingredients'
@@ -298,6 +309,7 @@ export interface FileRouteTypes {
     | '/recipes'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/top-creators'
     | '/admin/categories'
     | '/admin/community'
     | '/admin/ingredients'
@@ -325,11 +337,19 @@ export interface RootRouteChildren {
   RecipesRoute: typeof RecipesRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TopCreatorsRoute: typeof TopCreatorsRoute
   UUserIdRoute: typeof UUserIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/top-creators': {
+      id: '/top-creators'
+      path: '/top-creators'
+      fullPath: '/top-creators'
+      preLoaderRoute: typeof TopCreatorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -545,6 +565,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecipesRoute: RecipesRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TopCreatorsRoute: TopCreatorsRoute,
   UUserIdRoute: UUserIdRoute,
 }
 export const routeTree = rootRouteImport
