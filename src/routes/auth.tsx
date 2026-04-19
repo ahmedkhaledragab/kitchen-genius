@@ -77,10 +77,10 @@ function AuthPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-stretch px-4 pt-6 pb-20">
+    <div className="mx-auto flex w-full max-w-md flex-col items-stretch px-4 pt-6 pb-20 lg:max-w-5xl lg:flex-row lg:items-center lg:gap-10 lg:px-8 lg:pt-12">
       <Link
         to="/"
-        className="mx-auto mb-5 block aspect-[16/9] w-full max-w-sm overflow-hidden rounded-3xl shadow-card ring-1 ring-border/60"
+        className="mx-auto mb-5 block aspect-[16/9] w-full max-w-sm overflow-hidden rounded-3xl shadow-card ring-1 ring-border/60 lg:mx-0 lg:mb-0 lg:aspect-[4/5] lg:max-w-none lg:flex-1"
       >
         <img
           src={authHero}
@@ -91,7 +91,7 @@ function AuthPage() {
         />
       </Link>
 
-      <Card className="rounded-3xl border-border/60 bg-card p-6 shadow-card">
+      <Card className="rounded-3xl border-border/60 bg-card p-6 shadow-card lg:flex-1 lg:p-8">
         <h1 className="text-center text-2xl font-extrabold">{t.auth.welcome}</h1>
         <p className="mt-1 text-center text-sm leading-relaxed text-muted-foreground">
           {t.auth.welcomeSub}
