@@ -23,6 +23,16 @@ export interface SiteSettings {
   tiktok_url: string | null;
   telegram_url: string | null;
   twitter_url: string | null;
+  // PWA
+  pwa_enabled: boolean;
+  pwa_short_name_ar: string | null;
+  pwa_short_name_en: string | null;
+  pwa_theme_color: string | null;
+  pwa_background_color: string | null;
+  pwa_icon_192_url: string | null;
+  pwa_icon_512_url: string | null;
+  pwa_apple_touch_icon_url: string | null;
+  pwa_display: string;
 }
 
 const DEFAULTS: SiteSettings = {
@@ -46,6 +56,15 @@ const DEFAULTS: SiteSettings = {
   tiktok_url: null,
   telegram_url: null,
   twitter_url: null,
+  pwa_enabled: false,
+  pwa_short_name_ar: null,
+  pwa_short_name_en: null,
+  pwa_theme_color: "#16a34a",
+  pwa_background_color: "#ffffff",
+  pwa_icon_192_url: null,
+  pwa_icon_512_url: null,
+  pwa_apple_touch_icon_url: null,
+  pwa_display: "standalone",
 };
 
 interface SiteSettingsContextValue {
@@ -65,7 +84,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase
       .from("site_settings")
       .select(
-        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color, facebook_url, instagram_url, whatsapp_url, contact_email, tiktok_url, telegram_url, twitter_url"
+        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color, facebook_url, instagram_url, whatsapp_url, contact_email, tiktok_url, telegram_url, twitter_url, pwa_enabled, pwa_short_name_ar, pwa_short_name_en, pwa_theme_color, pwa_background_color, pwa_icon_192_url, pwa_icon_512_url, pwa_apple_touch_icon_url, pwa_display"
       )
       .limit(1)
       .maybeSingle();
@@ -91,6 +110,15 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
         tiktok_url: (data as { tiktok_url?: string | null }).tiktok_url ?? null,
         telegram_url: (data as { telegram_url?: string | null }).telegram_url ?? null,
         twitter_url: (data as { twitter_url?: string | null }).twitter_url ?? null,
+        pwa_enabled: (data as { pwa_enabled?: boolean }).pwa_enabled ?? false,
+        pwa_short_name_ar: (data as { pwa_short_name_ar?: string | null }).pwa_short_name_ar ?? null,
+        pwa_short_name_en: (data as { pwa_short_name_en?: string | null }).pwa_short_name_en ?? null,
+        pwa_theme_color: (data as { pwa_theme_color?: string | null }).pwa_theme_color ?? "#16a34a",
+        pwa_background_color: (data as { pwa_background_color?: string | null }).pwa_background_color ?? "#ffffff",
+        pwa_icon_192_url: (data as { pwa_icon_192_url?: string | null }).pwa_icon_192_url ?? null,
+        pwa_icon_512_url: (data as { pwa_icon_512_url?: string | null }).pwa_icon_512_url ?? null,
+        pwa_apple_touch_icon_url: (data as { pwa_apple_touch_icon_url?: string | null }).pwa_apple_touch_icon_url ?? null,
+        pwa_display: (data as { pwa_display?: string }).pwa_display ?? "standalone",
       });
     }
     setLoading(false);
