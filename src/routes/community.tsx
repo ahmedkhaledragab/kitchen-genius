@@ -111,6 +111,7 @@ function CommunityPage() {
   useEffect(() => {
     if (!user) {
       setIsBanned(false);
+      setFollowingIds(new Set());
       return;
     }
     void supabase
@@ -119,6 +120,14 @@ function CommunityPage() {
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => setIsBanned(!!data));
+
+    void supabase
+      .from("user_follows")
+      .select("following_id")
+      .eq("follower_id", user.id)
+      .then(({ data }) => {
+        setFollowingIds(new Set((data || []).map((r) => r.following_id)));
+      });
   }, [user?.id]);
 
   async function loadPosts() {
