@@ -14,6 +14,7 @@ import {
   Mail,
   Inbox,
   Home,
+  MessagesSquare,
 } from "lucide-react";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -79,6 +80,11 @@ function AdminLayout() {
       to: "/admin/users" as const,
       icon: Users,
       label: lang === "ar" ? "المستخدمين" : "Users",
+    },
+    {
+      to: "/admin/community" as const,
+      icon: MessagesSquare,
+      label: lang === "ar" ? "المجتمع" : "Community",
     },
     {
       to: "/admin/content/home" as const,

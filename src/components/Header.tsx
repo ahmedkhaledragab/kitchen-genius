@@ -66,6 +66,9 @@ export function Header() {
             <Link to="/features">{t.nav.features}</Link>
           </Button>
           <Button asChild variant="ghost" size="sm" className="rounded-xl">
+            <Link to="/community">{t.nav.community}</Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm" className="rounded-xl">
             <Link to="/about">{t.nav.about}</Link>
           </Button>
           <Button asChild variant="ghost" size="sm" className="rounded-xl">
@@ -157,6 +160,12 @@ export function Header() {
                   <Link to="/features">
                     <Sparkles className="me-2 h-4 w-4" />
                     {t.nav.features}
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                  <Link to="/community">
+                    <Users className="me-2 h-4 w-4" />
+                    {t.nav.community}
                   </Link>
                 </Button>
                 <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>

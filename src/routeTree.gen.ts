@@ -15,6 +15,7 @@ import { Route as RecipesRouteImport } from './routes/recipes'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CommunityRouteImport } from './routes/community'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
@@ -25,6 +26,7 @@ import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRecipesRouteImport } from './routes/admin.recipes'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminIngredientsRouteImport } from './routes/admin.ingredients'
+import { Route as AdminCommunityRouteImport } from './routes/admin.community'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminContentHomeRouteImport } from './routes/admin.content.home'
 import { Route as AdminContentFeaturesRouteImport } from './routes/admin.content.features'
@@ -59,6 +61,11 @@ const FeaturesRoute = FeaturesRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -111,6 +118,11 @@ const AdminIngredientsRoute = AdminIngredientsRouteImport.update({
   path: '/ingredients',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCommunityRoute = AdminCommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -142,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/profile': typeof ProfileRoute
@@ -149,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/community': typeof AdminCommunityRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/recipes': typeof AdminRecipesRoute
@@ -164,6 +178,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
+  '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/profile': typeof ProfileRoute
@@ -171,6 +186,7 @@ export interface FileRoutesByTo {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/community': typeof AdminCommunityRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/recipes': typeof AdminRecipesRoute
@@ -188,6 +204,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/profile': typeof ProfileRoute
@@ -195,6 +212,7 @@ export interface FileRoutesById {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/community': typeof AdminCommunityRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/recipes': typeof AdminRecipesRoute
@@ -213,6 +231,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
+    | '/community'
     | '/contact'
     | '/features'
     | '/profile'
@@ -220,6 +239,7 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/admin/categories'
+    | '/admin/community'
     | '/admin/ingredients'
     | '/admin/messages'
     | '/admin/recipes'
@@ -235,6 +255,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
+    | '/community'
     | '/contact'
     | '/features'
     | '/profile'
@@ -242,6 +263,7 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/admin/categories'
+    | '/admin/community'
     | '/admin/ingredients'
     | '/admin/messages'
     | '/admin/recipes'
@@ -258,6 +280,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/auth'
+    | '/community'
     | '/contact'
     | '/features'
     | '/profile'
@@ -265,6 +288,7 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/admin/categories'
+    | '/admin/community'
     | '/admin/ingredients'
     | '/admin/messages'
     | '/admin/recipes'
@@ -282,6 +306,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CommunityRoute: typeof CommunityRoute
   ContactRoute: typeof ContactRoute
   FeaturesRoute: typeof FeaturesRoute
   ProfileRoute: typeof ProfileRoute
@@ -332,6 +357,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -404,6 +436,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIngredientsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/community': {
+      id: '/admin/community'
+      path: '/community'
+      fullPath: '/admin/community'
+      preLoaderRoute: typeof AdminCommunityRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/categories'
@@ -444,6 +483,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminCommunityRoute: typeof AdminCommunityRoute
   AdminIngredientsRoute: typeof AdminIngredientsRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminRecipesRoute: typeof AdminRecipesRoute
@@ -458,6 +498,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminCommunityRoute: AdminCommunityRoute,
   AdminIngredientsRoute: AdminIngredientsRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminRecipesRoute: AdminRecipesRoute,
@@ -477,6 +518,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
+  CommunityRoute: CommunityRoute,
   ContactRoute: ContactRoute,
   FeaturesRoute: FeaturesRoute,
   ProfileRoute: ProfileRoute,
@@ -487,12 +529,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
