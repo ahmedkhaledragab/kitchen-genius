@@ -291,6 +291,29 @@ function AdminUsersPage() {
         ))}
       </div>
 
+      <div className="mb-4 flex flex-wrap gap-1.5">
+        {(
+          [
+            { k: "all", ar: "كل الوقت", en: "All time" },
+            { k: "7d", ar: "آخر ٧ أيام", en: "Last 7 days" },
+            { k: "30d", ar: "آخر ٣٠ يوم", en: "Last 30 days" },
+          ] as const
+        ).map((f) => (
+          <button
+            key={f.k}
+            type="button"
+            onClick={() => setDateFilter(f.k as DateFilter)}
+            className={`rounded-full px-3 py-1 text-xs font-bold transition ${
+              dateFilter === f.k
+                ? "bg-foreground text-background"
+                : "border border-border/70 bg-background text-muted-foreground hover:bg-accent"
+            }`}
+          >
+            {lang === "ar" ? f.ar : f.en}
+          </button>
+        ))}
+      </div>
+
       {busy && rows.length === 0 ? (
         <div className="flex justify-center py-10">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
