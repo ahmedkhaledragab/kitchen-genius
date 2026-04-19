@@ -47,6 +47,7 @@ function AdminUsersPage() {
   const [rows, setRows] = useState<AdminUserRow[]>([]);
   const [busy, setBusy] = useState(false);
   const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<UserFilter>("all");
 
   const [editing, setEditing] = useState<{ user: AdminUserRow } | null>(null);
   const [newLimit, setNewLimit] = useState<number>(10);
@@ -82,13 +83,65 @@ function AdminUsersPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter(
-      (r) =>
+    return rows.filter((r) => {
+      if (filter === "admin" && !r.is_admin) return false;
+      if (filter === "user" && r.is_admin) return false;
+      if (filter === "active" && !r.is_active) return false;
+      if (filter === "banned" && r.is_active) return false;
+      if (!q) return true;
+      return (
         (r.email ?? "").toLowerCase().includes(q) ||
-        (r.display_name ?? "").toLowerCase().includes(q),
-    );
-  }, [rows, query]);
+        (r.display_name ?? "").toLowerCase().includes(q) ||
+        (r.phone ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [rows, query, filter]);
+
+  const exportCsv = () => {
+    const headers = [
+      "id",
+      "email",
+      "display_name",
+      "phone",
+      "is_admin",
+      "is_active",
+      "created_at",
+      "recipes_today",
+      "recipes_limit",
+    ];
+    const escape = (v: unknown) => {
+      const s = v === null || v === undefined ? "" : String(v);
+      return `"${s.replace(/"/g, '""')}"`;
+    };
+    const csv = [
+      headers.join(","),
+      ...filtered.map((r) =>
+        [
+          r.id,
+          r.email,
+          r.display_name,
+          r.phone,
+          r.is_admin,
+          r.is_active,
+          r.created_at,
+          r.recipes_today,
+          r.recipes_limit,
+        ]
+          .map(escape)
+          .join(","),
+      ),
+    ].join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `users-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(lang === "ar" ? "تم التصدير" : "Exported");
+  };
 
   if (loading) return null;
   if (!isAdmin) {
