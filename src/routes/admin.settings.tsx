@@ -971,7 +971,8 @@ function AdminSettingsPage() {
         )}
       </Card>
 
-
+      <Card className="mt-4 rounded-3xl border-border/60 bg-muted/30 p-5">
+        <p className="text-sm font-bold">{t.admin.siteSettings.sitemapInfo}</p>
         <p className="mt-1 text-xs text-muted-foreground">{t.admin.siteSettings.sitemapHint}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button asChild variant="outline" size="sm" className="rounded-xl">
