@@ -713,7 +713,8 @@ function CommunityPage() {
             </Card>
           ))}
         </div>
-      )}
+        );
+      })()}
 
       {/* Report dialog */}
       <Dialog open={!!reportTarget} onOpenChange={(o) => !o && setReportTarget(null)}>
