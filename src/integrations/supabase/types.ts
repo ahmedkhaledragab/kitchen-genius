@@ -738,6 +738,7 @@ export type Database = {
           id: string
           is_active: boolean
           is_admin: boolean
+          phone: string
           recipes_limit: number
           recipes_today: number
         }[]
