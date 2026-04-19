@@ -1009,3 +1009,85 @@ function AdminSettingsPage() {
     </div>
   );
 }
+
+function PwaIconRow({
+  label,
+  hint,
+  url,
+  uploading,
+  onPick,
+  onRemove,
+  inputRef,
+  tUploading,
+  tUpload,
+  tRemove,
+}: {
+  label: string;
+  hint: string;
+  url: string | null;
+  uploading: boolean;
+  onPick: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onRemove: () => void;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  tUploading: string;
+  tUpload: string;
+  tRemove: string;
+}) {
+  return (
+    <div className="flex items-center gap-4 rounded-2xl border border-border/60 p-3">
+      <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-dashed border-border/60 bg-muted/30">
+        {url ? (
+          <img src={url} alt={label} className="h-full w-full object-contain" />
+        ) : (
+          <ImageIcon className="h-6 w-6 text-muted-foreground/50" />
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-bold">{label}</p>
+        <p className="text-[11px] text-muted-foreground">{hint}</p>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/png,image/webp"
+          className="hidden"
+          onChange={onPick}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="rounded-xl"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+        >
+          {uploading ? (
+            <>
+              <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
+              {tUploading}
+            </>
+          ) : (
+            <>
+              <Upload className="me-1.5 h-4 w-4" />
+              {tUpload}
+            </>
+          )}
+        </Button>
+        {url && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="rounded-xl text-destructive hover:bg-destructive/10"
+            onClick={onRemove}
+          >
+            <Trash2 className="me-1.5 h-4 w-4" />
+            {tRemove}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
