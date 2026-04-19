@@ -24,6 +24,7 @@ import { useLang } from "@/contexts/LanguageContext";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { Button } from "@/components/ui/button";
 import { NotificationsBell } from "@/components/NotificationsBell";
+import { InstallPWAButton } from "@/components/InstallPWAButton";
 import {
   Sheet,
   SheetContent,
@@ -96,6 +97,7 @@ export function Header() {
           )}
 
           {user && <NotificationsBell />}
+          <InstallPWAButton className="hidden lg:inline-flex" />
 
           <Button
             type="button"
