@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, Loader2, LogOut, User as UserIcon } from "lucide-react";
+import { Camera, Loader2, LogOut, User as UserIcon, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { RecipeCard } from "@/components/RecipeCard";
 import { RecipeDetail } from "@/components/RecipeDetail";
 import type { Recipe } from "@/lib/recipe";
@@ -33,6 +34,7 @@ function ProfilePage() {
 
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
+  const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -46,13 +48,14 @@ function ProfilePage() {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("display_name, phone, avatar_url")
+      .select("display_name, phone, avatar_url, bio")
       .eq("id", user.id)
       .maybeSingle()
       .then(({ data }) => {
         setDisplayName(data?.display_name ?? "");
         setPhone(data?.phone ?? "");
         setAvatarUrl(data?.avatar_url ?? null);
+        setBio((data as { bio?: string | null } | null)?.bio ?? "");
       });
   }, [user]);
 
@@ -102,6 +105,7 @@ function ProfilePage() {
         .update({
           display_name: displayName.trim() || null,
           phone: phone.trim() || null,
+          bio: bio.trim() || null,
         })
         .eq("id", user.id);
       if (error) throw error;
