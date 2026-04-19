@@ -21,6 +21,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as UUserIdRouteImport } from './routes/u.$userId'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRecipesRouteImport } from './routes/admin.recipes'
@@ -92,6 +93,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const UUserIdRoute = UUserIdRouteImport.update({
+  id: '/u/$userId',
+  path: '/u/$userId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/u/$userId': typeof UUserIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/content/about': typeof AdminContentAboutRoute
   '/admin/content/contact': typeof AdminContentContactRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/u/$userId': typeof UUserIdRoute
   '/admin': typeof AdminIndexRoute
   '/admin/content/about': typeof AdminContentAboutRoute
   '/admin/content/contact': typeof AdminContentContactRoute
@@ -218,6 +226,7 @@ export interface FileRoutesById {
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/u/$userId': typeof UUserIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/content/about': typeof AdminContentAboutRoute
   '/admin/content/contact': typeof AdminContentContactRoute
@@ -245,6 +254,7 @@ export interface FileRouteTypes {
     | '/admin/recipes'
     | '/admin/settings'
     | '/admin/users'
+    | '/u/$userId'
     | '/admin/'
     | '/admin/content/about'
     | '/admin/content/contact'
@@ -269,6 +279,7 @@ export interface FileRouteTypes {
     | '/admin/recipes'
     | '/admin/settings'
     | '/admin/users'
+    | '/u/$userId'
     | '/admin'
     | '/admin/content/about'
     | '/admin/content/contact'
@@ -294,6 +305,7 @@ export interface FileRouteTypes {
     | '/admin/recipes'
     | '/admin/settings'
     | '/admin/users'
+    | '/u/$userId'
     | '/admin/'
     | '/admin/content/about'
     | '/admin/content/contact'
@@ -313,6 +325,7 @@ export interface RootRouteChildren {
   RecipesRoute: typeof RecipesRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  UUserIdRoute: typeof UUserIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -400,6 +413,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/u/$userId': {
+      id: '/u/$userId'
+      path: '/u/$userId'
+      fullPath: '/u/$userId'
+      preLoaderRoute: typeof UUserIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/users': {
       id: '/admin/users'
@@ -525,6 +545,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecipesRoute: RecipesRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  UUserIdRoute: UUserIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
