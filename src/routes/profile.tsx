@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RecipeCard } from "@/components/RecipeCard";
 import { RecipeDetail } from "@/components/RecipeDetail";
+import { UserListTab } from "@/components/UserListTab";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Recipe } from "@/lib/recipe";
 
 export const Route = createFileRoute("/profile")({
@@ -229,34 +231,65 @@ function ProfilePage() {
       </Card>
 
       <section className="mt-6">
-        <h2 className="mb-3 text-lg font-extrabold">{t.profile.mySaved}</h2>
-        {savedRecipes.length === 0 ? (
-          <Card className="rounded-3xl border-dashed border-border bg-muted/40 p-8 text-center">
-            <p className="text-sm text-muted-foreground">{t.profile.empty}</p>
-            <Button
-              asChild
-              className="mt-4 rounded-xl gradient-primary text-primary-foreground hover:opacity-95"
-            >
-              <Link to="/">{t.profile.goHome}</Link>
-            </Button>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {savedRecipes.map((r, i) => (
-              <RecipeCard
-                key={i}
-                recipe={r}
-                index={i}
-                onOpen={() => setOpenRecipe(r)}
-                onToggleFavorite={() => {
-                  toggle(r);
-                  setTimeout(refresh, 200);
-                }}
-                isFavorite={isFavorite(r)}
-              />
-            ))}
-          </div>
-        )}
+        <Tabs defaultValue="saved">
+          <TabsList className="grid w-full grid-cols-3 rounded-2xl">
+            <TabsTrigger value="saved" className="rounded-xl text-xs">
+              {t.profile.mySaved}
+            </TabsTrigger>
+            <TabsTrigger value="followers" className="rounded-xl text-xs">
+              {t.profile.followers}
+            </TabsTrigger>
+            <TabsTrigger value="following" className="rounded-xl text-xs">
+              {t.profile.following}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="saved" className="mt-4">
+            {savedRecipes.length === 0 ? (
+              <Card className="rounded-3xl border-dashed border-border bg-muted/40 p-8 text-center">
+                <p className="text-sm text-muted-foreground">{t.profile.empty}</p>
+                <Button
+                  asChild
+                  className="mt-4 rounded-xl gradient-primary text-primary-foreground hover:opacity-95"
+                >
+                  <Link to="/">{t.profile.goHome}</Link>
+                </Button>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {savedRecipes.map((r, i) => (
+                  <RecipeCard
+                    key={i}
+                    recipe={r}
+                    index={i}
+                    onOpen={() => setOpenRecipe(r)}
+                    onToggleFavorite={() => {
+                      toggle(r);
+                      setTimeout(refresh, 200);
+                    }}
+                    isFavorite={isFavorite(r)}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="followers" className="mt-4">
+            <UserListTab
+              ownerId={user.id}
+              mode="followers"
+              emptyText={t.profile.noFollowers}
+            />
+          </TabsContent>
+
+          <TabsContent value="following" className="mt-4">
+            <UserListTab
+              ownerId={user.id}
+              mode="following"
+              emptyText={t.profile.noFollowing}
+            />
+          </TabsContent>
+        </Tabs>
       </section>
 
       <RecipeDetail
