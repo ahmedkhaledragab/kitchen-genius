@@ -59,8 +59,11 @@ const arDict = {
       days: "يوم",
       tabAll: "الكل",
       tabFollowing: "بتابعهم",
+      tabTrending: "الترند 🔥",
       followingEmpty: "تابعي ناس عشان تشوفي بوستاتهم هنا 💕",
       followingLoginPrompt: "سجّلي دخول علشان تشوفي بوستات اللي بتتابعيهم",
+      trendingEmpty: "لسه مفيش بوستات ترند الأسبوع ده 🔥",
+      trendingHint: "أكتر البوستات لايكات في آخر ٧ أيام",
     },
     home: {
       heroTitle: "من اللي عندك؟ 👀",
