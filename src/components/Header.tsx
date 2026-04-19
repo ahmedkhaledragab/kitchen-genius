@@ -69,6 +69,9 @@ export function Header() {
             <Link to="/community">{t.nav.community}</Link>
           </Button>
           <Button asChild variant="ghost" size="sm" className="rounded-xl">
+            <Link to="/top-creators">{t.nav.topCreators}</Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm" className="rounded-xl">
             <Link to="/about">{t.nav.about}</Link>
           </Button>
           <Button asChild variant="ghost" size="sm" className="rounded-xl">
@@ -166,6 +169,12 @@ export function Header() {
                   <Link to="/community">
                     <Users className="me-2 h-4 w-4" />
                     {t.nav.community}
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                  <Link to="/top-creators">
+                    <Star className="me-2 h-4 w-4" />
+                    {t.nav.topCreators}
                   </Link>
                 </Button>
                 <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
