@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Loader2, Search, Shield, ShieldOff, Ban, CheckCircle2, Pencil, UserPlus } from "lucide-react";
+import { Loader2, Search, Shield, ShieldOff, Ban, CheckCircle2, Pencil, UserPlus, Download, Phone } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,12 +29,15 @@ interface AdminUserRow {
   email: string | null;
   display_name: string | null;
   avatar_url: string | null;
+  phone: string | null;
   is_active: boolean;
   is_admin: boolean;
   created_at: string;
   recipes_today: number;
   recipes_limit: number;
 }
+
+type UserFilter = "all" | "admin" | "user" | "active" | "banned";
 
 function AdminUsersPage() {
   const { user, isAdmin, loading } = useAuth();
