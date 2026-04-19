@@ -579,6 +579,15 @@ export type Database = {
           logo_url: string | null
           og_image_url: string | null
           primary_color: string | null
+          pwa_apple_touch_icon_url: string | null
+          pwa_background_color: string | null
+          pwa_display: string
+          pwa_enabled: boolean
+          pwa_icon_192_url: string | null
+          pwa_icon_512_url: string | null
+          pwa_short_name_ar: string | null
+          pwa_short_name_en: string | null
+          pwa_theme_color: string | null
           singleton: boolean
           site_name_ar: string
           site_name_en: string
@@ -606,6 +615,15 @@ export type Database = {
           logo_url?: string | null
           og_image_url?: string | null
           primary_color?: string | null
+          pwa_apple_touch_icon_url?: string | null
+          pwa_background_color?: string | null
+          pwa_display?: string
+          pwa_enabled?: boolean
+          pwa_icon_192_url?: string | null
+          pwa_icon_512_url?: string | null
+          pwa_short_name_ar?: string | null
+          pwa_short_name_en?: string | null
+          pwa_theme_color?: string | null
           singleton?: boolean
           site_name_ar?: string
           site_name_en?: string
@@ -633,6 +651,15 @@ export type Database = {
           logo_url?: string | null
           og_image_url?: string | null
           primary_color?: string | null
+          pwa_apple_touch_icon_url?: string | null
+          pwa_background_color?: string | null
+          pwa_display?: string
+          pwa_enabled?: boolean
+          pwa_icon_192_url?: string | null
+          pwa_icon_512_url?: string | null
+          pwa_short_name_ar?: string | null
+          pwa_short_name_en?: string | null
+          pwa_theme_color?: string | null
           singleton?: boolean
           site_name_ar?: string
           site_name_en?: string

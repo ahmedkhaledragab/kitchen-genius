@@ -14,6 +14,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as RecipesRouteImport } from './routes/recipes'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CommunityRouteImport } from './routes/community'
@@ -58,6 +59,11 @@ const RecipesRoute = RecipesRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManifestDotwebmanifestRoute = ManifestDotwebmanifestRouteImport.update({
+  id: '/manifest.webmanifest',
+  path: '/manifest.webmanifest',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeaturesRoute = FeaturesRouteImport.update({
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
+  '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
+  '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -223,6 +231,7 @@ export interface FileRoutesById {
   '/community': typeof CommunityRoute
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
+  '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
   '/robots.txt': typeof RobotsDottxtRoute
@@ -252,6 +261,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/features'
+    | '/manifest.webmanifest'
     | '/profile'
     | '/recipes'
     | '/robots.txt'
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/features'
+    | '/manifest.webmanifest'
     | '/profile'
     | '/recipes'
     | '/robots.txt'
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/features'
+    | '/manifest.webmanifest'
     | '/profile'
     | '/recipes'
     | '/robots.txt'
@@ -333,6 +345,7 @@ export interface RootRouteChildren {
   CommunityRoute: typeof CommunityRoute
   ContactRoute: typeof ContactRoute
   FeaturesRoute: typeof FeaturesRoute
+  ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
   ProfileRoute: typeof ProfileRoute
   RecipesRoute: typeof RecipesRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
@@ -376,6 +389,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manifest.webmanifest': {
+      id: '/manifest.webmanifest'
+      path: '/manifest.webmanifest'
+      fullPath: '/manifest.webmanifest'
+      preLoaderRoute: typeof ManifestDotwebmanifestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/features': {
@@ -561,6 +581,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityRoute: CommunityRoute,
   ContactRoute: ContactRoute,
   FeaturesRoute: FeaturesRoute,
+  ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
   ProfileRoute: ProfileRoute,
   RecipesRoute: RecipesRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
@@ -571,12 +592,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
