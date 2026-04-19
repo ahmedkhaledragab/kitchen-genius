@@ -283,6 +283,7 @@ function AdminUsersPage() {
             {lang === "ar" ? f.ar : f.en}
           </button>
         ))}
+      </div>
 
       {busy && rows.length === 0 ? (
         <div className="flex justify-center py-10">
