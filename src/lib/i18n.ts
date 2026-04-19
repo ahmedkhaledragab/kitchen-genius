@@ -135,6 +135,9 @@ const arDict = {
       saveChanges: "احفظي التغييرات",
       saved: "اتحفظت يا قمر 💕",
       saveError: "حصل لخبطة صغيرة، حاولي تاني 🌸",
+      bio: "نبذة عنك",
+      bioPlaceholder: "اكتبي تعريف بسيط عن نفسك يظهر في بروفايلك العام...",
+      viewPublic: "شوفي بروفايلك العام",
     },
     admin: {
       title: "لوحة التحكم",
@@ -413,6 +416,9 @@ const enDict = {
       saveChanges: "Save changes",
       saved: "Saved sweetie 💕",
       saveError: "Tiny hiccup, try again 🌸",
+      bio: "About you",
+      bioPlaceholder: "Write a short intro about yourself shown on your public profile...",
+      viewPublic: "View public profile",
     },
     admin: {
       title: "Dashboard",

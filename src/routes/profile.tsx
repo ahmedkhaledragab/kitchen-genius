@@ -164,6 +164,17 @@ function ProfilePage() {
             <span className="hidden sm:inline">{t.profile.logout}</span>
           </Button>
         </div>
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className="mt-3 w-full rounded-xl border border-dashed border-border text-xs"
+        >
+          <Link to="/u/$userId" params={{ userId: user.id }}>
+            <ExternalLink className="me-1 h-3.5 w-3.5" />
+            {t.profile.viewPublic}
+          </Link>
+        </Button>
       </Card>
 
       <Card className="mt-4 rounded-3xl border-border/60 bg-card p-6 shadow-card">
@@ -193,6 +204,18 @@ function ProfilePage() {
               placeholder={t.profile.phonePlaceholder}
               dir="ltr"
             />
+          </div>
+          <div>
+            <label className="text-xs font-semibold">{t.profile.bio}</label>
+            <Textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              maxLength={300}
+              rows={3}
+              className="mt-1 rounded-xl"
+              placeholder={t.profile.bioPlaceholder}
+            />
+            <p className="mt-1 text-[10px] text-muted-foreground">{bio.length}/300</p>
           </div>
           <Button
             type="button"
