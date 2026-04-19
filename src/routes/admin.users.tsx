@@ -54,6 +54,7 @@ function AdminUsersPage() {
     email: "",
     password: "",
     display_name: "",
+    phone: "",
     make_admin: false,
   });
 
@@ -158,7 +159,7 @@ function AdminUsersPage() {
     }
     toast.success(t.admin.users.userCreated);
     setCreateOpen(false);
-    setNewUser({ email: "", password: "", display_name: "", make_admin: false });
+    setNewUser({ email: "", password: "", display_name: "", phone: "", make_admin: false });
     refresh();
   };
 
@@ -374,6 +375,18 @@ function AdminUsersPage() {
                 value={newUser.display_name}
                 onChange={(e) => setNewUser((u) => ({ ...u, display_name: e.target.value }))}
                 className="mt-1 rounded-xl"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold">{t.profile.phoneOptional}</label>
+              <Input
+                type="tel"
+                value={newUser.phone}
+                onChange={(e) => setNewUser((u) => ({ ...u, phone: e.target.value }))}
+                maxLength={20}
+                className="mt-1 rounded-xl"
+                placeholder={t.profile.phonePlaceholder}
+                dir="ltr"
               />
             </div>
             <label className="flex items-center gap-2 text-sm">

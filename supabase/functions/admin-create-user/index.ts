@@ -13,6 +13,7 @@ interface ReqBody {
   email?: string;
   password?: string;
   display_name?: string;
+  phone?: string;
   make_admin?: boolean;
 }
 
@@ -62,6 +63,7 @@ serve(async (req: Request) => {
     const email = (body.email ?? "").trim().toLowerCase();
     const password = body.password ?? "";
     const display_name = (body.display_name ?? "").trim();
+    const phone = (body.phone ?? "").trim();
     const make_admin = !!body.make_admin;
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -76,6 +78,12 @@ serve(async (req: Request) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    if (phone && phone.length > 20) {
+      return new Response(JSON.stringify({ error: "invalid_phone" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // 3. Create user with admin client
     const adminClient = createClient(SUPABASE_URL, SERVICE_KEY);
@@ -83,7 +91,10 @@ serve(async (req: Request) => {
       email,
       password,
       email_confirm: true,
-      user_metadata: { display_name: display_name || email.split("@")[0] },
+      user_metadata: {
+        display_name: display_name || email.split("@")[0],
+        phone: phone || null,
+      },
     });
 
     if (createErr || !created.user) {
