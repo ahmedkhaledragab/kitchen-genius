@@ -181,7 +181,23 @@ function AdminSettingsPage() {
     e.target.value = "";
   };
 
-  const save = async () => {
+  const onPickPwa = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    kind: "192" | "512" | "apple"
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const setUploading =
+      kind === "192" ? setUploadingPwa192 : kind === "512" ? setUploadingPwa512 : setUploadingPwaApple;
+    const setUrl =
+      kind === "192" ? setPwaIcon192 : kind === "512" ? setPwaIcon512 : setPwaAppleIcon;
+    const prefix = kind === "192" ? "pwa192" : kind === "512" ? "pwa512" : "pwaapple";
+    setUploading(true);
+    const url = await uploadFile(file, prefix);
+    setUploading(false);
+    if (url) setUrl(url);
+    e.target.value = "";
+  };
     setSaving(true);
     const cleanedTwitter = twitterHandle.trim().replace(/^@/, "") || null;
     const { error } = await supabase
