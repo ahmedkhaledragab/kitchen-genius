@@ -515,6 +515,7 @@ export type Database = {
           is_active: boolean
           phone: string | null
           preferred_language: string
+          preferred_theme: string
           updated_at: string
         }
         Insert: {
@@ -527,6 +528,7 @@ export type Database = {
           is_active?: boolean
           phone?: string | null
           preferred_language?: string
+          preferred_theme?: string
           updated_at?: string
         }
         Update: {
@@ -539,6 +541,7 @@ export type Database = {
           is_active?: boolean
           phone?: string | null
           preferred_language?: string
+          preferred_theme?: string
           updated_at?: string
         }
         Relationships: []
