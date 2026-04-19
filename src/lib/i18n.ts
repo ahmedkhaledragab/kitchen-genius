@@ -16,6 +16,7 @@ const arDict = {
       features: "مميزاتنا",
       contact: "تواصلي معانا",
       community: "المجتمع",
+      topCreators: "أكثر نشاطاً",
     },
     community: {
       title: "مجتمع المطبخ",
@@ -297,6 +298,7 @@ const enDict = {
       features: "Features",
       contact: "Contact",
       community: "Community",
+      topCreators: "Top creators",
     },
     community: {
       title: "Kitchen Community",
