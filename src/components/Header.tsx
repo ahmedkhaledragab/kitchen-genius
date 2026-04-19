@@ -243,6 +243,12 @@ export function Header() {
                       </Link>
                     </Button>
                     <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                      <Link to="/admin/community">
+                        <Users className="me-2 h-4 w-4" />
+                        {lang === "ar" ? "إدارة المجتمع" : "Community"}
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
                       <Link to="/admin/messages">
                         <Inbox className="me-2 h-4 w-4" />
                         {lang === "ar" ? "الرسائل" : "Messages"}
