@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Loader2, Search, Shield, ShieldOff, Ban, CheckCircle2, Pencil, UserPlus } from "lucide-react";
+import { Loader2, Search, Shield, ShieldOff, Ban, CheckCircle2, Pencil, UserPlus, Download, Phone } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,12 +29,15 @@ interface AdminUserRow {
   email: string | null;
   display_name: string | null;
   avatar_url: string | null;
+  phone: string | null;
   is_active: boolean;
   is_admin: boolean;
   created_at: string;
   recipes_today: number;
   recipes_limit: number;
 }
+
+type UserFilter = "all" | "admin" | "user" | "active" | "banned";
 
 function AdminUsersPage() {
   const { user, isAdmin, loading } = useAuth();
@@ -44,6 +47,7 @@ function AdminUsersPage() {
   const [rows, setRows] = useState<AdminUserRow[]>([]);
   const [busy, setBusy] = useState(false);
   const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<UserFilter>("all");
 
   const [editing, setEditing] = useState<{ user: AdminUserRow } | null>(null);
   const [newLimit, setNewLimit] = useState<number>(10);
@@ -79,13 +83,65 @@ function AdminUsersPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter(
-      (r) =>
+    return rows.filter((r) => {
+      if (filter === "admin" && !r.is_admin) return false;
+      if (filter === "user" && r.is_admin) return false;
+      if (filter === "active" && !r.is_active) return false;
+      if (filter === "banned" && r.is_active) return false;
+      if (!q) return true;
+      return (
         (r.email ?? "").toLowerCase().includes(q) ||
-        (r.display_name ?? "").toLowerCase().includes(q),
-    );
-  }, [rows, query]);
+        (r.display_name ?? "").toLowerCase().includes(q) ||
+        (r.phone ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [rows, query, filter]);
+
+  const exportCsv = () => {
+    const headers = [
+      "id",
+      "email",
+      "display_name",
+      "phone",
+      "is_admin",
+      "is_active",
+      "created_at",
+      "recipes_today",
+      "recipes_limit",
+    ];
+    const escape = (v: unknown) => {
+      const s = v === null || v === undefined ? "" : String(v);
+      return `"${s.replace(/"/g, '""')}"`;
+    };
+    const csv = [
+      headers.join(","),
+      ...filtered.map((r) =>
+        [
+          r.id,
+          r.email,
+          r.display_name,
+          r.phone,
+          r.is_admin,
+          r.is_active,
+          r.created_at,
+          r.recipes_today,
+          r.recipes_limit,
+        ]
+          .map(escape)
+          .join(","),
+      ),
+    ].join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `users-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(lang === "ar" ? "تم التصدير" : "Exported");
+  };
 
   if (loading) return null;
   if (!isAdmin) {
@@ -185,6 +241,16 @@ function AdminUsersPage() {
           </div>
           <Button
             type="button"
+            variant="outline"
+            onClick={exportCsv}
+            disabled={filtered.length === 0}
+            className="rounded-xl"
+          >
+            <Download className="me-1 h-4 w-4" />
+            {lang === "ar" ? `تصدير (${filtered.length})` : `Export (${filtered.length})`}
+          </Button>
+          <Button
+            type="button"
             onClick={() => setCreateOpen(true)}
             className="rounded-xl gradient-primary text-primary-foreground hover:opacity-95"
           >
@@ -192,6 +258,31 @@ function AdminUsersPage() {
             {t.admin.users.addUser}
           </Button>
         </div>
+      </div>
+
+      <div className="mb-3 flex flex-wrap gap-1.5">
+        {(
+          [
+            { k: "all", ar: "الكل", en: "All" },
+            { k: "admin", ar: "أدمن", en: "Admins" },
+            { k: "user", ar: "مستخدمين", en: "Users" },
+            { k: "active", ar: "نشط", en: "Active" },
+            { k: "banned", ar: "محظور", en: "Banned" },
+          ] as const
+        ).map((f) => (
+          <button
+            key={f.k}
+            type="button"
+            onClick={() => setFilter(f.k as UserFilter)}
+            className={`rounded-full px-3 py-1 text-xs font-bold transition ${
+              filter === f.k
+                ? "gradient-primary text-primary-foreground"
+                : "border border-border/70 bg-background text-muted-foreground hover:bg-accent"
+            }`}
+          >
+            {lang === "ar" ? f.ar : f.en}
+          </button>
+        ))}
       </div>
 
       {busy && rows.length === 0 ? (
@@ -239,6 +330,12 @@ function AdminUsersPage() {
                       </Badge>
                     </div>
                     <p className="mt-0.5 truncate text-xs text-muted-foreground">{u.email}</p>
+                    {u.phone && (
+                      <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground" dir="ltr">
+                        <Phone className="h-3 w-3" />
+                        {u.phone}
+                      </p>
+                    )}
                     <p className="mt-0.5 text-[11px] text-muted-foreground">
                       {t.admin.users.joined}: {dateFmt.format(new Date(u.created_at))}
                     </p>
