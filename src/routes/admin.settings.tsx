@@ -134,7 +134,7 @@ function AdminSettingsPage() {
 
   const uploadFile = async (
     file: File,
-    prefix: "logo" | "favicon" | "og"
+    prefix: "logo" | "favicon" | "og" | "pwa192" | "pwa512" | "pwaapple"
   ): Promise<string | null> => {
     const ext = file.name.split(".").pop()?.toLowerCase() || "png";
     const path = `${prefix}-${Date.now()}.${ext}`;
