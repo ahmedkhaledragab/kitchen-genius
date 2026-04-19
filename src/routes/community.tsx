@@ -1,17 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
-import { Heart, MessageCircle, Bookmark, Flag, Trash2, ImagePlus, X, Send, Loader2, ChefHat, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/contexts/LanguageContext";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +17,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { Composer } from "@/components/community/Composer";
+import { PostCard, type FeedPost } from "@/components/community/PostCard";
+import { CommunitySidebar } from "@/components/community/CommunitySidebar";
+import type { ReactionType } from "@/lib/community";
 
 export const Route = createFileRoute("/community")({
   head: () => ({
@@ -33,79 +35,20 @@ export const Route = createFileRoute("/community")({
   component: CommunityPage,
 });
 
-interface PostAuthor {
-  display_name: string | null;
-  avatar_url: string | null;
-}
-
-interface CommunityPost {
-  id: string;
-  user_id: string;
-  post_type: "post" | "recipe";
-  title: string | null;
-  content: string;
-  image_url: string | null;
-  recipe_data: unknown;
-  is_pinned: boolean;
-  likes_count: number;
-  comments_count: number;
-  created_at: string;
-  author?: PostAuthor;
-  liked_by_me?: boolean;
-  saved_by_me?: boolean;
-}
-
-interface CommunityComment {
-  id: string;
-  user_id: string;
-  content: string;
-  created_at: string;
-  author?: PostAuthor;
-}
-
-const postSchema = z.object({
-  title: z.string().trim().max(150).optional(),
-  content: z.string().trim().min(1).max(2000),
-});
-
-function timeAgo(iso: string, lang: "ar" | "en", t: ReturnType<typeof useLang>["t"]): string {
-  const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-  if (diff < 60) return t.community.now;
-  if (diff < 3600) return `${Math.floor(diff / 60)} ${t.community.minutes} ${t.community.ago}`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)} ${t.community.hours} ${t.community.ago}`;
-  return `${Math.floor(diff / 86400)} ${t.community.days} ${t.community.ago}`;
-}
-
 function CommunityPage() {
   const { user } = useAuth();
-  const { t, lang } = useLang();
-  const [posts, setPosts] = useState<CommunityPost[]>([]);
+  const { t } = useLang();
+  const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [isBanned, setIsBanned] = useState(false);
-
-  // composer state
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [postType, setPostType] = useState<"post" | "recipe">("post");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-
-  // expanded comments
-  const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
-  const [comments, setComments] = useState<Record<string, CommunityComment[]>>({});
-  const [commentDraft, setCommentDraft] = useState<Record<string, string>>({});
-
-  // feed tab
   const [feedTab, setFeedTab] = useState<"all" | "following" | "trending">("all");
   const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
-
-  // report dialog
   const [reportTarget, setReportTarget] = useState<{ postId?: string; commentId?: string } | null>(null);
   const [reportReason, setReportReason] = useState("");
 
   useEffect(() => {
     void loadPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   useEffect(() => {
@@ -146,230 +89,60 @@ function CommunityPage() {
       return;
     }
 
-    const list = (postsData || []) as CommunityPost[];
+    const list = (postsData || []) as unknown as FeedPost[];
     const userIds = [...new Set(list.map((p) => p.user_id))];
+    const ids = list.map((p) => p.id);
 
-    // load authors
-    let authors: Record<string, PostAuthor> = {};
-    if (userIds.length > 0) {
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, display_name, avatar_url")
-        .in("id", userIds);
-      authors = Object.fromEntries(
-        (profiles || []).map((p) => [p.id, { display_name: p.display_name, avatar_url: p.avatar_url }]),
-      );
-    }
+    const [profilesRes, savesRes, reactionsRes, myReactionRes] = await Promise.all([
+      userIds.length
+        ? supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds)
+        : Promise.resolve({ data: [] as { id: string; display_name: string | null; avatar_url: string | null }[] }),
+      user && ids.length
+        ? supabase.from("community_saves").select("post_id").eq("user_id", user.id).in("post_id", ids)
+        : Promise.resolve({ data: [] as { post_id: string }[] }),
+      ids.length
+        ? supabase.from("community_reactions").select("post_id, reaction").in("post_id", ids)
+        : Promise.resolve({ data: [] as { post_id: string; reaction: ReactionType }[] }),
+      user && ids.length
+        ? supabase
+            .from("community_reactions")
+            .select("post_id, reaction")
+            .eq("user_id", user.id)
+            .in("post_id", ids)
+        : Promise.resolve({ data: [] as { post_id: string; reaction: ReactionType }[] }),
+    ]);
 
-    // load my likes & saves
-    let likedSet = new Set<string>();
-    let savedSet = new Set<string>();
-    if (user && list.length > 0) {
-      const ids = list.map((p) => p.id);
-      const [likesRes, savesRes] = await Promise.all([
-        supabase.from("community_likes").select("post_id").eq("user_id", user.id).in("post_id", ids),
-        supabase.from("community_saves").select("post_id").eq("user_id", user.id).in("post_id", ids),
-      ]);
-      likedSet = new Set((likesRes.data || []).map((r) => r.post_id));
-      savedSet = new Set((savesRes.data || []).map((r) => r.post_id));
-    }
+    const authors = Object.fromEntries(
+      (profilesRes.data || []).map((p) => [
+        p.id,
+        { display_name: p.display_name, avatar_url: p.avatar_url },
+      ]),
+    );
+    const savedSet = new Set((savesRes.data || []).map((r) => r.post_id));
+
+    const summaries: Record<string, Partial<Record<ReactionType, number>>> = {};
+    const totals: Record<string, number> = {};
+    (reactionsRes.data || []).forEach((r) => {
+      summaries[r.post_id] = summaries[r.post_id] || {};
+      summaries[r.post_id][r.reaction] = (summaries[r.post_id][r.reaction] || 0) + 1;
+      totals[r.post_id] = (totals[r.post_id] || 0) + 1;
+    });
+    const myReactions: Record<string, ReactionType> = {};
+    (myReactionRes.data || []).forEach((r) => {
+      myReactions[r.post_id] = r.reaction;
+    });
 
     setPosts(
       list.map((p) => ({
         ...p,
         author: authors[p.user_id],
-        liked_by_me: likedSet.has(p.id),
         saved_by_me: savedSet.has(p.id),
+        my_reaction: myReactions[p.id] ?? null,
+        reaction_summary: summaries[p.id] || {},
+        reaction_total: totals[p.id] || 0,
       })),
     );
     setLoading(false);
-  }
-
-  function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Max 5MB");
-      return;
-    }
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-  }
-
-  function clearImage() {
-    setImageFile(null);
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
-    setImagePreview(null);
-  }
-
-  async function uploadImage(): Promise<string | null> {
-    if (!imageFile || !user) return null;
-    const ext = imageFile.name.split(".").pop()?.toLowerCase() || "jpg";
-    const path = `${user.id}/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("community-posts").upload(path, imageFile, {
-      cacheControl: "3600",
-      upsert: false,
-    });
-    if (error) {
-      toast.error(error.message);
-      return null;
-    }
-    const { data } = supabase.storage.from("community-posts").getPublicUrl(path);
-    return data.publicUrl;
-  }
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    if (!user) {
-      toast.error(t.community.loginPrompt);
-      return;
-    }
-    if (isBanned) {
-      toast.error(t.community.banned);
-      return;
-    }
-
-    const parsed = postSchema.safeParse({ title: title.trim() || undefined, content: content.trim() });
-    if (!parsed.success) {
-      toast.error(t.community.contentRequired);
-      return;
-    }
-
-    setSubmitting(true);
-    let imageUrl: string | null = null;
-    if (imageFile) {
-      imageUrl = await uploadImage();
-      if (!imageUrl) {
-        setSubmitting(false);
-        return;
-      }
-    }
-
-    const { error } = await supabase.from("community_posts").insert({
-      user_id: user.id,
-      post_type: postType,
-      title: parsed.data.title || null,
-      content: parsed.data.content,
-      image_url: imageUrl,
-    });
-
-    setSubmitting(false);
-
-    if (error) {
-      if (error.message.includes("is_community_banned")) {
-        toast.error(t.community.banned);
-      } else {
-        toast.error(error.message);
-      }
-      return;
-    }
-
-    toast.success(t.community.published);
-    setTitle("");
-    setContent("");
-    setPostType("post");
-    clearImage();
-    void loadPosts();
-  }
-
-  async function toggleLike(post: CommunityPost) {
-    if (!user) {
-      toast.error(t.community.loginPrompt);
-      return;
-    }
-    if (post.liked_by_me) {
-      await supabase.from("community_likes").delete().eq("post_id", post.id).eq("user_id", user.id);
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.id === post.id ? { ...p, liked_by_me: false, likes_count: Math.max(0, p.likes_count - 1) } : p,
-        ),
-      );
-    } else {
-      const { error } = await supabase.from("community_likes").insert({ post_id: post.id, user_id: user.id });
-      if (error) return;
-      setPosts((prev) =>
-        prev.map((p) => (p.id === post.id ? { ...p, liked_by_me: true, likes_count: p.likes_count + 1 } : p)),
-      );
-    }
-  }
-
-  async function toggleSave(post: CommunityPost) {
-    if (!user) {
-      toast.error(t.community.loginPrompt);
-      return;
-    }
-    if (post.saved_by_me) {
-      await supabase.from("community_saves").delete().eq("post_id", post.id).eq("user_id", user.id);
-      setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, saved_by_me: false } : p)));
-    } else {
-      const { error } = await supabase.from("community_saves").insert({ post_id: post.id, user_id: user.id });
-      if (error) return;
-      setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, saved_by_me: true } : p)));
-    }
-  }
-
-  async function deletePost(post: CommunityPost) {
-    if (!confirm(t.community.confirmDelete)) return;
-    const { error } = await supabase.from("community_posts").delete().eq("id", post.id);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    toast.success(t.community.deleted);
-    setPosts((prev) => prev.filter((p) => p.id !== post.id));
-  }
-
-  async function loadComments(postId: string) {
-    const { data } = await supabase
-      .from("community_comments")
-      .select("id, user_id, content, created_at")
-      .eq("post_id", postId)
-      .eq("is_hidden", false)
-      .order("created_at", { ascending: true });
-
-    const list = (data || []) as CommunityComment[];
-    const userIds = [...new Set(list.map((c) => c.user_id))];
-    if (userIds.length > 0) {
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, display_name, avatar_url")
-        .in("id", userIds);
-      const map = Object.fromEntries(
-        (profs || []).map((p) => [p.id, { display_name: p.display_name, avatar_url: p.avatar_url }]),
-      );
-      list.forEach((c) => (c.author = map[c.user_id]));
-    }
-    setComments((prev) => ({ ...prev, [postId]: list }));
-  }
-
-  function toggleComments(postId: string) {
-    if (expandedPostId === postId) {
-      setExpandedPostId(null);
-    } else {
-      setExpandedPostId(postId);
-      if (!comments[postId]) void loadComments(postId);
-    }
-  }
-
-  async function submitComment(postId: string) {
-    if (!user) {
-      toast.error(t.community.loginPrompt);
-      return;
-    }
-    const text = (commentDraft[postId] || "").trim();
-    if (!text || text.length > 500) return;
-
-    const { error } = await supabase
-      .from("community_comments")
-      .insert({ post_id: postId, user_id: user.id, content: text });
-    if (error) {
-      if (error.message.includes("is_community_banned")) toast.error(t.community.banned);
-      else toast.error(error.message);
-      return;
-    }
-    setCommentDraft((prev) => ({ ...prev, [postId]: "" }));
-    setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, comments_count: p.comments_count + 1 } : p)));
-    void loadComments(postId);
   }
 
   async function submitReport() {
@@ -389,162 +162,59 @@ function CommunityPage() {
     setReportReason("");
   }
 
+  function patchPost(id: string, patch: Partial<FeedPost>) {
+    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+  }
+
+  let visiblePosts = posts;
+  if (feedTab === "following") {
+    visiblePosts = posts.filter((p) => followingIds.has(p.user_id) || p.user_id === user?.id);
+  } else if (feedTab === "trending") {
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    visiblePosts = posts
+      .filter((p) => new Date(p.created_at).getTime() >= sevenDaysAgo && (p.reaction_total ?? 0) > 0)
+      .slice()
+      .sort((a, b) => (b.reaction_total ?? 0) - (a.reaction_total ?? 0));
+  }
+
   return (
-    <div className="mx-auto max-w-2xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6">
+    <div className="mx-auto max-w-6xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6">
       <div className="mb-5 text-center">
         <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t.community.title}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t.community.subtitle}</p>
       </div>
 
-      {/* Composer */}
-      {user ? (
-        isBanned ? (
-          <Card className="mb-6 rounded-3xl border-destructive/40 bg-destructive/5 p-4 text-center text-sm text-destructive">
-            {t.community.banned}
-          </Card>
-        ) : (
-          <Card className="mb-6 rounded-3xl p-4 shadow-soft">
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={postType === "post" ? "default" : "outline"}
-                  className="rounded-xl"
-                  onClick={() => setPostType("post")}
-                >
-                  <Sparkles className="me-1.5 h-3.5 w-3.5" />
-                  {t.community.typePost}
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant={postType === "recipe" ? "default" : "outline"}
-                  className="rounded-xl"
-                  onClick={() => setPostType("recipe")}
-                >
-                  <ChefHat className="me-1.5 h-3.5 w-3.5" />
-                  {t.community.typeRecipe}
-                </Button>
-              </div>
+      <div className="grid gap-5 lg:grid-cols-[1fr_300px]">
+        {/* MAIN COLUMN */}
+        <div className="min-w-0 space-y-4">
+          <Composer isBanned={isBanned} onPosted={loadPosts} />
 
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder={t.community.composeTitle}
-                maxLength={150}
-                className="rounded-xl"
-              />
-              <Textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder={t.community.composePlaceholder}
-                maxLength={2000}
-                rows={3}
-                className="rounded-xl resize-none"
-              />
+          <Tabs
+            value={feedTab}
+            onValueChange={(v) => setFeedTab(v as "all" | "following" | "trending")}
+          >
+            <TabsList className="grid w-full grid-cols-3 rounded-2xl">
+              <TabsTrigger value="all" className="rounded-xl text-xs sm:text-sm">
+                {t.community.tabAll}
+              </TabsTrigger>
+              <TabsTrigger value="following" className="rounded-xl text-xs sm:text-sm">
+                {t.community.tabFollowing}
+              </TabsTrigger>
+              <TabsTrigger value="trending" className="rounded-xl text-xs sm:text-sm">
+                {t.community.tabTrending}
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-              {imagePreview && (
-                <div className="relative">
-                  <img src={imagePreview} alt="preview" className="max-h-64 w-full rounded-xl object-cover" />
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="destructive"
-                    className="absolute end-2 top-2 h-7 w-7 rounded-full p-0"
-                    onClick={clearImage}
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between">
-                <label className="cursor-pointer">
-                  <input type="file" accept="image/*" className="hidden" onChange={onPickImage} />
-                  <span className="inline-flex items-center gap-1.5 rounded-xl border border-input px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted">
-                    <ImagePlus className="h-3.5 w-3.5" />
-                    {t.community.addImage}
-                  </span>
-                </label>
-                <Button
-                  type="submit"
-                  size="sm"
-                  className="rounded-xl gradient-primary px-5 text-primary-foreground"
-                  disabled={submitting || !content.trim()}
-                >
-                  {submitting ? (
-                    <>
-                      <Loader2 className="me-1.5 h-3.5 w-3.5 animate-spin" />
-                      {t.community.publishing}
-                    </>
-                  ) : (
-                    t.community.publish
-                  )}
-                </Button>
-              </div>
-            </form>
-          </Card>
-        )
-      ) : (
-        <Card className="mb-6 rounded-3xl p-4 text-center">
-          <p className="mb-3 text-sm text-muted-foreground">{t.community.loginPrompt}</p>
-          <Button asChild size="sm" className="rounded-xl gradient-primary text-primary-foreground">
-            <Link to="/auth">{t.auth.login}</Link>
-          </Button>
-        </Card>
-      )}
-
-      {/* Feed tabs */}
-      <Tabs
-        value={feedTab}
-        onValueChange={(v) => setFeedTab(v as "all" | "following" | "trending")}
-        className="mb-4"
-      >
-        <TabsList className="grid w-full grid-cols-3 rounded-2xl">
-          <TabsTrigger value="all" className="rounded-xl text-xs sm:text-sm">
-            {t.community.tabAll}
-          </TabsTrigger>
-          <TabsTrigger value="following" className="rounded-xl text-xs sm:text-sm">
-            {t.community.tabFollowing}
-          </TabsTrigger>
-          <TabsTrigger value="trending" className="rounded-xl text-xs sm:text-sm">
-            {t.community.tabTrending}
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
-
-      {/* Feed */}
-      {(() => {
-        let visiblePosts = posts;
-        if (feedTab === "following") {
-          visiblePosts = posts.filter((p) => followingIds.has(p.user_id) || p.user_id === user?.id);
-        } else if (feedTab === "trending") {
-          const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-          visiblePosts = posts
-            .filter((p) => new Date(p.created_at).getTime() >= sevenDaysAgo && p.likes_count > 0)
-            .slice()
-            .sort((a, b) => b.likes_count - a.likes_count);
-        }
-
-        if (loading) {
-          return (
+          {loading ? (
             <div className="flex justify-center py-10">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
-          );
-        }
-
-        if (feedTab === "following" && !user) {
-          return (
+          ) : feedTab === "following" && !user ? (
             <Card className="rounded-3xl p-8 text-center text-sm text-muted-foreground">
               {t.community.followingLoginPrompt}
             </Card>
-          );
-        }
-
-        if (visiblePosts.length === 0) {
-          return (
+          ) : visiblePosts.length === 0 ? (
             <Card className="rounded-3xl p-8 text-center text-sm text-muted-foreground">
               {feedTab === "following"
                 ? t.community.followingEmpty
@@ -552,182 +222,29 @@ function CommunityPage() {
                   ? t.community.trendingEmpty
                   : t.community.empty}
             </Card>
-          );
-        }
-
-        return (
-          <div className="space-y-4">
-            {visiblePosts.map((post) => (
-            <Card key={post.id} className="overflow-hidden rounded-3xl shadow-soft">
-              {/* Header */}
-              <div className="flex items-center gap-3 px-4 pt-4">
-                <Link
-                  to="/u/$userId"
-                  params={{ userId: post.user_id }}
-                  className="shrink-0 transition hover:opacity-80"
-                  aria-label={post.author?.display_name || t.community.anonymous}
-                >
-                  <Avatar className="h-10 w-10">
-                    {post.author?.avatar_url && <AvatarImage src={post.author.avatar_url} />}
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">
-                      {(post.author?.display_name || t.community.anonymous).charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </Link>
-                <div className="min-w-0 flex-1">
-                  <Link
-                    to="/u/$userId"
-                    params={{ userId: post.user_id }}
-                    className="block truncate text-sm font-bold hover:text-primary hover:underline"
-                  >
-                    {post.author?.display_name || t.community.anonymous}
-                  </Link>
-                  <p className="text-xs text-muted-foreground">{timeAgo(post.created_at, lang, t)}</p>
-                </div>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                    post.post_type === "recipe" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {post.post_type === "recipe" ? t.community.typeRecipe : t.community.typePost}
-                </span>
-                {user?.id === post.user_id && (
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 w-8 rounded-full p-0 text-destructive"
-                    onClick={() => deletePost(post)}
-                    aria-label={t.community.delete}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-
-              {/* Body */}
-              <div className="px-4 py-3">
-                {post.title && <h3 className="mb-1 text-base font-extrabold">{post.title}</h3>}
-                <p className="whitespace-pre-wrap text-sm leading-relaxed">{post.content}</p>
-              </div>
-
-              {post.image_url && (
-                <img src={post.image_url} alt="" className="max-h-96 w-full object-cover" loading="lazy" />
-              )}
-
-              {/* Actions */}
-              <div className="flex items-center gap-1 border-t border-border/50 px-2 py-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  className={`flex-1 rounded-xl ${post.liked_by_me ? "text-rose-500" : ""}`}
-                  onClick={() => toggleLike(post)}
-                >
-                  <Heart className={`me-1.5 h-4 w-4 ${post.liked_by_me ? "fill-current" : ""}`} />
-                  <span className="text-xs">{post.likes_count}</span>
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  className="flex-1 rounded-xl"
-                  onClick={() => toggleComments(post.id)}
-                >
-                  <MessageCircle className="me-1.5 h-4 w-4" />
-                  <span className="text-xs">{post.comments_count}</span>
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  className={`flex-1 rounded-xl ${post.saved_by_me ? "text-primary" : ""}`}
-                  onClick={() => toggleSave(post)}
-                >
-                  <Bookmark className={`h-4 w-4 ${post.saved_by_me ? "fill-current" : ""}`} />
-                </Button>
-                {user && user.id !== post.user_id && (
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="rounded-xl text-muted-foreground"
-                    onClick={() => setReportTarget({ postId: post.id })}
-                    aria-label={t.community.report}
-                  >
-                    <Flag className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-
-              {/* Comments */}
-              {expandedPostId === post.id && (
-                <div className="border-t border-border/50 bg-muted/30 px-4 py-3">
-                  <div className="space-y-3">
-                    {(comments[post.id] || []).length === 0 ? (
-                      <p className="text-center text-xs text-muted-foreground">{t.community.noComments}</p>
-                    ) : (
-                      (comments[post.id] || []).map((c) => (
-                        <div key={c.id} className="flex gap-2">
-                          <Link
-                            to="/u/$userId"
-                            params={{ userId: c.user_id }}
-                            className="shrink-0 transition hover:opacity-80"
-                          >
-                            <Avatar className="h-7 w-7">
-                              {c.author?.avatar_url && <AvatarImage src={c.author.avatar_url} />}
-                              <AvatarFallback className="bg-primary/10 text-[10px] text-primary">
-                                {(c.author?.display_name || "?").charAt(0).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                          </Link>
-                          <div className="flex-1 rounded-2xl bg-background px-3 py-1.5">
-                            <Link
-                              to="/u/$userId"
-                              params={{ userId: c.user_id }}
-                              className="text-xs font-bold hover:text-primary hover:underline"
-                            >
-                              {c.author?.display_name || t.community.anonymous}
-                            </Link>
-                            <p className="text-sm">{c.content}</p>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-
-                  {user && !isBanned && (
-                    <div className="mt-3 flex gap-2">
-                      <Input
-                        value={commentDraft[post.id] || ""}
-                        onChange={(e) => setCommentDraft((prev) => ({ ...prev, [post.id]: e.target.value }))}
-                        placeholder={t.community.writeComment}
-                        maxLength={500}
-                        className="rounded-xl"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
-                            void submitComment(post.id);
-                          }
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        size="sm"
-                        className="rounded-xl"
-                        onClick={() => submitComment(post.id)}
-                      >
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </Card>
-          ))}
+          ) : (
+            <div className="space-y-4">
+              {visiblePosts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  isBanned={isBanned}
+                  onMutate={(patch) => patchPost(post.id, patch)}
+                  onDelete={() => setPosts((prev) => prev.filter((p) => p.id !== post.id))}
+                  onReport={(target) => setReportTarget(target)}
+                />
+              ))}
+            </div>
+          )}
         </div>
-        );
-      })()}
+
+        {/* SIDEBAR */}
+        <div className="hidden lg:block">
+          <div className="sticky top-20">
+            <CommunitySidebar />
+          </div>
+        </div>
+      </div>
 
       {/* Report dialog */}
       <Dialog open={!!reportTarget} onOpenChange={(o) => !o && setReportTarget(null)}>
@@ -758,6 +275,9 @@ function CommunityPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Hidden link to satisfy router (visited from sidebar) */}
+      <Link to="/community" className="hidden" aria-hidden />
     </div>
   );
 }
