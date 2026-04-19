@@ -287,10 +287,16 @@ serve(async (req: Request) => {
         : `Exclude: ${exclude.join(", ")}.`
       : "";
 
+    const avoidText = localTitles.length
+      ? language === "ar"
+        ? `تجنّب تكرار هذه الوصفات اللي عندي بالفعل: ${localTitles.join("، ")}.`
+        : `Avoid duplicating these recipes I already have: ${localTitles.join(", ")}.`
+      : "";
+
     const userMsg =
       language === "ar"
-        ? `المكونات المتوفرة عندي: ${ingredients.join("، ")}.\n${excludeText}\n${filterText}\nاقترح من 3 إلى 5 وصفات أقدر أعملها بالمكونات دي. حاول تستعمل أقل عدد من المكونات الناقصة.`
-        : `My ingredients: ${ingredients.join(", ")}.\n${excludeText}\n${filterText}\nSuggest 3-5 recipes I can make. Minimize missing ingredients.`;
+        ? `المكونات المتوفرة عندي: ${ingredients.join("، ")}.\n${excludeText}\n${filterText}\n${avoidText}\nاقترح ${aiNeeded} وصفات جديدة أقدر أعملها بالمكونات دي. حاول تستعمل أقل عدد من المكونات الناقصة.`
+        : `My ingredients: ${ingredients.join(", ")}.\n${excludeText}\n${filterText}\n${avoidText}\nSuggest ${aiNeeded} new recipes I can make. Minimize missing ingredients.`;
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -310,6 +316,14 @@ serve(async (req: Request) => {
     });
 
     if (!resp.ok) {
+      // If AI fails but we have local matches, return them gracefully.
+      if (localMatches.length > 0) {
+        console.warn("AI failed, returning local matches only:", resp.status);
+        return new Response(
+          JSON.stringify({ recipes: localMatches, source: "local" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
       if (resp.status === 429) {
         return new Response(
           JSON.stringify({ error: "rate_limited", message: "حد الاستخدام انتهى مؤقتاً، حاول بعد دقيقة." }),
@@ -334,24 +348,45 @@ serve(async (req: Request) => {
     const toolCall = data?.choices?.[0]?.message?.tool_calls?.[0];
     if (!toolCall?.function?.arguments) {
       console.error("Missing tool call in response", JSON.stringify(data));
+      if (localMatches.length > 0) {
+        return new Response(
+          JSON.stringify({ recipes: localMatches, source: "local" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
       return new Response(
         JSON.stringify({ error: "bad_response", message: "الرد غير مكتمل." }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    let parsed: { recipes: unknown[] };
+    let parsed: { recipes: Array<Record<string, unknown>> };
     try {
       parsed = JSON.parse(toolCall.function.arguments);
     } catch (e) {
       console.error("Failed to parse tool args", e);
+      if (localMatches.length > 0) {
+        return new Response(
+          JSON.stringify({ recipes: localMatches, source: "local" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
       return new Response(
         JSON.stringify({ error: "parse_error" }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    return new Response(JSON.stringify(parsed), {
+    // Merge: local first, then AI fills the rest (capped at TARGET_COUNT).
+    const aiRecipes = (parsed.recipes ?? []).map((r) => ({ ...r, source: "ai" as const }));
+    const merged = [...localMatches, ...aiRecipes].slice(0, TARGET_COUNT);
+    const sourceLabel = localMatches.length > 0 && aiRecipes.length > 0
+      ? "hybrid"
+      : localMatches.length > 0
+        ? "local"
+        : "ai";
+
+    return new Response(JSON.stringify({ recipes: merged, source: sourceLabel }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
