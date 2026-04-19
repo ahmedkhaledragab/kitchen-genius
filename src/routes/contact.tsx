@@ -47,21 +47,78 @@ export const Route = createFileRoute("/contact")({
 
 function pickIcon(title?: string) {
   const t = (title ?? "").toLowerCase();
-  if (t.includes("face")) return { Icon: Facebook, color: "text-[#1877F2] bg-[#1877F2]/10" };
-  if (t.includes("insta")) return { Icon: Instagram, color: "text-[#d62976] bg-[#d62976]/10" };
+  if (t.includes("face"))
+    return {
+      Icon: Facebook,
+      color: "text-[#1877F2] bg-[#1877F2]/10",
+      hoverCard: "group-hover:bg-[#1877F2] group-hover:border-[#1877F2]",
+      hoverIcon: "group-hover:bg-white/20 group-hover:text-white",
+      hoverText: "group-hover:text-white",
+    };
+  if (t.includes("insta"))
+    return {
+      Icon: Instagram,
+      color: "text-[#d62976] bg-[#d62976]/10",
+      hoverCard:
+        "group-hover:bg-gradient-to-tr group-hover:from-[#feda75] group-hover:via-[#d62976] group-hover:to-[#4f5bd5] group-hover:border-transparent",
+      hoverIcon: "group-hover:bg-white/20 group-hover:text-white",
+      hoverText: "group-hover:text-white",
+    };
   if (t.includes("whats") || t.includes("واتس"))
-    return { Icon: MessageCircle, color: "text-[#25D366] bg-[#25D366]/10" };
+    return {
+      Icon: MessageCircle,
+      color: "text-[#25D366] bg-[#25D366]/10",
+      hoverCard: "group-hover:bg-[#25D366] group-hover:border-[#25D366]",
+      hoverIcon: "group-hover:bg-white/20 group-hover:text-white",
+      hoverText: "group-hover:text-white",
+    };
   if (t.includes("tiktok") || t.includes("تيك"))
-    return { Icon: Music2, color: "text-foreground bg-foreground/10" };
+    return {
+      Icon: Music2,
+      color: "text-foreground bg-foreground/10",
+      hoverCard: "group-hover:bg-black group-hover:border-black",
+      hoverIcon: "group-hover:bg-white/20 group-hover:text-white",
+      hoverText: "group-hover:text-white",
+    };
   if (t.includes("telegram") || t.includes("تيلي") || t.includes("تليجرام"))
-    return { Icon: Send, color: "text-[#229ED9] bg-[#229ED9]/10" };
+    return {
+      Icon: Send,
+      color: "text-[#229ED9] bg-[#229ED9]/10",
+      hoverCard: "group-hover:bg-[#229ED9] group-hover:border-[#229ED9]",
+      hoverIcon: "group-hover:bg-white/20 group-hover:text-white",
+      hoverText: "group-hover:text-white",
+    };
   if (t.includes("twitter") || t.includes("x.com") || t === "x" || t.includes("تويتر"))
-    return { Icon: Twitter, color: "text-foreground bg-foreground/10" };
+    return {
+      Icon: Twitter,
+      color: "text-foreground bg-foreground/10",
+      hoverCard: "group-hover:bg-black group-hover:border-black",
+      hoverIcon: "group-hover:bg-white/20 group-hover:text-white",
+      hoverText: "group-hover:text-white",
+    };
   if (t.includes("mail") || t.includes("إيميل") || t.includes("بريد"))
-    return { Icon: Mail, color: "text-primary bg-primary/10" };
+    return {
+      Icon: Mail,
+      color: "text-primary bg-primary/10",
+      hoverCard: "group-hover:bg-primary group-hover:border-primary",
+      hoverIcon: "group-hover:bg-white/20 group-hover:text-white",
+      hoverText: "group-hover:text-white",
+    };
   if (t.includes("phone") || t.includes("tel") || t.includes("هاتف") || t.includes("تليفون"))
-    return { Icon: Phone, color: "text-emerald-600 bg-emerald-500/10" };
-  return { Icon: Globe, color: "text-muted-foreground bg-muted" };
+    return {
+      Icon: Phone,
+      color: "text-emerald-600 bg-emerald-500/10",
+      hoverCard: "group-hover:bg-emerald-500 group-hover:border-emerald-500",
+      hoverIcon: "group-hover:bg-white/20 group-hover:text-white",
+      hoverText: "group-hover:text-white",
+    };
+  return {
+    Icon: Globe,
+    color: "text-muted-foreground bg-muted",
+    hoverCard: "group-hover:bg-foreground group-hover:border-foreground",
+    hoverIcon: "group-hover:bg-white/20 group-hover:text-white",
+    hoverText: "group-hover:text-white",
+  };
 }
 
 function buildWhatsAppHref(raw: string): string | null {
@@ -230,14 +287,22 @@ function ContactPage() {
       <section className="mt-6 grid grid-cols-3 gap-3 sm:grid-cols-4">
         {channels.map((c, i) => {
           const href = c.icon || ""; // we store href in `icon` field
-          const { Icon, color } = pickIcon(c.title);
+          const { Icon, color, hoverCard, hoverIcon, hoverText } = pickIcon(c.title);
           const isExternal = href.startsWith("http");
           const CardInner = (
-            <Card className="flex aspect-square h-full flex-col items-center justify-center gap-2 rounded-2xl border-border/60 bg-card p-3 shadow-card transition-all group-hover:-translate-y-0.5 group-hover:shadow-warm">
-              <div className={`grid h-12 w-12 place-items-center rounded-2xl ${color}`}>
+            <Card
+              className={`flex aspect-square h-full flex-col items-center justify-center gap-2 rounded-2xl border-border/60 bg-card p-3 shadow-card transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-warm ${hoverCard}`}
+            >
+              <div
+                className={`grid h-12 w-12 place-items-center rounded-2xl transition-colors duration-300 ${color} ${hoverIcon}`}
+              >
                 <Icon className="h-6 w-6" />
               </div>
-              <h3 className="text-center text-xs font-extrabold">{c.title}</h3>
+              <h3
+                className={`text-center text-xs font-extrabold transition-colors duration-300 ${hoverText}`}
+              >
+                {c.title}
+              </h3>
             </Card>
           );
           if (!href) {
