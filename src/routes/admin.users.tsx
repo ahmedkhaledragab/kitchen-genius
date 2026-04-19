@@ -38,6 +38,7 @@ interface AdminUserRow {
 }
 
 type UserFilter = "all" | "admin" | "user" | "active" | "banned";
+type DateFilter = "all" | "7d" | "30d";
 
 function AdminUsersPage() {
   const { user, isAdmin, loading } = useAuth();
