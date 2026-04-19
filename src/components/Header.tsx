@@ -148,15 +148,19 @@ export function Header() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side={lang === "ar" ? "right" : "left"} className="w-72">
-              <SheetHeader>
+            <SheetContent
+              side={lang === "ar" ? "right" : "left"}
+              className="flex w-72 flex-col p-0"
+            >
+              <SheetHeader className="border-b border-border/60 p-6 pb-4">
                 <SheetTitle className="flex items-center gap-2">
                   <img src={logo} alt={siteName} className="h-9 w-9 object-contain" />
                   <span className="truncate">{siteName}</span>
                 </SheetTitle>
               </SheetHeader>
 
-              <div className="mt-6 flex flex-col gap-1">
+              <div className="flex-1 overflow-y-auto px-6 py-4">
+              <div className="flex flex-col gap-1">
                 <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
                   <Link to="/">
                     <Home className="me-2 h-4 w-4" />
@@ -296,6 +300,7 @@ export function Header() {
                     <Link to="/auth">{t.nav.login}</Link>
                   </Button>
                 )}
+              </div>
               </div>
             </SheetContent>
           </Sheet>

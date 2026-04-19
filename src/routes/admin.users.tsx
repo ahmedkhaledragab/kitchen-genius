@@ -38,6 +38,7 @@ interface AdminUserRow {
 }
 
 type UserFilter = "all" | "admin" | "user" | "active" | "banned";
+type DateFilter = "all" | "7d" | "30d";
 
 function AdminUsersPage() {
   const { user, isAdmin, loading } = useAuth();
@@ -48,6 +49,7 @@ function AdminUsersPage() {
   const [busy, setBusy] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<UserFilter>("all");
+  const [dateFilter, setDateFilter] = useState<DateFilter>("all");
 
   const [editing, setEditing] = useState<{ user: AdminUserRow } | null>(null);
   const [newLimit, setNewLimit] = useState<number>(10);
@@ -83,11 +85,15 @@ function AdminUsersPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const now = Date.now();
+    const cutoff =
+      dateFilter === "7d" ? now - 7 * 86400000 : dateFilter === "30d" ? now - 30 * 86400000 : 0;
     return rows.filter((r) => {
       if (filter === "admin" && !r.is_admin) return false;
       if (filter === "user" && r.is_admin) return false;
       if (filter === "active" && !r.is_active) return false;
       if (filter === "banned" && r.is_active) return false;
+      if (cutoff && new Date(r.created_at).getTime() < cutoff) return false;
       if (!q) return true;
       return (
         (r.email ?? "").toLowerCase().includes(q) ||
@@ -95,7 +101,7 @@ function AdminUsersPage() {
         (r.phone ?? "").toLowerCase().includes(q)
       );
     });
-  }, [rows, query, filter]);
+  }, [rows, query, filter, dateFilter]);
 
   const exportCsv = () => {
     const headers = [
@@ -277,6 +283,29 @@ function AdminUsersPage() {
             className={`rounded-full px-3 py-1 text-xs font-bold transition ${
               filter === f.k
                 ? "gradient-primary text-primary-foreground"
+                : "border border-border/70 bg-background text-muted-foreground hover:bg-accent"
+            }`}
+          >
+            {lang === "ar" ? f.ar : f.en}
+          </button>
+        ))}
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-1.5">
+        {(
+          [
+            { k: "all", ar: "كل الوقت", en: "All time" },
+            { k: "7d", ar: "آخر ٧ أيام", en: "Last 7 days" },
+            { k: "30d", ar: "آخر ٣٠ يوم", en: "Last 30 days" },
+          ] as const
+        ).map((f) => (
+          <button
+            key={f.k}
+            type="button"
+            onClick={() => setDateFilter(f.k as DateFilter)}
+            className={`rounded-full px-3 py-1 text-xs font-bold transition ${
+              dateFilter === f.k
+                ? "bg-foreground text-background"
                 : "border border-border/70 bg-background text-muted-foreground hover:bg-accent"
             }`}
           >
