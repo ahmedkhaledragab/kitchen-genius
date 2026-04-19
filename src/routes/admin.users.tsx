@@ -49,6 +49,7 @@ function AdminUsersPage() {
   const [busy, setBusy] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<UserFilter>("all");
+  const [dateFilter, setDateFilter] = useState<DateFilter>("all");
 
   const [editing, setEditing] = useState<{ user: AdminUserRow } | null>(null);
   const [newLimit, setNewLimit] = useState<number>(10);
