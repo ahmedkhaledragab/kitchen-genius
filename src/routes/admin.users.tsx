@@ -241,6 +241,16 @@ function AdminUsersPage() {
           </div>
           <Button
             type="button"
+            variant="outline"
+            onClick={exportCsv}
+            disabled={filtered.length === 0}
+            className="rounded-xl"
+          >
+            <Download className="me-1 h-4 w-4" />
+            {lang === "ar" ? `تصدير (${filtered.length})` : `Export (${filtered.length})`}
+          </Button>
+          <Button
+            type="button"
             onClick={() => setCreateOpen(true)}
             className="rounded-xl gradient-primary text-primary-foreground hover:opacity-95"
           >
@@ -249,6 +259,30 @@ function AdminUsersPage() {
           </Button>
         </div>
       </div>
+
+      <div className="mb-3 flex flex-wrap gap-1.5">
+        {(
+          [
+            { k: "all", ar: "الكل", en: "All" },
+            { k: "admin", ar: "أدمن", en: "Admins" },
+            { k: "user", ar: "مستخدمين", en: "Users" },
+            { k: "active", ar: "نشط", en: "Active" },
+            { k: "banned", ar: "محظور", en: "Banned" },
+          ] as const
+        ).map((f) => (
+          <button
+            key={f.k}
+            type="button"
+            onClick={() => setFilter(f.k as UserFilter)}
+            className={`rounded-full px-3 py-1 text-xs font-bold transition ${
+              filter === f.k
+                ? "gradient-primary text-primary-foreground"
+                : "border border-border/70 bg-background text-muted-foreground hover:bg-accent"
+            }`}
+          >
+            {lang === "ar" ? f.ar : f.en}
+          </button>
+        ))}
 
       {busy && rows.length === 0 ? (
         <div className="flex justify-center py-10">
@@ -295,6 +329,12 @@ function AdminUsersPage() {
                       </Badge>
                     </div>
                     <p className="mt-0.5 truncate text-xs text-muted-foreground">{u.email}</p>
+                    {u.phone && (
+                      <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground" dir="ltr">
+                        <Phone className="h-3 w-3" />
+                        {u.phone}
+                      </p>
+                    )}
                     <p className="mt-0.5 text-[11px] text-muted-foreground">
                       {t.admin.users.joined}: {dateFmt.format(new Date(u.created_at))}
                     </p>
