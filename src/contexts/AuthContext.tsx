@@ -60,8 +60,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       typeof document !== "undefined" && document.documentElement.lang === "en" ? "en" : "ar";
     toast.success(
       lang === "ar"
-        ? "مع السلامة يا قمر، رجعيلنا بسرعة 💕"
-        : "See you soon lovely, come back quick 💕"
+        ? "مع السلامة، ارجعلنا تاني بسرعة 💕"
+        : "See you soon, come back quick 💕"
     );
   };
 
