@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import appCss from "../styles.css?url";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { SiteSettingsProvider, useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -92,17 +93,19 @@ function RootComponent() {
   return (
     <LanguageProvider>
       <AuthProvider>
-        <SiteSettingsProvider>
-          <PWAManager />
-          <div className="flex min-h-screen flex-col bg-background">
-            <Header />
-            <main className="flex-1">
-              <Outlet />
-            </main>
-            <Footer />
-          </div>
-          <Toaster richColors closeButton position="top-center" />
-        </SiteSettingsProvider>
+        <ThemeProvider>
+          <SiteSettingsProvider>
+            <PWAManager />
+            <div className="flex min-h-screen flex-col bg-background">
+              <Header />
+              <main className="flex-1">
+                <Outlet />
+              </main>
+              <Footer />
+            </div>
+            <Toaster richColors closeButton position="top-center" />
+          </SiteSettingsProvider>
+        </ThemeProvider>
       </AuthProvider>
     </LanguageProvider>
   );
