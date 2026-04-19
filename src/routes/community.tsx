@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/community")({
   head: () => ({
@@ -94,6 +95,10 @@ function CommunityPage() {
   const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
   const [comments, setComments] = useState<Record<string, CommunityComment[]>>({});
   const [commentDraft, setCommentDraft] = useState<Record<string, string>>({});
+
+  // feed tab
+  const [feedTab, setFeedTab] = useState<"all" | "following">("all");
+  const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
 
   // report dialog
   const [reportTarget, setReportTarget] = useState<{ postId?: string; commentId?: string } | null>(null);
