@@ -25,6 +25,7 @@ import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { Button } from "@/components/ui/button";
 import { NotificationsBell } from "@/components/NotificationsBell";
 import { InstallPWAButton } from "@/components/InstallPWAButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Sheet,
   SheetContent,
@@ -99,6 +100,8 @@ export function Header() {
           {user && <NotificationsBell />}
           <InstallPWAButton className="hidden lg:inline-flex" />
 
+          <ThemeToggle />
+
           <Button
             type="button"
             variant="ghost"
@@ -132,6 +135,7 @@ export function Header() {
         {/* Mobile nav */}
         <div className="flex items-center gap-1 md:hidden">
           {user && <NotificationsBell />}
+          <ThemeToggle className="rounded-xl px-2" />
           <Button
             type="button"
             variant="ghost"
