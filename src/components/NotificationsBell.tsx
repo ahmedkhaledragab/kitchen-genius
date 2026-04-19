@@ -43,9 +43,9 @@ export function NotificationsBell() {
   useEffect(() => {
     if (!user) return;
     void load();
-    // realtime subscribe
-    const channel = supabase
-      .channel(`notif-${user.id}`)
+    // unique channel name per mount avoids "add callback after subscribe" in StrictMode
+    const channel = supabase.channel(`notif-${user.id}-${Math.random().toString(36).slice(2)}`);
+    channel
       .on(
         "postgres_changes",
         {
