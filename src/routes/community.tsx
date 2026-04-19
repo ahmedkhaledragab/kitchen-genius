@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/community")({
   head: () => ({
@@ -95,6 +96,10 @@ function CommunityPage() {
   const [comments, setComments] = useState<Record<string, CommunityComment[]>>({});
   const [commentDraft, setCommentDraft] = useState<Record<string, string>>({});
 
+  // feed tab
+  const [feedTab, setFeedTab] = useState<"all" | "following">("all");
+  const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
+
   // report dialog
   const [reportTarget, setReportTarget] = useState<{ postId?: string; commentId?: string } | null>(null);
   const [reportReason, setReportReason] = useState("");
@@ -106,6 +111,7 @@ function CommunityPage() {
   useEffect(() => {
     if (!user) {
       setIsBanned(false);
+      setFollowingIds(new Set());
       return;
     }
     void supabase
@@ -114,6 +120,14 @@ function CommunityPage() {
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => setIsBanned(!!data));
+
+    void supabase
+      .from("user_follows")
+      .select("following_id")
+      .eq("follower_id", user.id)
+      .then(({ data }) => {
+        setFollowingIds(new Set((data || []).map((r) => r.following_id)));
+      });
   }, [user?.id]);
 
   async function loadPosts() {
@@ -481,16 +495,56 @@ function CommunityPage() {
         </Card>
       )}
 
+      {/* Feed tabs */}
+      <Tabs
+        value={feedTab}
+        onValueChange={(v) => setFeedTab(v as "all" | "following")}
+        className="mb-4"
+      >
+        <TabsList className="grid w-full grid-cols-2 rounded-2xl">
+          <TabsTrigger value="all" className="rounded-xl">
+            {t.community.tabAll}
+          </TabsTrigger>
+          <TabsTrigger value="following" className="rounded-xl">
+            {t.community.tabFollowing}
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       {/* Feed */}
-      {loading ? (
-        <div className="flex justify-center py-10">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        </div>
-      ) : posts.length === 0 ? (
-        <Card className="rounded-3xl p-8 text-center text-sm text-muted-foreground">{t.community.empty}</Card>
-      ) : (
-        <div className="space-y-4">
-          {posts.map((post) => (
+      {(() => {
+        const visiblePosts =
+          feedTab === "following"
+            ? posts.filter((p) => followingIds.has(p.user_id) || p.user_id === user?.id)
+            : posts;
+
+        if (loading) {
+          return (
+            <div className="flex justify-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          );
+        }
+
+        if (feedTab === "following" && !user) {
+          return (
+            <Card className="rounded-3xl p-8 text-center text-sm text-muted-foreground">
+              {t.community.followingLoginPrompt}
+            </Card>
+          );
+        }
+
+        if (visiblePosts.length === 0) {
+          return (
+            <Card className="rounded-3xl p-8 text-center text-sm text-muted-foreground">
+              {feedTab === "following" ? t.community.followingEmpty : t.community.empty}
+            </Card>
+          );
+        }
+
+        return (
+          <div className="space-y-4">
+            {visiblePosts.map((post) => (
             <Card key={post.id} className="overflow-hidden rounded-3xl shadow-soft">
               {/* Header */}
               <div className="flex items-center gap-3 px-4 pt-4">
@@ -659,7 +713,8 @@ function CommunityPage() {
             </Card>
           ))}
         </div>
-      )}
+        );
+      })()}
 
       {/* Report dialog */}
       <Dialog open={!!reportTarget} onOpenChange={(o) => !o && setReportTarget(null)}>

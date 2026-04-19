@@ -57,6 +57,10 @@ const arDict = {
       minutes: "دقيقة",
       hours: "ساعة",
       days: "يوم",
+      tabAll: "الكل",
+      tabFollowing: "بتابعهم",
+      followingEmpty: "تابعي ناس عشان تشوفي بوستاتهم هنا 💕",
+      followingLoginPrompt: "سجّلي دخول علشان تشوفي بوستات اللي بتتابعيهم",
     },
     home: {
       heroTitle: "من اللي عندك؟ 👀",
@@ -343,6 +347,10 @@ const enDict = {
       minutes: "min",
       hours: "h",
       days: "d",
+      tabAll: "All",
+      tabFollowing: "Following",
+      followingEmpty: "Follow people to see their posts here 💕",
+      followingLoginPrompt: "Sign in to see posts from people you follow",
     },
     home: {
       heroTitle: "What's in your kitchen? 👀",
