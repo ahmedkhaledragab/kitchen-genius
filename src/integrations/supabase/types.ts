@@ -373,6 +373,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          actor_id: string
+          comment_id: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          post_id: string | null
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          actor_id: string
+          comment_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          post_id?: string | null
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          actor_id?: string
+          comment_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          post_id?: string | null
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       pages_content: {
         Row: {
           content_ar: Json
@@ -751,6 +784,7 @@ export type Database = {
       community_post_type: "recipe" | "post"
       difficulty_level: "easy" | "medium" | "hard"
       message_status: "new" | "read" | "replied" | "archived"
+      notification_type: "like" | "comment" | "follow"
       report_status: "pending" | "reviewed" | "dismissed" | "actioned"
     }
     CompositeTypes: {
@@ -883,6 +917,7 @@ export const Constants = {
       community_post_type: ["recipe", "post"],
       difficulty_level: ["easy", "medium", "hard"],
       message_status: ["new", "read", "replied", "archived"],
+      notification_type: ["like", "comment", "follow"],
       report_status: ["pending", "reviewed", "dismissed", "actioned"],
     },
   },

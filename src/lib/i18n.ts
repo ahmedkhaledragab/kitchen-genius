@@ -139,6 +139,10 @@ const arDict = {
       bio: "نبذة عنك",
       bioPlaceholder: "اكتبي تعريف بسيط عن نفسك يظهر في بروفايلك العام...",
       viewPublic: "شوفي بروفايلك العام",
+      followers: "المتابِعون",
+      following: "بتابعهم",
+      noFollowers: "لسه محدش بيتابعك",
+      noFollowing: "لسه ما بتتابعيش حد",
     },
     admin: {
       title: "لوحة التحكم",
@@ -421,6 +425,10 @@ const enDict = {
       bio: "About you",
       bioPlaceholder: "Write a short intro about yourself shown on your public profile...",
       viewPublic: "View public profile",
+      followers: "Followers",
+      following: "Following",
+      noFollowers: "No followers yet",
+      noFollowing: "Not following anyone yet",
     },
     admin: {
       title: "Dashboard",
