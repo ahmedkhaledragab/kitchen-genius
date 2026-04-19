@@ -198,6 +198,8 @@ function AdminSettingsPage() {
     if (url) setUrl(url);
     e.target.value = "";
   };
+
+  const save = async () => {
     setSaving(true);
     const cleanedTwitter = twitterHandle.trim().replace(/^@/, "") || null;
     const { error } = await supabase
@@ -223,6 +225,14 @@ function AdminSettingsPage() {
         tiktok_url: tiktokUrl.trim() || null,
         telegram_url: telegramUrl.trim() || null,
         twitter_url: twitterUrl.trim() || null,
+        pwa_enabled: pwaEnabled,
+        pwa_short_name_ar: pwaShortNameAr.trim() || null,
+        pwa_short_name_en: pwaShortNameEn.trim() || null,
+        pwa_theme_color: pwaThemeColor || null,
+        pwa_background_color: pwaBgColor || null,
+        pwa_icon_192_url: pwaIcon192,
+        pwa_icon_512_url: pwaIcon512,
+        pwa_apple_touch_icon_url: pwaAppleIcon,
         updated_by: user?.id ?? null,
       })
       .eq("singleton", true);
