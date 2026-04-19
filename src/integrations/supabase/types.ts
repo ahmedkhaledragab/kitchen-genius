@@ -646,6 +646,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -703,6 +724,18 @@ export type Database = {
       check_and_increment_usage: {
         Args: { _default_limit?: number; _feature: string; _user_id: string }
         Returns: Json
+      }
+      get_top_creators: {
+        Args: { _limit?: number }
+        Returns: {
+          avatar_url: string
+          bio: string
+          display_name: string
+          followers_count: number
+          id: string
+          likes_count: number
+          posts_count: number
+        }[]
       }
       has_role: {
         Args: {
