@@ -37,12 +37,10 @@ export function RichContent({ text, className }: RichContentProps) {
               </Link>
             );
           case "mention":
-            // payload is display_name or handle — we link to a search-style profile lookup
             return (
               <Link
                 key={i}
                 to="/top-creators"
-                search={{ q: s.payload }}
                 className="font-semibold text-primary hover:underline"
               >
                 {s.value}
