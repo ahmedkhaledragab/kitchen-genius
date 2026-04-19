@@ -95,6 +95,8 @@ export function Header() {
             </Button>
           )}
 
+          {user && <NotificationsBell />}
+
           <Button
             type="button"
             variant="ghost"
@@ -127,6 +129,7 @@ export function Header() {
 
         {/* Mobile nav */}
         <div className="flex items-center gap-1 md:hidden">
+          {user && <NotificationsBell />}
           <Button
             type="button"
             variant="ghost"
