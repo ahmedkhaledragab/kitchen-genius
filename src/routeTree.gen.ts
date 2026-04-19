@@ -24,6 +24,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as UUserIdRouteImport } from './routes/u.$userId'
+import { Route as CommunityPostIdRouteImport } from './routes/community.$postId'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRecipesRouteImport } from './routes/admin.recipes'
@@ -31,6 +32,7 @@ import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
 import { Route as AdminIngredientsRouteImport } from './routes/admin.ingredients'
 import { Route as AdminCommunityRouteImport } from './routes/admin.community'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as CommunityTagTagRouteImport } from './routes/community.tag.$tag'
 import { Route as AdminContentHomeRouteImport } from './routes/admin.content.home'
 import { Route as AdminContentFeaturesRouteImport } from './routes/admin.content.features'
 import { Route as AdminContentContactRouteImport } from './routes/admin.content.contact'
@@ -111,6 +113,11 @@ const UUserIdRoute = UUserIdRouteImport.update({
   path: '/u/$userId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommunityPostIdRoute = CommunityPostIdRouteImport.update({
+  id: '/$postId',
+  path: '/$postId',
+  getParentRoute: () => CommunityRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -146,6 +153,11 @@ const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => AdminRoute,
 } as any)
+const CommunityTagTagRoute = CommunityTagTagRouteImport.update({
+  id: '/tag/$tag',
+  path: '/tag/$tag',
+  getParentRoute: () => CommunityRoute,
+} as any)
 const AdminContentHomeRoute = AdminContentHomeRouteImport.update({
   id: '/content/home',
   path: '/content/home',
@@ -172,7 +184,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
-  '/community': typeof CommunityRoute
+  '/community': typeof CommunityRouteWithChildren
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
@@ -188,18 +200,20 @@ export interface FileRoutesByFullPath {
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/community/$postId': typeof CommunityPostIdRoute
   '/u/$userId': typeof UUserIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/content/about': typeof AdminContentAboutRoute
   '/admin/content/contact': typeof AdminContentContactRoute
   '/admin/content/features': typeof AdminContentFeaturesRoute
   '/admin/content/home': typeof AdminContentHomeRoute
+  '/community/tag/$tag': typeof CommunityTagTagRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
-  '/community': typeof CommunityRoute
+  '/community': typeof CommunityRouteWithChildren
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
@@ -215,12 +229,14 @@ export interface FileRoutesByTo {
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/community/$postId': typeof CommunityPostIdRoute
   '/u/$userId': typeof UUserIdRoute
   '/admin': typeof AdminIndexRoute
   '/admin/content/about': typeof AdminContentAboutRoute
   '/admin/content/contact': typeof AdminContentContactRoute
   '/admin/content/features': typeof AdminContentFeaturesRoute
   '/admin/content/home': typeof AdminContentHomeRoute
+  '/community/tag/$tag': typeof CommunityTagTagRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -228,7 +244,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
-  '/community': typeof CommunityRoute
+  '/community': typeof CommunityRouteWithChildren
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
@@ -244,12 +260,14 @@ export interface FileRoutesById {
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/community/$postId': typeof CommunityPostIdRoute
   '/u/$userId': typeof UUserIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/content/about': typeof AdminContentAboutRoute
   '/admin/content/contact': typeof AdminContentContactRoute
   '/admin/content/features': typeof AdminContentFeaturesRoute
   '/admin/content/home': typeof AdminContentHomeRoute
+  '/community/tag/$tag': typeof CommunityTagTagRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -274,12 +292,14 @@ export interface FileRouteTypes {
     | '/admin/recipes'
     | '/admin/settings'
     | '/admin/users'
+    | '/community/$postId'
     | '/u/$userId'
     | '/admin/'
     | '/admin/content/about'
     | '/admin/content/contact'
     | '/admin/content/features'
     | '/admin/content/home'
+    | '/community/tag/$tag'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -301,12 +321,14 @@ export interface FileRouteTypes {
     | '/admin/recipes'
     | '/admin/settings'
     | '/admin/users'
+    | '/community/$postId'
     | '/u/$userId'
     | '/admin'
     | '/admin/content/about'
     | '/admin/content/contact'
     | '/admin/content/features'
     | '/admin/content/home'
+    | '/community/tag/$tag'
   id:
     | '__root__'
     | '/'
@@ -329,12 +351,14 @@ export interface FileRouteTypes {
     | '/admin/recipes'
     | '/admin/settings'
     | '/admin/users'
+    | '/community/$postId'
     | '/u/$userId'
     | '/admin/'
     | '/admin/content/about'
     | '/admin/content/contact'
     | '/admin/content/features'
     | '/admin/content/home'
+    | '/community/tag/$tag'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -342,7 +366,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
-  CommunityRoute: typeof CommunityRoute
+  CommunityRoute: typeof CommunityRouteWithChildren
   ContactRoute: typeof ContactRoute
   FeaturesRoute: typeof FeaturesRoute
   ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
@@ -461,6 +485,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/community/$postId': {
+      id: '/community/$postId'
+      path: '/$postId'
+      fullPath: '/community/$postId'
+      preLoaderRoute: typeof CommunityPostIdRouteImport
+      parentRoute: typeof CommunityRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -509,6 +540,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/categories'
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/community/tag/$tag': {
+      id: '/community/tag/$tag'
+      path: '/tag/$tag'
+      fullPath: '/community/tag/$tag'
+      preLoaderRoute: typeof CommunityTagTagRouteImport
+      parentRoute: typeof CommunityRoute
     }
     '/admin/content/home': {
       id: '/admin/content/home'
@@ -573,12 +611,26 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface CommunityRouteChildren {
+  CommunityPostIdRoute: typeof CommunityPostIdRoute
+  CommunityTagTagRoute: typeof CommunityTagTagRoute
+}
+
+const CommunityRouteChildren: CommunityRouteChildren = {
+  CommunityPostIdRoute: CommunityPostIdRoute,
+  CommunityTagTagRoute: CommunityTagTagRoute,
+}
+
+const CommunityRouteWithChildren = CommunityRoute._addFileChildren(
+  CommunityRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
-  CommunityRoute: CommunityRoute,
+  CommunityRoute: CommunityRouteWithChildren,
   ContactRoute: ContactRoute,
   FeaturesRoute: FeaturesRoute,
   ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
