@@ -494,16 +494,27 @@ function CommunityPage() {
             <Card key={post.id} className="overflow-hidden rounded-3xl shadow-soft">
               {/* Header */}
               <div className="flex items-center gap-3 px-4 pt-4">
-                <Avatar className="h-10 w-10">
-                  {post.author?.avatar_url && <AvatarImage src={post.author.avatar_url} />}
-                  <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">
-                    {(post.author?.display_name || t.community.anonymous).charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <Link
+                  to="/u/$userId"
+                  params={{ userId: post.user_id }}
+                  className="shrink-0 transition hover:opacity-80"
+                  aria-label={post.author?.display_name || t.community.anonymous}
+                >
+                  <Avatar className="h-10 w-10">
+                    {post.author?.avatar_url && <AvatarImage src={post.author.avatar_url} />}
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">
+                      {(post.author?.display_name || t.community.anonymous).charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold">
+                  <Link
+                    to="/u/$userId"
+                    params={{ userId: post.user_id }}
+                    className="block truncate text-sm font-bold hover:text-primary hover:underline"
+                  >
                     {post.author?.display_name || t.community.anonymous}
-                  </p>
+                  </Link>
                   <p className="text-xs text-muted-foreground">{timeAgo(post.created_at, lang, t)}</p>
                 </div>
                 <span
@@ -591,14 +602,26 @@ function CommunityPage() {
                     ) : (
                       (comments[post.id] || []).map((c) => (
                         <div key={c.id} className="flex gap-2">
-                          <Avatar className="h-7 w-7">
-                            {c.author?.avatar_url && <AvatarImage src={c.author.avatar_url} />}
-                            <AvatarFallback className="bg-primary/10 text-[10px] text-primary">
-                              {(c.author?.display_name || "?").charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
+                          <Link
+                            to="/u/$userId"
+                            params={{ userId: c.user_id }}
+                            className="shrink-0 transition hover:opacity-80"
+                          >
+                            <Avatar className="h-7 w-7">
+                              {c.author?.avatar_url && <AvatarImage src={c.author.avatar_url} />}
+                              <AvatarFallback className="bg-primary/10 text-[10px] text-primary">
+                                {(c.author?.display_name || "?").charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                          </Link>
                           <div className="flex-1 rounded-2xl bg-background px-3 py-1.5">
-                            <p className="text-xs font-bold">{c.author?.display_name || t.community.anonymous}</p>
+                            <Link
+                              to="/u/$userId"
+                              params={{ userId: c.user_id }}
+                              className="text-xs font-bold hover:text-primary hover:underline"
+                            >
+                              {c.author?.display_name || t.community.anonymous}
+                            </Link>
                             <p className="text-sm">{c.content}</p>
                           </div>
                         </div>
