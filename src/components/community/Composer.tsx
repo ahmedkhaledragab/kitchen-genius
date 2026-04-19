@@ -182,7 +182,7 @@ export function Composer({ isBanned, onPosted }: ComposerProps) {
           </button>
           <label className="cursor-pointer">
             <input type="file" accept="image/*" className="hidden" onChange={pickImage} />
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full text-emerald-600 hover:bg-muted">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-full text-primary hover:bg-muted">
               <ImagePlus className="h-5 w-5" />
             </span>
           </label>
