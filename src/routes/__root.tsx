@@ -1,12 +1,14 @@
 import { Outlet, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
+import { SiteSettingsProvider, useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
+import { registerServiceWorker, unregisterServiceWorkers } from "@/lib/pwa";
 
 function NotFoundComponent() {
   return (
@@ -42,6 +44,10 @@ export const Route = createRootRoute({
           "اكتب اللي عندك في المطبخ ونقترحلك وصفات تقدر تعملها فوراً بالذكاء الاصطناعي.",
       },
       { name: "author", content: "Lovable" },
+      { name: "theme-color", content: "#16a34a" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { property: "og:title", content: "من اللي عندك؟ — وصفات من مكوناتك" },
       {
         property: "og:description",
@@ -52,6 +58,7 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -86,6 +93,7 @@ function RootComponent() {
     <LanguageProvider>
       <AuthProvider>
         <SiteSettingsProvider>
+          <PWAManager />
           <div className="flex min-h-screen flex-col bg-background">
             <Header />
             <main className="flex-1">
@@ -98,4 +106,43 @@ function RootComponent() {
       </AuthProvider>
     </LanguageProvider>
   );
+}
+
+function PWAManager() {
+  const { settings } = useSiteSettings();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (settings.pwa_enabled) {
+      registerServiceWorker();
+    } else {
+      unregisterServiceWorkers();
+    }
+  }, [settings.pwa_enabled]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const themeColor = settings.pwa_theme_color || "#16a34a";
+    let meta = document.querySelector<HTMLMetaElement>("meta[name='theme-color']");
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "theme-color";
+      document.head.appendChild(meta);
+    }
+    meta.content = themeColor;
+  }, [settings.pwa_theme_color]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (!settings.pwa_apple_touch_icon_url) return;
+    let link = document.querySelector<HTMLLinkElement>("link[rel='apple-touch-icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "apple-touch-icon";
+      document.head.appendChild(link);
+    }
+    link.href = settings.pwa_apple_touch_icon_url;
+  }, [settings.pwa_apple_touch_icon_url]);
+
+  return null;
 }
