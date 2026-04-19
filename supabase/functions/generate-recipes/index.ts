@@ -138,9 +138,10 @@ serve(async (req: Request) => {
       });
     }
 
-    // ============== LOCAL-FIRST SEARCH ==============
-    // Search the recipes table before calling AI. If we find >= 3 good matches,
-    // return them without spending AI credits.
+    // ============== LOCAL-FIRST HYBRID SEARCH ==============
+    // Search recipes table first. Always return any local matches found,
+    // then top up with AI to reach TARGET_COUNT total recipes.
+    const TARGET_COUNT = 5;
     const norm = (s: string) =>
       s
         .toLowerCase()
@@ -154,6 +155,23 @@ serve(async (req: Request) => {
 
     const userIngsNorm = ingredients.map(norm).filter(Boolean);
     const excludeNorm = exclude.map(norm).filter(Boolean);
+
+    type LocalRecipeOut = {
+      id: string;
+      title: string;
+      description: string;
+      ingredients: string[];
+      missing_ingredients: string[];
+      steps: string[];
+      estimated_time_minutes: number;
+      difficulty: string;
+      tags: string[];
+      cuisine?: string;
+      image_url?: string;
+      source: "local";
+    };
+
+    let localMatches: LocalRecipeOut[] = [];
 
     try {
       const { data: pool } = await admin
@@ -183,20 +201,17 @@ serve(async (req: Request) => {
         const ings: string[] = Array.isArray(r.ingredients) ? (r.ingredients as string[]) : [];
         const ingsNorm = ings.map((x) => norm(String(x)));
 
-        // exclude check: if any excluded item appears in ingredients, skip
         const hasExcluded = excludeNorm.some((ex) =>
           ingsNorm.some((ing) => ing.includes(ex)),
         );
         if (hasExcluded) continue;
 
-        // tag/filter check (best-effort)
         if (filters.length) {
           const tagsNorm = (r.tags ?? []).map(norm);
           const allMatch = filters.every((f) => tagsNorm.some((t) => t.includes(norm(f))));
           if (!allMatch) continue;
         }
 
-        // matching: how many of user's ingredients appear in recipe ingredients
         let matched = 0;
         for (const u of userIngsNorm) {
           if (ingsNorm.some((ing) => ing.includes(u) || u.includes(ing))) matched++;
@@ -207,46 +222,48 @@ serve(async (req: Request) => {
         scored.push({ r, matched, missing });
       }
 
-      // sort by most matched, then fewest missing
       scored.sort((a, b) => b.matched - a.matched || a.missing - b.missing);
 
-      const topLocal = scored.slice(0, 5);
-      if (topLocal.length >= 3) {
-        const recipesOut = topLocal.map(({ r, matched }) => {
-          const ings: string[] = Array.isArray(r.ingredients) ? (r.ingredients as string[]) : [];
-          const ingsNorm = ings.map((x) => norm(String(x)));
-          // missing_ingredients = recipe ingredients not present in user list
-          const missingList = ings.filter((_, i) => {
-            const ing = ingsNorm[i];
-            return !userIngsNorm.some((u) => ing.includes(u) || u.includes(ing));
-          });
-          return {
-            id: r.id,
-            title: r.title,
-            description: r.description ?? "",
-            ingredients: ings,
-            missing_ingredients: missingList,
-            steps: Array.isArray(r.steps) ? r.steps : [],
-            estimated_time_minutes: r.estimated_time_minutes ?? 30,
-            difficulty: r.difficulty,
-            tags: r.tags ?? [],
-            cuisine: r.cuisine ?? undefined,
-            image_url: r.image_url ?? undefined,
-            _source: "local",
-            _matched: matched,
-          };
+      localMatches = scored.slice(0, TARGET_COUNT).map(({ r }) => {
+        const ings: string[] = Array.isArray(r.ingredients) ? (r.ingredients as string[]) : [];
+        const ingsNorm = ings.map((x) => norm(String(x)));
+        const missingList = ings.filter((_, i) => {
+          const ing = ingsNorm[i];
+          return !userIngsNorm.some((u) => ing.includes(u) || u.includes(ing));
         });
+        return {
+          id: r.id,
+          title: r.title,
+          description: r.description ?? "",
+          ingredients: ings,
+          missing_ingredients: missingList,
+          steps: Array.isArray(r.steps) ? (r.steps as string[]) : [],
+          estimated_time_minutes: r.estimated_time_minutes ?? 30,
+          difficulty: r.difficulty,
+          tags: r.tags ?? [],
+          cuisine: r.cuisine ?? undefined,
+          image_url: r.image_url ?? undefined,
+          source: "local" as const,
+        };
+      });
+
+      console.log(`local search found ${localMatches.length} matches`);
+
+      // If we have enough local matches, skip AI entirely.
+      if (localMatches.length >= TARGET_COUNT) {
         return new Response(
-          JSON.stringify({ recipes: recipesOut, source: "local" }),
+          JSON.stringify({ recipes: localMatches, source: "local" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
-      // else: fall through to AI generation, but we may have a few local hits to merge later
-      console.log(`local search found ${topLocal.length} matches, falling back to AI`);
     } catch (e) {
-      console.error("local search failed, falling back to AI:", e);
+      console.error("local search failed, falling back to AI only:", e);
     }
     // ============== END LOCAL-FIRST SEARCH ==============
+
+    const aiNeeded = TARGET_COUNT - localMatches.length;
+    // Tell the AI which recipe titles already came from local so it doesn't duplicate them.
+    const localTitles = localMatches.map((r) => r.title);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -270,10 +287,16 @@ serve(async (req: Request) => {
         : `Exclude: ${exclude.join(", ")}.`
       : "";
 
+    const avoidText = localTitles.length
+      ? language === "ar"
+        ? `تجنّب تكرار هذه الوصفات اللي عندي بالفعل: ${localTitles.join("، ")}.`
+        : `Avoid duplicating these recipes I already have: ${localTitles.join(", ")}.`
+      : "";
+
     const userMsg =
       language === "ar"
-        ? `المكونات المتوفرة عندي: ${ingredients.join("، ")}.\n${excludeText}\n${filterText}\nاقترح من 3 إلى 5 وصفات أقدر أعملها بالمكونات دي. حاول تستعمل أقل عدد من المكونات الناقصة.`
-        : `My ingredients: ${ingredients.join(", ")}.\n${excludeText}\n${filterText}\nSuggest 3-5 recipes I can make. Minimize missing ingredients.`;
+        ? `المكونات المتوفرة عندي: ${ingredients.join("، ")}.\n${excludeText}\n${filterText}\n${avoidText}\nاقترح ${aiNeeded} وصفات جديدة أقدر أعملها بالمكونات دي. حاول تستعمل أقل عدد من المكونات الناقصة.`
+        : `My ingredients: ${ingredients.join(", ")}.\n${excludeText}\n${filterText}\n${avoidText}\nSuggest ${aiNeeded} new recipes I can make. Minimize missing ingredients.`;
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -293,6 +316,14 @@ serve(async (req: Request) => {
     });
 
     if (!resp.ok) {
+      // If AI fails but we have local matches, return them gracefully.
+      if (localMatches.length > 0) {
+        console.warn("AI failed, returning local matches only:", resp.status);
+        return new Response(
+          JSON.stringify({ recipes: localMatches, source: "local" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
       if (resp.status === 429) {
         return new Response(
           JSON.stringify({ error: "rate_limited", message: "حد الاستخدام انتهى مؤقتاً، حاول بعد دقيقة." }),
@@ -317,24 +348,45 @@ serve(async (req: Request) => {
     const toolCall = data?.choices?.[0]?.message?.tool_calls?.[0];
     if (!toolCall?.function?.arguments) {
       console.error("Missing tool call in response", JSON.stringify(data));
+      if (localMatches.length > 0) {
+        return new Response(
+          JSON.stringify({ recipes: localMatches, source: "local" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
       return new Response(
         JSON.stringify({ error: "bad_response", message: "الرد غير مكتمل." }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    let parsed: { recipes: unknown[] };
+    let parsed: { recipes: Array<Record<string, unknown>> };
     try {
       parsed = JSON.parse(toolCall.function.arguments);
     } catch (e) {
       console.error("Failed to parse tool args", e);
+      if (localMatches.length > 0) {
+        return new Response(
+          JSON.stringify({ recipes: localMatches, source: "local" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
       return new Response(
         JSON.stringify({ error: "parse_error" }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    return new Response(JSON.stringify(parsed), {
+    // Merge: local first, then AI fills the rest (capped at TARGET_COUNT).
+    const aiRecipes = (parsed.recipes ?? []).map((r) => ({ ...r, source: "ai" as const }));
+    const merged = [...localMatches, ...aiRecipes].slice(0, TARGET_COUNT);
+    const sourceLabel = localMatches.length > 0 && aiRecipes.length > 0
+      ? "hybrid"
+      : localMatches.length > 0
+        ? "local"
+        : "ai";
+
+    return new Response(JSON.stringify({ recipes: merged, source: sourceLabel }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
