@@ -498,25 +498,34 @@ function CommunityPage() {
       {/* Feed tabs */}
       <Tabs
         value={feedTab}
-        onValueChange={(v) => setFeedTab(v as "all" | "following")}
+        onValueChange={(v) => setFeedTab(v as "all" | "following" | "trending")}
         className="mb-4"
       >
-        <TabsList className="grid w-full grid-cols-2 rounded-2xl">
-          <TabsTrigger value="all" className="rounded-xl">
+        <TabsList className="grid w-full grid-cols-3 rounded-2xl">
+          <TabsTrigger value="all" className="rounded-xl text-xs sm:text-sm">
             {t.community.tabAll}
           </TabsTrigger>
-          <TabsTrigger value="following" className="rounded-xl">
+          <TabsTrigger value="following" className="rounded-xl text-xs sm:text-sm">
             {t.community.tabFollowing}
+          </TabsTrigger>
+          <TabsTrigger value="trending" className="rounded-xl text-xs sm:text-sm">
+            {t.community.tabTrending}
           </TabsTrigger>
         </TabsList>
       </Tabs>
 
       {/* Feed */}
       {(() => {
-        const visiblePosts =
-          feedTab === "following"
-            ? posts.filter((p) => followingIds.has(p.user_id) || p.user_id === user?.id)
-            : posts;
+        let visiblePosts = posts;
+        if (feedTab === "following") {
+          visiblePosts = posts.filter((p) => followingIds.has(p.user_id) || p.user_id === user?.id);
+        } else if (feedTab === "trending") {
+          const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+          visiblePosts = posts
+            .filter((p) => new Date(p.created_at).getTime() >= sevenDaysAgo && p.likes_count > 0)
+            .slice()
+            .sort((a, b) => b.likes_count - a.likes_count);
+        }
 
         if (loading) {
           return (
@@ -537,7 +546,11 @@ function CommunityPage() {
         if (visiblePosts.length === 0) {
           return (
             <Card className="rounded-3xl p-8 text-center text-sm text-muted-foreground">
-              {feedTab === "following" ? t.community.followingEmpty : t.community.empty}
+              {feedTab === "following"
+                ? t.community.followingEmpty
+                : feedTab === "trending"
+                  ? t.community.trendingEmpty
+                  : t.community.empty}
             </Card>
           );
         }
