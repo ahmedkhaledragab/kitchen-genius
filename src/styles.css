@@ -135,6 +135,15 @@
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.78 0.18 145);
+
+  --sidebar: oklch(0.21 0.025 150);
+  --sidebar-foreground: oklch(0.95 0.01 95);
+  --sidebar-primary: oklch(0.78 0.18 145);
+  --sidebar-primary-foreground: oklch(0.18 0.02 150);
+  --sidebar-accent: oklch(0.28 0.03 150);
+  --sidebar-accent-foreground: oklch(0.97 0.01 95);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.78 0.18 145);
 }
 
 @layer base {
