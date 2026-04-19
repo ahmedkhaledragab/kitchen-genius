@@ -352,8 +352,11 @@ const enDict = {
       days: "d",
       tabAll: "All",
       tabFollowing: "Following",
+      tabTrending: "Trending 🔥",
       followingEmpty: "Follow people to see their posts here 💕",
       followingLoginPrompt: "Sign in to see posts from people you follow",
+      trendingEmpty: "No trending posts this week yet 🔥",
+      trendingHint: "Top liked posts in the last 7 days",
     },
     home: {
       heroTitle: "What's in your kitchen? 👀",
