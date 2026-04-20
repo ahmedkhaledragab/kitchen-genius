@@ -77,10 +77,10 @@ function AuthPage() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col items-stretch px-4 pt-6 pb-20 lg:max-w-5xl lg:flex-row lg:items-center lg:gap-10 lg:px-8 lg:pt-12">
+    <div className="mx-auto flex w-full max-w-md flex-col items-stretch px-4 pt-6 pb-20 lg:max-w-7xl lg:flex-row lg:items-center lg:gap-12 lg:px-8 lg:pt-12">
       <Link
         to="/"
-        className="mx-auto mb-5 block aspect-[16/9] w-full max-w-sm overflow-hidden rounded-3xl shadow-card ring-1 ring-border/60 lg:mx-0 lg:mb-0 lg:aspect-[4/5] lg:max-w-none lg:flex-1"
+        className="mx-auto mb-5 block aspect-[16/9] w-full max-w-sm overflow-hidden rounded-3xl shadow-card ring-1 ring-border/60 lg:mx-0 lg:mb-0 lg:aspect-[4/5] lg:max-w-none lg:flex-[1.6] xl:flex-[1.8]"
       >
         <img
           src={authHero}
