@@ -33,6 +33,9 @@ export interface SiteSettings {
   pwa_icon_512_url: string | null;
   pwa_apple_touch_icon_url: string | null;
   pwa_display: string;
+  // Recipe generation controls (admin-tunable)
+  recipes_target_count: number;
+  recipes_daily_limit: number;
 }
 
 const DEFAULTS: SiteSettings = {
@@ -65,6 +68,8 @@ const DEFAULTS: SiteSettings = {
   pwa_icon_512_url: null,
   pwa_apple_touch_icon_url: null,
   pwa_display: "standalone",
+  recipes_target_count: 3,
+  recipes_daily_limit: 4,
 };
 
 interface SiteSettingsContextValue {
@@ -84,7 +89,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase
       .from("site_settings")
       .select(
-        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color, facebook_url, instagram_url, whatsapp_url, contact_email, tiktok_url, telegram_url, twitter_url, pwa_enabled, pwa_short_name_ar, pwa_short_name_en, pwa_theme_color, pwa_background_color, pwa_icon_192_url, pwa_icon_512_url, pwa_apple_touch_icon_url, pwa_display"
+        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color, facebook_url, instagram_url, whatsapp_url, contact_email, tiktok_url, telegram_url, twitter_url, pwa_enabled, pwa_short_name_ar, pwa_short_name_en, pwa_theme_color, pwa_background_color, pwa_icon_192_url, pwa_icon_512_url, pwa_apple_touch_icon_url, pwa_display, recipes_target_count, recipes_daily_limit"
       )
       .limit(1)
       .maybeSingle();
@@ -119,6 +124,8 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
         pwa_icon_512_url: (data as { pwa_icon_512_url?: string | null }).pwa_icon_512_url ?? null,
         pwa_apple_touch_icon_url: (data as { pwa_apple_touch_icon_url?: string | null }).pwa_apple_touch_icon_url ?? null,
         pwa_display: (data as { pwa_display?: string }).pwa_display ?? "standalone",
+        recipes_target_count: (data as { recipes_target_count?: number }).recipes_target_count ?? 3,
+        recipes_daily_limit: (data as { recipes_daily_limit?: number }).recipes_daily_limit ?? 4,
       });
     }
     setLoading(false);

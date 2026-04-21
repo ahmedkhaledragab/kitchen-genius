@@ -100,10 +100,33 @@ serve(async (req: Request) => {
     }
 
     const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // Read admin-controlled settings (target recipe count + daily limit).
+    // Fall back to safe defaults if the row is missing or the columns are not set.
+    let targetCount = 3;
+    let dailyLimit = 4;
+    try {
+      const { data: cfg } = await admin
+        .from("site_settings")
+        .select("recipes_target_count, recipes_daily_limit")
+        .limit(1)
+        .maybeSingle();
+      if (cfg) {
+        if (typeof cfg.recipes_target_count === "number" && cfg.recipes_target_count > 0) {
+          targetCount = Math.min(Math.max(cfg.recipes_target_count, 1), 10);
+        }
+        if (typeof cfg.recipes_daily_limit === "number" && cfg.recipes_daily_limit > 0) {
+          dailyLimit = Math.min(Math.max(cfg.recipes_daily_limit, 1), 100);
+        }
+      }
+    } catch (e) {
+      console.warn("could not read site_settings, using defaults", e);
+    }
+
     const { data: usage, error: usageError } = await admin.rpc("check_and_increment_usage", {
       _user_id: user.id,
       _feature: "generate_recipes",
-      _default_limit: 10,
+      _default_limit: dailyLimit,
     });
     if (usageError) {
       console.error("usage rpc error", usageError);
@@ -168,7 +191,8 @@ serve(async (req: Request) => {
     // ============== LOCAL-FIRST HYBRID SEARCH ==============
     // Search recipes table first. Always return any local matches found,
     // then top up with AI to reach TARGET_COUNT total recipes.
-    const TARGET_COUNT = 5;
+    // TARGET_COUNT is admin-controlled via site_settings.recipes_target_count.
+    const TARGET_COUNT = targetCount;
     const norm = (s: string) =>
       s
         .toLowerCase()
@@ -441,12 +465,12 @@ serve(async (req: Request) => {
         }
       }
 
-      // PREFER LOCAL: if we have ANY local matches, return them and skip AI
-      // entirely. This keeps results grounded in our curated recipe library
-      // instead of relying on AI generation.
-      if (localMatches.length > 0) {
+      // PREFER LOCAL: if local already covers the full target count, skip AI.
+      // Otherwise we'll fall through and let AI top up the remaining slots
+      // (e.g. user wants 3 recipes, local has 2 → AI generates 1 more).
+      if (localMatches.length >= TARGET_COUNT) {
         return new Response(
-          JSON.stringify({ recipes: localMatches, source: "local" }),
+          JSON.stringify({ recipes: localMatches.slice(0, TARGET_COUNT), source: "local" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }

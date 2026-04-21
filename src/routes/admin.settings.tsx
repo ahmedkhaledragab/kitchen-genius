@@ -61,6 +61,10 @@ function AdminSettingsPage() {
   const [telegramUrl, setTelegramUrl] = useState("");
   const [twitterUrl, setTwitterUrl] = useState("");
 
+  // Recipe generation controls
+  const [recipesTargetCount, setRecipesTargetCount] = useState<number>(3);
+  const [recipesDailyLimit, setRecipesDailyLimit] = useState<number>(4);
+
   // PWA state
   const [pwaEnabled, setPwaEnabled] = useState(false);
   const [pwaShortNameAr, setPwaShortNameAr] = useState("");
@@ -119,6 +123,8 @@ function AdminSettingsPage() {
     setPwaIcon192(settings.pwa_icon_192_url);
     setPwaIcon512(settings.pwa_icon_512_url);
     setPwaAppleIcon(settings.pwa_apple_touch_icon_url);
+    setRecipesTargetCount(settings.recipes_target_count ?? 3);
+    setRecipesDailyLimit(settings.recipes_daily_limit ?? 4);
   }, [settings]);
 
   if (loading) return null;
@@ -233,6 +239,8 @@ function AdminSettingsPage() {
         pwa_icon_192_url: pwaIcon192,
         pwa_icon_512_url: pwaIcon512,
         pwa_apple_touch_icon_url: pwaAppleIcon,
+        recipes_target_count: Math.min(Math.max(recipesTargetCount || 3, 1), 10),
+        recipes_daily_limit: Math.min(Math.max(recipesDailyLimit || 4, 1), 100),
         updated_by: user?.id ?? null,
       })
       .eq("singleton", true);
@@ -422,7 +430,65 @@ function AdminSettingsPage() {
         </p>
       </Card>
 
-      {/* Names + taglines */}
+      {/* Recipe generation controls */}
+      <Card className="mt-4 rounded-3xl border-border/60 p-5">
+        <Label className="text-sm font-bold">
+          {lang === "ar" ? "إعدادات توليد الوصفات" : "Recipe generation"}
+        </Label>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {lang === "ar"
+            ? "تحكّم في عدد الوصفات اللي بتظهر للمستخدم وعدد محاولات التوليد اليومية."
+            : "Control how many recipes each user sees per generation and the daily attempt limit."}
+        </p>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="recipesTargetCount" className="text-sm font-bold">
+              {lang === "ar" ? "عدد الوصفات في كل توليد" : "Recipes per generation"}
+            </Label>
+            <Input
+              id="recipesTargetCount"
+              type="number"
+              min={1}
+              max={10}
+              value={recipesTargetCount}
+              onChange={(e) => setRecipesTargetCount(Number(e.target.value))}
+              className="mt-1.5 rounded-xl"
+              dir="ltr"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {lang === "ar"
+                ? "لو فيه عدد كافي من الوصفات في الداتا بيز، يرجعهم. لو ناقص، الـ AI يكمّل الباقي."
+                : "Shown from your recipe library first; AI fills any remaining slots."}
+            </p>
+          </div>
+          <div>
+            <Label htmlFor="recipesDailyLimit" className="text-sm font-bold">
+              {lang === "ar" ? "عدد المحاولات اليومية" : "Daily attempts per user"}
+            </Label>
+            <Input
+              id="recipesDailyLimit"
+              type="number"
+              min={1}
+              max={100}
+              value={recipesDailyLimit}
+              onChange={(e) => setRecipesDailyLimit(Number(e.target.value))}
+              className="mt-1.5 rounded-xl"
+              dir="ltr"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {lang === "ar"
+                ? "كل مستخدم يقدر يضغط 'توليد' الرقم ده من المرات في اليوم. الأدمن متجاوز الحد."
+                : "Each user can generate this many times per day. Admins bypass the limit."}
+            </p>
+          </div>
+        </div>
+        <p className="mt-3 text-[11px] text-muted-foreground">
+          {lang === "ar"
+            ? "ملاحظة: تغيير الحد اليومي يطبّق على المحاولات الجديدة فقط — العدّاد الحالي لكل مستخدم يفضل زي ما هو لحد بكره."
+            : "Note: changing the daily limit applies to new attempts only; today's existing counters stay until tomorrow."}
+        </p>
+      </Card>
       <Card className="mt-4 rounded-3xl border-border/60 p-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
