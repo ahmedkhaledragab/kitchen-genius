@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCategoriesCatalog } from "@/hooks/useCategoriesCatalog";
+import { useKitchens } from "@/hooks/useKitchens";
 
 export const Route = createFileRoute("/admin/ingredients")({
   head: () => ({
@@ -40,7 +41,12 @@ interface DraftRow {
   name_en: string;
   category: string;
   sort_order: number;
+  kitchen_ids: string[];
 }
+
+// `ingredient_kitchens` is a new table not yet in the auto-generated types.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sb = supabase as any;
 
 function AdminIngredientsPage() {
   const { user, isAdmin, loading: authLoading } = useAuth();
