@@ -77,9 +77,10 @@ function HomePage() {
   const [iconByName, setIconByName] = useState<Record<string, string>>({});
   const [catalogLoading, setCatalogLoading] = useState(false);
 
-  // Reload the ingredient catalog whenever the selected kitchen changes. We
-  // join through `ingredient_kitchens` so an ingredient assigned to multiple
-  // kitchens shows up in each one (many-to-many).
+  // Reload the ingredient catalog whenever the selected kitchen changes.
+  // New behavior: ALL active ingredients show by default in every kitchen.
+  // The `ingredient_kitchen_excludes` junction holds ingredients the admin
+  // explicitly hid for this kitchen — we filter those out client-side.
   useEffect(() => {
     if (!selectedKitchen) {
       setCatalogAr([]);
@@ -90,31 +91,29 @@ function HomePage() {
     let cancelled = false;
     setCatalogLoading(true);
     (async () => {
-      // Step 1: ingredient ids belonging to this kitchen
-      const { data: links } = await sb
-        .from("ingredient_kitchens")
-        .select("ingredient_id")
-        .eq("kitchen_id", selectedKitchen.id);
-      const ids = (links ?? []).map((l: { ingredient_id: string }) => l.ingredient_id);
-
-      // Step 2: load those ingredients + the category icon map
-      const [ingsRes, catsRes] = await Promise.all([
-        ids.length === 0
-          ? Promise.resolve({ data: [] as Array<{ name_ar: string; name_en: string; category: string | null }> })
-          : supabase
-              .from("ingredients_catalog")
-              .select("name_ar, name_en, category")
-              .eq("is_active", true)
-              .in("id", ids)
-              .order("sort_order", { ascending: true })
-              .limit(500),
+      const [ingsRes, catsRes, exRes] = await Promise.all([
+        supabase
+          .from("ingredients_catalog")
+          .select("id, name_ar, name_en, category")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true })
+          .limit(1000),
         supabase
           .from("ingredient_categories")
           .select("slug, icon")
           .eq("is_active", true),
+        sb
+          .from("ingredient_kitchen_excludes")
+          .select("ingredient_id")
+          .eq("kitchen_id", selectedKitchen.id),
       ]);
       if (cancelled) return;
-      const ings = (ingsRes.data ?? []) as Array<{ name_ar: string; name_en: string; category: string | null }>;
+      const excludedIds = new Set(
+        ((exRes.data ?? []) as Array<{ ingredient_id: string }>).map((x) => x.ingredient_id),
+      );
+      const ings = ((ingsRes.data ?? []) as Array<{ id: string; name_ar: string; name_en: string; category: string | null }>).filter(
+        (i) => !excludedIds.has(i.id),
+      );
       const cats = (catsRes.data ?? []) as Array<{ slug: string; icon: string | null }>;
       setCatalogAr(ings.map((d) => d.name_ar));
       setCatalogEn(ings.map((d) => d.name_en));
@@ -438,8 +437,8 @@ function HomePage() {
         ) : (
           <p className="mt-4 rounded-xl border border-dashed border-border/60 p-3 text-xs text-muted-foreground">
             {lang === "ar"
-              ? "لسه مفيش مكونات معيّنة لهذا المطبخ. الأدمن يقدر يربط مكونات من لوحة المكونات."
-              : "No ingredients linked to this kitchen yet. Admin can link from the ingredients page."}
+              ? "لسه مفيش مكونات في الكتالوج. ضيفي مكونات من لوحة الأدمن."
+              : "No ingredients in the catalog yet. Add some from the admin panel."}
           </p>
         )}
 
