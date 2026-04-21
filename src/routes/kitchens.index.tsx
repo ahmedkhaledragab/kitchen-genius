@@ -6,7 +6,7 @@ import { useLang } from "@/contexts/LanguageContext";
 import { useKitchens } from "@/hooks/useKitchens";
 import { Card } from "@/components/ui/card";
 
-export const Route = createFileRoute("/kitchens")({
+export const Route = createFileRoute("/kitchens/")({
   head: () => ({
     meta: [
       { title: "المطابخ — اختاري مطبخك المفضل" },
