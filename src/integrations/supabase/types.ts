@@ -740,6 +740,8 @@ export type Database = {
           pwa_short_name_ar: string | null
           pwa_short_name_en: string | null
           pwa_theme_color: string | null
+          recipes_daily_limit: number
+          recipes_target_count: number
           singleton: boolean
           site_name_ar: string
           site_name_en: string
@@ -776,6 +778,8 @@ export type Database = {
           pwa_short_name_ar?: string | null
           pwa_short_name_en?: string | null
           pwa_theme_color?: string | null
+          recipes_daily_limit?: number
+          recipes_target_count?: number
           singleton?: boolean
           site_name_ar?: string
           site_name_en?: string
@@ -812,6 +816,8 @@ export type Database = {
           pwa_short_name_ar?: string | null
           pwa_short_name_en?: string | null
           pwa_theme_color?: string | null
+          recipes_daily_limit?: number
+          recipes_target_count?: number
           singleton?: boolean
           site_name_ar?: string
           site_name_en?: string
