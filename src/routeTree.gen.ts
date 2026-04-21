@@ -10,11 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TopCreatorsRouteImport } from './routes/top-creators'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as RecipesRouteImport } from './routes/recipes'
 import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CommunityRouteImport } from './routes/community'
@@ -46,16 +43,6 @@ const TopCreatorsRoute = TopCreatorsRouteImport.update({
   path: '/top-creators',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
-  id: '/robots.txt',
-  path: '/robots.txt',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RecipesRoute = RecipesRouteImport.update({
   id: '/recipes',
   path: '/recipes',
@@ -64,11 +51,6 @@ const RecipesRoute = RecipesRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ManifestDotwebmanifestRoute = ManifestDotwebmanifestRouteImport.update({
-  id: '/manifest.webmanifest',
-  path: '/manifest.webmanifest',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeaturesRoute = FeaturesRouteImport.update({
@@ -205,11 +187,8 @@ export interface FileRoutesByFullPath {
   '/community': typeof CommunityRouteWithChildren
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
-  '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
-  '/robots.txt': typeof RobotsDottxtRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/top-creators': typeof TopCreatorsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/community': typeof AdminCommunityRoute
@@ -237,11 +216,8 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityRouteWithChildren
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
-  '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
-  '/robots.txt': typeof RobotsDottxtRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/top-creators': typeof TopCreatorsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/community': typeof AdminCommunityRoute
@@ -271,11 +247,8 @@ export interface FileRoutesById {
   '/community': typeof CommunityRouteWithChildren
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
-  '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
-  '/robots.txt': typeof RobotsDottxtRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/top-creators': typeof TopCreatorsRoute
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/community': typeof AdminCommunityRoute
@@ -306,11 +279,8 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/features'
-    | '/manifest.webmanifest'
     | '/profile'
     | '/recipes'
-    | '/robots.txt'
-    | '/sitemap.xml'
     | '/top-creators'
     | '/admin/categories'
     | '/admin/community'
@@ -338,11 +308,8 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/features'
-    | '/manifest.webmanifest'
     | '/profile'
     | '/recipes'
-    | '/robots.txt'
-    | '/sitemap.xml'
     | '/top-creators'
     | '/admin/categories'
     | '/admin/community'
@@ -371,11 +338,8 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/features'
-    | '/manifest.webmanifest'
     | '/profile'
     | '/recipes'
-    | '/robots.txt'
-    | '/sitemap.xml'
     | '/top-creators'
     | '/admin/categories'
     | '/admin/community'
@@ -405,11 +369,8 @@ export interface RootRouteChildren {
   CommunityRoute: typeof CommunityRouteWithChildren
   ContactRoute: typeof ContactRoute
   FeaturesRoute: typeof FeaturesRoute
-  ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
   ProfileRoute: typeof ProfileRoute
   RecipesRoute: typeof RecipesRoute
-  RobotsDottxtRoute: typeof RobotsDottxtRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TopCreatorsRoute: typeof TopCreatorsRoute
   KitchensSlugRoute: typeof KitchensSlugRoute
   UUserIdRoute: typeof UUserIdRoute
@@ -425,20 +386,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TopCreatorsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/robots.txt': {
-      id: '/robots.txt'
-      path: '/robots.txt'
-      fullPath: '/robots.txt'
-      preLoaderRoute: typeof RobotsDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/recipes': {
       id: '/recipes'
       path: '/recipes'
@@ -451,13 +398,6 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/manifest.webmanifest': {
-      id: '/manifest.webmanifest'
-      path: '/manifest.webmanifest'
-      fullPath: '/manifest.webmanifest'
-      preLoaderRoute: typeof ManifestDotwebmanifestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/features': {
@@ -694,11 +634,8 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityRoute: CommunityRouteWithChildren,
   ContactRoute: ContactRoute,
   FeaturesRoute: FeaturesRoute,
-  ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
   ProfileRoute: ProfileRoute,
   RecipesRoute: RecipesRoute,
-  RobotsDottxtRoute: RobotsDottxtRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TopCreatorsRoute: TopCreatorsRoute,
   KitchensSlugRoute: KitchensSlugRoute,
   UUserIdRoute: UUserIdRoute,
