@@ -61,9 +61,14 @@ export function Footer() {
       </nav>
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          {settings.logo_url && (
-            <img src={settings.logo_url} alt={siteName} className="h-6 w-6 object-contain" />
-          )}
+          <img
+            src={settings.logo_url || defaultLogo}
+            alt={siteName}
+            onError={(e) => {
+              if (e.currentTarget.src !== defaultLogo) e.currentTarget.src = defaultLogo;
+            }}
+            className="h-6 w-6 object-contain"
+          />
           <p>
             © {year} {siteName} ·{" "}
             {lang === "ar" ? "كل الحقوق محفوظة" : "All rights reserved"}
