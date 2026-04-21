@@ -366,7 +366,9 @@ serve(async (req: Request) => {
         const ingsNorm = ings.map((x) => norm(String(x)));
         const missingList = ings.filter((_, i) => {
           const ing = ingsNorm[i];
-          return !userIngsNorm.some((u) => ing.includes(u) || u.includes(ing));
+          return !userIngsExpanded.some((variants) =>
+            variants.some((v) => ing.includes(v) || v.includes(ing)),
+          );
         });
         return {
           id: r.id,
