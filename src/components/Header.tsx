@@ -171,7 +171,7 @@ export function Header() {
             >
               <SheetHeader className="border-b border-border/60 p-6 pb-4">
                 <SheetTitle className="flex items-center gap-2">
-                  <img src={logo} alt={siteName} className="h-9 w-9 object-contain" />
+                  <img src={logo} alt={siteName} onError={handleLogoError} className="h-9 w-9 object-contain" />
                   <span className="truncate">{siteName}</span>
                 </SheetTitle>
               </SheetHeader>
