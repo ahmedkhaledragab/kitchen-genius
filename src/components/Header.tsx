@@ -17,6 +17,7 @@ import {
   Inbox,
   Settings as SettingsIcon,
   LayoutDashboard,
+  Utensils,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -64,6 +65,9 @@ export function Header() {
         <nav className="hidden items-center gap-1 md:flex">
           <Button asChild variant="ghost" size="sm" className="rounded-xl">
             <Link to="/">{t.nav.home}</Link>
+          </Button>
+          <Button asChild variant="ghost" size="sm" className="rounded-xl">
+            <Link to="/kitchens">{lang === "ar" ? "المطابخ" : "Kitchens"}</Link>
           </Button>
           <Button asChild variant="ghost" size="sm" className="rounded-xl">
             <Link to="/features">{t.nav.features}</Link>
@@ -171,6 +175,12 @@ export function Header() {
                   <Link to="/">
                     <Home className="me-2 h-4 w-4" />
                     {t.nav.home}
+                  </Link>
+                </Button>
+                <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
+                  <Link to="/kitchens">
+                    <Utensils className="me-2 h-4 w-4" />
+                    {lang === "ar" ? "المطابخ" : "Kitchens"}
                   </Link>
                 </Button>
                 <Button asChild variant="ghost" className="justify-start rounded-xl" onClick={close}>
