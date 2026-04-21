@@ -100,10 +100,33 @@ serve(async (req: Request) => {
     }
 
     const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // Read admin-controlled settings (target recipe count + daily limit).
+    // Fall back to safe defaults if the row is missing or the columns are not set.
+    let targetCount = 3;
+    let dailyLimit = 4;
+    try {
+      const { data: cfg } = await admin
+        .from("site_settings")
+        .select("recipes_target_count, recipes_daily_limit")
+        .limit(1)
+        .maybeSingle();
+      if (cfg) {
+        if (typeof cfg.recipes_target_count === "number" && cfg.recipes_target_count > 0) {
+          targetCount = Math.min(Math.max(cfg.recipes_target_count, 1), 10);
+        }
+        if (typeof cfg.recipes_daily_limit === "number" && cfg.recipes_daily_limit > 0) {
+          dailyLimit = Math.min(Math.max(cfg.recipes_daily_limit, 1), 100);
+        }
+      }
+    } catch (e) {
+      console.warn("could not read site_settings, using defaults", e);
+    }
+
     const { data: usage, error: usageError } = await admin.rpc("check_and_increment_usage", {
       _user_id: user.id,
       _feature: "generate_recipes",
-      _default_limit: 10,
+      _default_limit: dailyLimit,
     });
     if (usageError) {
       console.error("usage rpc error", usageError);
