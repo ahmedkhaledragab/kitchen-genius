@@ -61,6 +61,12 @@ function HomePage() {
   const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[] | null>(null);
   const [openRecipe, setOpenRecipe] = useState<Recipe | null>(null);
+  const [limitInfo, setLimitInfo] = useState<{
+    used?: number;
+    limit?: number;
+    scope?: "device" | "user";
+    message?: string;
+  } | null>(null);
 
   // Catalog of all active ingredients (full catalog, no kitchen filter).
   const [catalogAr, setCatalogAr] = useState<string[]>([]);
@@ -182,6 +188,7 @@ function HomePage() {
     }
     setLoading(true);
     setRecipes(null);
+    setLimitInfo(null);
     const res = await generateRecipes({
       ingredients,
       exclude: excluded,
@@ -190,7 +197,18 @@ function HomePage() {
     });
     setLoading(false);
     if ("error" in res) {
-      toast.error(res.message ?? t.common.error);
+      const isLimit =
+        res.error === "limit_reached" || res.error === "device_limit_reached";
+      if (isLimit) {
+        setLimitInfo({
+          used: res.used,
+          limit: res.limit,
+          scope: res.scope,
+          message: res.message,
+        });
+      } else {
+        toast.error(res.message ?? t.common.error);
+      }
       return;
     }
     setRecipes(res.recipes ?? []);
@@ -416,6 +434,46 @@ function HomePage() {
             </>
           )}
         </Button>
+
+        {/* Limit reached message — appears under the cook button */}
+        {limitInfo && (
+          <div className="mt-4 rounded-2xl border-2 border-dashed border-accent/40 bg-accent/5 p-4 text-center">
+            <div className="mb-2 text-3xl" aria-hidden>⏰</div>
+            <p className="text-sm font-bold text-foreground">
+              {lang === "ar"
+                ? limitInfo.scope === "device"
+                  ? "وصلت لحد الاستخدام اليومي على الجهاز ده"
+                  : "وصلت لحد الاستخدام اليومي"
+                : limitInfo.scope === "device"
+                  ? "Daily limit reached on this device"
+                  : "Daily limit reached"}
+            </p>
+            {typeof limitInfo.used === "number" && typeof limitInfo.limit === "number" && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {lang === "ar"
+                  ? `استخدمت ${limitInfo.used} من ${limitInfo.limit} محاولات النهاردة`
+                  : `${limitInfo.used} of ${limitInfo.limit} tries used today`}
+              </p>
+            )}
+            <p className="mt-2 text-xs text-muted-foreground">
+              {lang === "ar"
+                ? "لو عاوز تشوف وصفات تانية، تعالى بكرة وجرّب تاني 💕"
+                : "Want more recipes? Come back tomorrow and try again 💕"}
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setLimitInfo(null);
+                handleCook();
+              }}
+              className="mt-3 rounded-xl border-accent/40 text-accent hover:bg-accent/10"
+            >
+              <span aria-hidden className="me-1">🔄</span>
+              {lang === "ar" ? "جرّب تاني" : "Try again"}
+            </Button>
+          </div>
+        )}
       </Card>
 
       {/* Results */}
