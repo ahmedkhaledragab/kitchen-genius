@@ -386,10 +386,65 @@ serve(async (req: Request) => {
         };
       });
 
-      console.log(`local search found ${localMatches.length} matches`);
+      console.log(`local search found ${localMatches.length} matches by ingredient`);
 
-      // If we have enough local matches, skip AI entirely.
-      if (localMatches.length >= TARGET_COUNT) {
+      // FALLBACK 1: if no ingredient matches in this kitchen, return the
+      // top recipes from the same kitchen anyway (sorted by recent). The user
+      // explicitly chose this kitchen, so showing local recipes from it is
+      // far better than burning AI credits on a generic answer.
+      if (localMatches.length === 0 && kitchenSlug) {
+        try {
+          const { data: kitchenPool } = await admin
+            .from("recipes")
+            .select(
+              "id,title,description,ingredients,missing_ingredients,steps,estimated_time_minutes,difficulty,tags,cuisine,language,image_url",
+            )
+            .eq("is_published", true)
+            .eq("language", language)
+            .eq("cuisine", kitchenSlug)
+            .order("created_at", { ascending: false })
+            .limit(TARGET_COUNT * 2);
+
+          const filtered = (kitchenPool ?? []).filter((r) => {
+            const ings: string[] = Array.isArray(r.ingredients) ? (r.ingredients as string[]) : [];
+            const ingsNorm = ings.map((x) => norm(String(x)));
+            return !excludeNorm.some((ex) => ingsNorm.some((ing) => ing.includes(ex)));
+          });
+
+          localMatches = filtered.slice(0, TARGET_COUNT).map((r) => {
+            const ings: string[] = Array.isArray(r.ingredients) ? (r.ingredients as string[]) : [];
+            const ingsNorm = ings.map((x) => norm(String(x)));
+            const missingList = ings.filter((_, i) => {
+              const ing = ingsNorm[i];
+              return !userIngsExpanded.some((variants) =>
+                variants.some((v) => ing.includes(v) || v.includes(ing)),
+              );
+            });
+            return {
+              id: r.id,
+              title: r.title,
+              description: r.description ?? "",
+              ingredients: ings,
+              missing_ingredients: missingList,
+              steps: Array.isArray(r.steps) ? (r.steps as string[]) : [],
+              estimated_time_minutes: r.estimated_time_minutes ?? 30,
+              difficulty: r.difficulty,
+              tags: r.tags ?? [],
+              cuisine: r.cuisine ?? undefined,
+              image_url: r.image_url ?? undefined,
+              source: "local" as const,
+            };
+          });
+          console.log(`fallback kitchen-only search found ${localMatches.length} matches`);
+        } catch (e) {
+          console.error("fallback kitchen search failed:", e);
+        }
+      }
+
+      // PREFER LOCAL: if we have ANY local matches, return them and skip AI
+      // entirely. This keeps results grounded in our curated recipe library
+      // instead of relying on AI generation.
+      if (localMatches.length > 0) {
         return new Response(
           JSON.stringify({ recipes: localMatches, source: "local" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } },
