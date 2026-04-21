@@ -465,12 +465,12 @@ serve(async (req: Request) => {
         }
       }
 
-      // PREFER LOCAL: if we have ANY local matches, return them and skip AI
-      // entirely. This keeps results grounded in our curated recipe library
-      // instead of relying on AI generation.
-      if (localMatches.length > 0) {
+      // PREFER LOCAL: if local already covers the full target count, skip AI.
+      // Otherwise we'll fall through and let AI top up the remaining slots
+      // (e.g. user wants 3 recipes, local has 2 → AI generates 1 more).
+      if (localMatches.length >= TARGET_COUNT) {
         return new Response(
-          JSON.stringify({ recipes: localMatches, source: "local" }),
+          JSON.stringify({ recipes: localMatches.slice(0, TARGET_COUNT), source: "local" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
