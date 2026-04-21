@@ -191,7 +191,8 @@ serve(async (req: Request) => {
     // ============== LOCAL-FIRST HYBRID SEARCH ==============
     // Search recipes table first. Always return any local matches found,
     // then top up with AI to reach TARGET_COUNT total recipes.
-    const TARGET_COUNT = 5;
+    // TARGET_COUNT is admin-controlled via site_settings.recipes_target_count.
+    const TARGET_COUNT = targetCount;
     const norm = (s: string) =>
       s
         .toLowerCase()
