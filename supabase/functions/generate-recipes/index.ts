@@ -449,6 +449,16 @@ serve(async (req: Request) => {
         }
         if (matched === 0) continue;
 
+        // Hard filter: if the user provided a protein/main ingredient, the
+        // recipe MUST contain at least one of those proteins. Prevents
+        // returning fig-appetizer when the user typed "fish".
+        if (requiredProteinTerms.length > 0) {
+          const hasProtein = ingsNorm.some((ing) =>
+            requiredProteinTerms.some((p) => ing.includes(p) || p.includes(ing)),
+          );
+          if (!hasProtein) continue;
+        }
+
         const missing = Math.max(0, ingsNorm.length - matched);
         scored.push({ r, matched, missing });
       }
