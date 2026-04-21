@@ -46,7 +46,9 @@ function KitchenRecipesPage() {
     let cancelled = false;
     setLoading(true);
     (async () => {
-      const { data, error } = await supabase
+      // Try the user's current language first; if empty, fall back to any language
+      // so kitchens that only have recipes in one language still render.
+      let { data, error } = await supabase
         .from("recipes")
         .select("*")
         .eq("is_published", true)
@@ -54,6 +56,18 @@ function KitchenRecipesPage() {
         .eq("language", lang)
         .order("created_at", { ascending: false })
         .limit(PAGE_SIZE);
+
+      if (!error && (!data || data.length === 0)) {
+        const fallback = await supabase
+          .from("recipes")
+          .select("*")
+          .eq("is_published", true)
+          .eq("cuisine", slug)
+          .order("created_at", { ascending: false })
+          .limit(PAGE_SIZE);
+        data = fallback.data;
+        error = fallback.error;
+      }
       if (cancelled) return;
       if (error) {
         toast.error(error.message);
