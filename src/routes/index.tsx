@@ -411,7 +411,7 @@ function HomePage() {
             </>
           ) : (
             <>
-              <ChefHat className="me-1 h-5 w-5" />
+              <span aria-hidden className="me-1 text-xl">👨‍🍳</span>
               {pick(c.home_cook_btn, t.home.cookBtn)}
             </>
           )}
