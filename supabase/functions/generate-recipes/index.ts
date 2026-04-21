@@ -190,7 +190,7 @@ serve(async (req: Request) => {
       );
     }
 
-    const body: ReqBody = await req.json();
+    const body: ReqBody = reqBodyRaw as ReqBody;
     const ingredients = (body.ingredients ?? []).filter(Boolean);
     const exclude = (body.exclude ?? []).filter(Boolean);
     const filters = body.filters ?? [];
