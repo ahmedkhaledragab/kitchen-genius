@@ -45,6 +45,12 @@ export function Header() {
   const logo = settings.logo_url || defaultLogo;
   const siteName = lang === "ar" ? settings.site_name_ar : settings.site_name_en;
 
+  const handleLogoError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    if (e.currentTarget.src !== defaultLogo) {
+      e.currentTarget.src = defaultLogo;
+    }
+  };
+
   const close = () => setOpen(false);
 
   return (
