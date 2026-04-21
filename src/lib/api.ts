@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getDeviceId } from "@/lib/device";
 import type { Recipe } from "@/lib/recipe";
 
 export async function generateRecipes(input: {
@@ -6,16 +7,22 @@ export async function generateRecipes(input: {
   exclude?: string[];
   filters?: string[];
   language: "ar" | "en";
-}): Promise<{ recipes: Recipe[]; source?: "local" | "ai" } | { error: string; message?: string }> {
+}): Promise<{ recipes: Recipe[]; source?: "local" | "ai" } | { error: string; message?: string; used?: number; limit?: number; scope?: "device" | "user" }> {
   const { data, error } = await supabase.functions.invoke("generate-recipes", {
-    body: input,
+    body: { ...input, deviceId: getDeviceId() },
   });
   if (error) {
     const ctx = (error as { context?: Response }).context;
     if (ctx && typeof ctx.json === "function") {
       try {
         const parsed = await ctx.json();
-        return { error: parsed.error ?? "error", message: parsed.message };
+        return {
+          error: parsed.error ?? "error",
+          message: parsed.message,
+          used: parsed.used,
+          limit: parsed.limit,
+          scope: parsed.scope,
+        };
       } catch {
         /* ignore */
       }
