@@ -29,6 +29,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminRecipesRouteImport } from './routes/admin.recipes'
 import { Route as AdminMessagesRouteImport } from './routes/admin.messages'
+import { Route as AdminKitchensRouteImport } from './routes/admin.kitchens'
 import { Route as AdminIngredientsRouteImport } from './routes/admin.ingredients'
 import { Route as AdminCommunityRouteImport } from './routes/admin.community'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
@@ -138,6 +139,11 @@ const AdminMessagesRoute = AdminMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminKitchensRoute = AdminKitchensRouteImport.update({
+  id: '/kitchens',
+  path: '/kitchens',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminIngredientsRoute = AdminIngredientsRouteImport.update({
   id: '/ingredients',
   path: '/ingredients',
@@ -196,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/community': typeof AdminCommunityRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
+  '/admin/kitchens': typeof AdminKitchensRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -225,6 +232,7 @@ export interface FileRoutesByTo {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/community': typeof AdminCommunityRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
+  '/admin/kitchens': typeof AdminKitchensRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -256,6 +264,7 @@ export interface FileRoutesById {
   '/admin/categories': typeof AdminCategoriesRoute
   '/admin/community': typeof AdminCommunityRoute
   '/admin/ingredients': typeof AdminIngredientsRoute
+  '/admin/kitchens': typeof AdminKitchensRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/recipes': typeof AdminRecipesRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/community'
     | '/admin/ingredients'
+    | '/admin/kitchens'
     | '/admin/messages'
     | '/admin/recipes'
     | '/admin/settings'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/community'
     | '/admin/ingredients'
+    | '/admin/kitchens'
     | '/admin/messages'
     | '/admin/recipes'
     | '/admin/settings'
@@ -347,6 +358,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/community'
     | '/admin/ingredients'
+    | '/admin/kitchens'
     | '/admin/messages'
     | '/admin/recipes'
     | '/admin/settings'
@@ -520,6 +532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMessagesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/kitchens': {
+      id: '/admin/kitchens'
+      path: '/kitchens'
+      fullPath: '/admin/kitchens'
+      preLoaderRoute: typeof AdminKitchensRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/ingredients': {
       id: '/admin/ingredients'
       path: '/ingredients'
@@ -583,6 +602,7 @@ interface AdminRouteChildren {
   AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminCommunityRoute: typeof AdminCommunityRoute
   AdminIngredientsRoute: typeof AdminIngredientsRoute
+  AdminKitchensRoute: typeof AdminKitchensRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminRecipesRoute: typeof AdminRecipesRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -598,6 +618,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriesRoute: AdminCategoriesRoute,
   AdminCommunityRoute: AdminCommunityRoute,
   AdminIngredientsRoute: AdminIngredientsRoute,
+  AdminKitchensRoute: AdminKitchensRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminRecipesRoute: AdminRecipesRoute,
   AdminSettingsRoute: AdminSettingsRoute,
