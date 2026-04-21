@@ -33,6 +33,9 @@ export interface SiteSettings {
   pwa_icon_512_url: string | null;
   pwa_apple_touch_icon_url: string | null;
   pwa_display: string;
+  // Recipe generation controls (admin-tunable)
+  recipes_target_count: number;
+  recipes_daily_limit: number;
 }
 
 const DEFAULTS: SiteSettings = {
