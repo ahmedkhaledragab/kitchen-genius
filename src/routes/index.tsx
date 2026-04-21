@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Sparkles, X, Loader2, ChefHat, ArrowLeft } from "lucide-react";
+import { Plus, Sparkles, X, Loader2, ChefHat } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge";
 import { useLang } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/hooks/useFavorites";
-import { useKitchens, type KitchenOption } from "@/hooks/useKitchens";
 import { generateRecipes } from "@/lib/api";
 import { COMMON_INGREDIENTS_AR, COMMON_INGREDIENTS_EN } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";

@@ -15,6 +15,7 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as RecipesRouteImport } from './routes/recipes'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ManifestDotwebmanifestRouteImport } from './routes/manifest[.]webmanifest'
+import { Route as KitchensRouteImport } from './routes/kitchens'
 import { Route as FeaturesRouteImport } from './routes/features'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CommunityRouteImport } from './routes/community'
@@ -24,6 +25,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as UUserIdRouteImport } from './routes/u.$userId'
+import { Route as KitchensSlugRouteImport } from './routes/kitchens.$slug'
 import { Route as CommunityPostIdRouteImport } from './routes/community.$postId'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
@@ -67,6 +69,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const ManifestDotwebmanifestRoute = ManifestDotwebmanifestRouteImport.update({
   id: '/manifest.webmanifest',
   path: '/manifest.webmanifest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KitchensRoute = KitchensRouteImport.update({
+  id: '/kitchens',
+  path: '/kitchens',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeaturesRoute = FeaturesRouteImport.update({
@@ -113,6 +120,11 @@ const UUserIdRoute = UUserIdRouteImport.update({
   id: '/u/$userId',
   path: '/u/$userId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const KitchensSlugRoute = KitchensSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => KitchensRoute,
 } as any)
 const CommunityPostIdRoute = CommunityPostIdRouteImport.update({
   id: '/$postId',
@@ -193,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/community': typeof CommunityRouteWithChildren
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
+  '/kitchens': typeof KitchensRouteWithChildren
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
@@ -208,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/community/$postId': typeof CommunityPostIdRoute
+  '/kitchens/$slug': typeof KitchensSlugRoute
   '/u/$userId': typeof UUserIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/content/about': typeof AdminContentAboutRoute
@@ -223,6 +237,7 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityRouteWithChildren
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
+  '/kitchens': typeof KitchensRouteWithChildren
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
@@ -238,6 +253,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/community/$postId': typeof CommunityPostIdRoute
+  '/kitchens/$slug': typeof KitchensSlugRoute
   '/u/$userId': typeof UUserIdRoute
   '/admin': typeof AdminIndexRoute
   '/admin/content/about': typeof AdminContentAboutRoute
@@ -255,6 +271,7 @@ export interface FileRoutesById {
   '/community': typeof CommunityRouteWithChildren
   '/contact': typeof ContactRoute
   '/features': typeof FeaturesRoute
+  '/kitchens': typeof KitchensRouteWithChildren
   '/manifest.webmanifest': typeof ManifestDotwebmanifestRoute
   '/profile': typeof ProfileRoute
   '/recipes': typeof RecipesRoute
@@ -270,6 +287,7 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/community/$postId': typeof CommunityPostIdRoute
+  '/kitchens/$slug': typeof KitchensSlugRoute
   '/u/$userId': typeof UUserIdRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/content/about': typeof AdminContentAboutRoute
@@ -288,6 +306,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/features'
+    | '/kitchens'
     | '/manifest.webmanifest'
     | '/profile'
     | '/recipes'
@@ -303,6 +322,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/community/$postId'
+    | '/kitchens/$slug'
     | '/u/$userId'
     | '/admin/'
     | '/admin/content/about'
@@ -318,6 +338,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/features'
+    | '/kitchens'
     | '/manifest.webmanifest'
     | '/profile'
     | '/recipes'
@@ -333,6 +354,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/community/$postId'
+    | '/kitchens/$slug'
     | '/u/$userId'
     | '/admin'
     | '/admin/content/about'
@@ -349,6 +371,7 @@ export interface FileRouteTypes {
     | '/community'
     | '/contact'
     | '/features'
+    | '/kitchens'
     | '/manifest.webmanifest'
     | '/profile'
     | '/recipes'
@@ -364,6 +387,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/users'
     | '/community/$postId'
+    | '/kitchens/$slug'
     | '/u/$userId'
     | '/admin/'
     | '/admin/content/about'
@@ -381,6 +405,7 @@ export interface RootRouteChildren {
   CommunityRoute: typeof CommunityRouteWithChildren
   ContactRoute: typeof ContactRoute
   FeaturesRoute: typeof FeaturesRoute
+  KitchensRoute: typeof KitchensRouteWithChildren
   ManifestDotwebmanifestRoute: typeof ManifestDotwebmanifestRoute
   ProfileRoute: typeof ProfileRoute
   RecipesRoute: typeof RecipesRoute
@@ -432,6 +457,13 @@ declare module '@tanstack/react-router' {
       path: '/manifest.webmanifest'
       fullPath: '/manifest.webmanifest'
       preLoaderRoute: typeof ManifestDotwebmanifestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kitchens': {
+      id: '/kitchens'
+      path: '/kitchens'
+      fullPath: '/kitchens'
+      preLoaderRoute: typeof KitchensRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/features': {
@@ -496,6 +528,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/u/$userId'
       preLoaderRoute: typeof UUserIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/kitchens/$slug': {
+      id: '/kitchens/$slug'
+      path: '/$slug'
+      fullPath: '/kitchens/$slug'
+      preLoaderRoute: typeof KitchensSlugRouteImport
+      parentRoute: typeof KitchensRoute
     }
     '/community/$postId': {
       id: '/community/$postId'
@@ -646,6 +685,18 @@ const CommunityRouteWithChildren = CommunityRoute._addFileChildren(
   CommunityRouteChildren,
 )
 
+interface KitchensRouteChildren {
+  KitchensSlugRoute: typeof KitchensSlugRoute
+}
+
+const KitchensRouteChildren: KitchensRouteChildren = {
+  KitchensSlugRoute: KitchensSlugRoute,
+}
+
+const KitchensRouteWithChildren = KitchensRoute._addFileChildren(
+  KitchensRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -654,6 +705,7 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityRoute: CommunityRouteWithChildren,
   ContactRoute: ContactRoute,
   FeaturesRoute: FeaturesRoute,
+  KitchensRoute: KitchensRouteWithChildren,
   ManifestDotwebmanifestRoute: ManifestDotwebmanifestRoute,
   ProfileRoute: ProfileRoute,
   RecipesRoute: RecipesRoute,
