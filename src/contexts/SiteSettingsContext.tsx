@@ -89,7 +89,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     const { data } = await supabase
       .from("site_settings")
       .select(
-        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color, facebook_url, instagram_url, whatsapp_url, contact_email, tiktok_url, telegram_url, twitter_url, pwa_enabled, pwa_short_name_ar, pwa_short_name_en, pwa_theme_color, pwa_background_color, pwa_icon_192_url, pwa_icon_512_url, pwa_apple_touch_icon_url, pwa_display"
+        "site_name_ar, site_name_en, tagline_ar, tagline_en, description_ar, description_en, keywords_ar, keywords_en, logo_url, favicon_url, og_image_url, twitter_handle, primary_color, facebook_url, instagram_url, whatsapp_url, contact_email, tiktok_url, telegram_url, twitter_url, pwa_enabled, pwa_short_name_ar, pwa_short_name_en, pwa_theme_color, pwa_background_color, pwa_icon_192_url, pwa_icon_512_url, pwa_apple_touch_icon_url, pwa_display, recipes_target_count, recipes_daily_limit"
       )
       .limit(1)
       .maybeSingle();
