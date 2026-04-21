@@ -343,6 +343,42 @@ export type Database = {
         }
         Relationships: []
       }
+      device_usage_counters: {
+        Row: {
+          created_at: string
+          daily_limit: number
+          day: string
+          device_id: string
+          feature: string
+          id: string
+          ip_address: string | null
+          updated_at: string
+          used_count: number
+        }
+        Insert: {
+          created_at?: string
+          daily_limit?: number
+          day?: string
+          device_id: string
+          feature: string
+          id?: string
+          ip_address?: string | null
+          updated_at?: string
+          used_count?: number
+        }
+        Update: {
+          created_at?: string
+          daily_limit?: number
+          day?: string
+          device_id?: string
+          feature?: string
+          id?: string
+          ip_address?: string | null
+          updated_at?: string
+          used_count?: number
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -939,6 +975,16 @@ export type Database = {
       admin_set_user_status: {
         Args: { _is_active: boolean; _user_id: string }
         Returns: undefined
+      }
+      check_and_increment_device_usage: {
+        Args: {
+          _default_limit?: number
+          _device_id: string
+          _feature: string
+          _ip: string
+          _user_id: string
+        }
+        Returns: Json
       }
       check_and_increment_usage: {
         Args: { _default_limit?: number; _feature: string; _user_id: string }
