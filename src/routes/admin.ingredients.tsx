@@ -669,6 +669,47 @@ function AdminIngredientsPage() {
                         </div>
                       </td>
                     </tr>
+                    {isEditing && editDraft && kitchens.length > 0 && (
+                      <tr key={`${it.id}-kitchens`} className="bg-primary/5">
+                        <td colSpan={6} className="px-3 py-2">
+                          <p className="mb-1.5 text-xs font-semibold text-muted-foreground">
+                            {lang === "ar" ? "المطابخ:" : "Kitchens:"}
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {kitchens.map((k) => {
+                              const checked = editDraft.kitchen_ids.includes(k.id);
+                              return (
+                                <button
+                                  key={k.id}
+                                  type="button"
+                                  onClick={() =>
+                                    setEditDraft((d) =>
+                                      d
+                                        ? {
+                                            ...d,
+                                            kitchen_ids: checked
+                                              ? d.kitchen_ids.filter((x) => x !== k.id)
+                                              : [...d.kitchen_ids, k.id],
+                                          }
+                                        : d,
+                                    )
+                                  }
+                                  className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs transition ${
+                                    checked
+                                      ? "border-primary bg-primary text-primary-foreground"
+                                      : "border-border bg-background text-muted-foreground hover:border-primary"
+                                  }`}
+                                >
+                                  {k.icon && <span aria-hidden>{k.icon}</span>}
+                                  {lang === "ar" ? k.name_ar : k.name_en}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                   );
                 })}
               </tbody>
