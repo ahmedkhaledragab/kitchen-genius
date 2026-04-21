@@ -6,6 +6,7 @@ import {
   Settings,
   Sparkles,
   Tags,
+  Utensils,
   Info,
   Star,
   Mail,
@@ -36,6 +37,7 @@ type AdminRoute =
   | "/admin/recipes"
   | "/admin/ingredients"
   | "/admin/categories"
+  | "/admin/kitchens"
   | "/admin/users"
   | "/admin/community"
   | "/admin/content/home"
@@ -78,6 +80,7 @@ const NAV_GROUPS: NavGroup[] = [
     labelEn: "Content",
     items: [
       { to: "/admin/recipes", icon: ChefHat, labelAr: "الوصفات", labelEn: "Recipes" },
+      { to: "/admin/kitchens", icon: Utensils, labelAr: "المطابخ", labelEn: "Kitchens" },
       { to: "/admin/ingredients", icon: Sparkles, labelAr: "المكونات", labelEn: "Ingredients" },
       { to: "/admin/categories", icon: Tags, labelAr: "الأصناف", labelEn: "Categories" },
     ],

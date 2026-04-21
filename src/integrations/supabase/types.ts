@@ -411,6 +411,42 @@ export type Database = {
         }
         Relationships: []
       }
+      ingredient_kitchens: {
+        Row: {
+          created_at: string
+          id: string
+          ingredient_id: string
+          kitchen_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ingredient_id: string
+          kitchen_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ingredient_id?: string
+          kitchen_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingredient_kitchens_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "ingredients_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ingredient_kitchens_kitchen_id_fkey"
+            columns: ["kitchen_id"]
+            isOneToOne: false
+            referencedRelation: "kitchens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ingredients_catalog: {
         Row: {
           category: string | null
@@ -439,6 +475,48 @@ export type Database = {
           is_active?: boolean
           name_ar?: string
           name_en?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      kitchens: {
+        Row: {
+          created_at: string
+          description_ar: string | null
+          description_en: string | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          name_ar: string
+          name_en: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name_ar: string
+          name_en: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name_ar?: string
+          name_en?: string
+          slug?: string
           sort_order?: number
           updated_at?: string
         }
