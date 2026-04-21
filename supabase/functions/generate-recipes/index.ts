@@ -341,9 +341,17 @@ serve(async (req: Request) => {
           if (!cuisineMatches && !tagMatches) continue;
         }
 
+        // Match using synonym expansion: a recipe ingredient counts as matched
+        // if any synonym of the user's ingredient appears in it (or vice versa).
         let matched = 0;
-        for (const u of userIngsNorm) {
-          if (ingsNorm.some((ing) => ing.includes(u) || u.includes(ing))) matched++;
+        for (const variants of userIngsExpanded) {
+          if (
+            ingsNorm.some((ing) =>
+              variants.some((v) => ing.includes(v) || v.includes(ing)),
+            )
+          ) {
+            matched++;
+          }
         }
         if (matched === 0) continue;
 
