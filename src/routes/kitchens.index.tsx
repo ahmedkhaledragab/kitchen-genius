@@ -42,8 +42,9 @@ function KitchensPage() {
           </div>
           <h1 className="mt-3 text-3xl font-black leading-tight sm:text-5xl">
             <span className="gradient-text">
-              {lang === "ar" ? "اختاري مطبخك 👩‍🍳" : "Pick a kitchen 👩‍🍳"}
+              {lang === "ar" ? "اختاري مطبخك" : "Pick a kitchen"}
             </span>
+            <span aria-hidden className="ms-2 align-middle">👩‍🍳</span>
           </h1>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
             {lang === "ar"
