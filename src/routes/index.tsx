@@ -280,14 +280,12 @@ function HomePage() {
         {catalogLoading ? (
           <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            {lang === "ar" ? "بنحضّر مكونات المطبخ..." : "Loading kitchen ingredients..."}
+            {lang === "ar" ? "بنحضّر المكونات..." : "Loading ingredients..."}
           </div>
         ) : suggestions.length > 0 ? (
           <div className="mt-4">
             <p className="text-xs font-semibold text-muted-foreground">
-              {lang === "ar"
-                ? `اقتراحات مطبخ ${selectedKitchen.name_ar}`
-                : `${selectedKitchen.name_en} kitchen suggestions`}
+              {lang === "ar" ? "اقتراحات مكونات" : "Ingredient suggestions"}
             </p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {suggestions.map((s) => (
