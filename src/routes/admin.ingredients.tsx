@@ -162,6 +162,7 @@ function AdminIngredientsPage() {
       name_en: it.name_en,
       category: it.category ?? "",
       sort_order: it.sort_order,
+      kitchen_ids: kitchenLinks[it.id] ?? [],
     });
   };
 
@@ -186,6 +187,9 @@ function AdminIngredientsPage() {
         sort_order: Number(editDraft.sort_order) || 0,
       })
       .eq("id", id);
+    if (!error) {
+      await saveKitchenLinks(id, editDraft.kitchen_ids);
+    }
     setBusyId(null);
     if (error) {
       toast.error(error.message);
