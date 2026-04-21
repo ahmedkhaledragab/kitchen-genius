@@ -690,7 +690,20 @@ serve(async (req: Request) => {
     }
 
     // Merge: local first, then AI fills the rest (capped at TARGET_COUNT).
-    const aiRecipes = (parsed.recipes ?? []).map((r) => ({ ...r, source: "ai" as const }));
+    let aiRecipes = (parsed.recipes ?? []).map((r) => ({ ...r, source: "ai" as const }));
+
+    // Post-filter AI output: if the user listed a protein, drop any AI recipe
+    // that doesn't actually include that protein in its ingredients list.
+    if (requiredProteinTerms.length > 0) {
+      aiRecipes = aiRecipes.filter((r) => {
+        const ings = Array.isArray(r.ingredients) ? (r.ingredients as string[]) : [];
+        const ingsNorm = ings.map((x) => norm(String(x)));
+        return ingsNorm.some((ing) =>
+          requiredProteinTerms.some((p) => ing.includes(p) || p.includes(ing)),
+        );
+      });
+    }
+
     const merged = [...localMatches, ...aiRecipes].slice(0, TARGET_COUNT);
     const sourceLabel = localMatches.length > 0 && aiRecipes.length > 0
       ? "hybrid"
