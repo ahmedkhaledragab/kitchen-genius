@@ -964,8 +964,8 @@ function AdminSettingsPage() {
 
             <p className="mt-4 text-[11px] text-muted-foreground">
               {lang === "ar"
-                ? "ملاحظة: تثبيت التطبيق يشتغل بس على الموقع المنشور (مش في معاينة Lovable)."
-                : "Note: Install only works on the published site (not the Lovable preview)."}
+                ? "ملاحظة: تثبيت التطبيق يشتغل بس على الموقع المنشور (مش في المعاينة)."
+                : "Note: Install only works on the published site (not in preview)."}
             </p>
           </>
         )}

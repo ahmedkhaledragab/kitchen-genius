@@ -44,7 +44,7 @@ export const Route = createRootRoute({
         content:
           "اكتب اللي عندك في المطبخ ونقترحلك وصفات تقدر تعملها فوراً بالذكاء الاصطناعي.",
       },
-      { name: "author", content: "Lovable" },
+      { name: "author", content: "Manar Elsheikh" },
       { name: "theme-color", content: "#16a34a" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },

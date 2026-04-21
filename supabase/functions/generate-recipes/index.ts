@@ -129,7 +129,41 @@ serve(async (req: Request) => {
     const ingredients = (body.ingredients ?? []).filter(Boolean);
     const exclude = (body.exclude ?? []).filter(Boolean);
     const filters = body.filters ?? [];
+    // Extract kitchen tag sent by the frontend (e.g. "kitchen:italian").
+    const kitchenTag = filters.find((f) => f.startsWith("kitchen:"));
+    const kitchenSlug = kitchenTag ? kitchenTag.slice("kitchen:".length) : null;
+    // Keep user-facing filters (quick/healthy/etc.) separate from the kitchen tag.
+    const userFilters = filters.filter((f) => !f.startsWith("kitchen:"));
+
+    // Look up the kitchen's display names so we can tell the AI *which* cuisine
+    // to cook. Without this, picking "Italian" and entering pizza ingredients
+    // could return Egyptian/Moroccan recipes — which is exactly the bug.
+    let kitchenNameAr: string | null = null;
+    let kitchenNameEn: string | null = null;
+    let kitchenIngredientIds: Set<string> | null = null;
     const language = body.language === "en" ? "en" : "ar";
+
+    if (kitchenSlug) {
+      try {
+        const { data: k } = await admin
+          .from("kitchens")
+          .select("id, name_ar, name_en")
+          .eq("slug", kitchenSlug)
+          .maybeSingle();
+        if (k) {
+          kitchenNameAr = k.name_ar;
+          kitchenNameEn = k.name_en;
+          const { data: links } = await admin
+            .from("ingredient_kitchens")
+            .select("ingredient_id")
+            .eq("kitchen_id", k.id);
+          const ids = (links ?? []).map((l: { ingredient_id: string }) => l.ingredient_id);
+          kitchenIngredientIds = new Set(ids);
+        }
+      } catch (e) {
+        console.error("kitchen lookup failed:", e);
+      }
+    }
 
     if (ingredients.length === 0) {
       return new Response(JSON.stringify({ error: "No ingredients provided" }), {
@@ -206,10 +240,33 @@ serve(async (req: Request) => {
         );
         if (hasExcluded) continue;
 
-        if (filters.length) {
+        if (userFilters.length) {
           const tagsNorm = (r.tags ?? []).map(norm);
-          const allMatch = filters.every((f) => tagsNorm.some((t) => t.includes(norm(f))));
+          const allMatch = userFilters.every((f) => tagsNorm.some((t) => t.includes(norm(f))));
           if (!allMatch) continue;
+        }
+
+        // Kitchen filter: only keep recipes whose cuisine matches the selected
+        // kitchen (match by slug OR by kitchen name in Arabic/English).
+        if (kitchenSlug) {
+          const recipeCuisineNorm = norm(r.cuisine ?? "");
+          const slugNorm = norm(kitchenSlug);
+          const arNorm = kitchenNameAr ? norm(kitchenNameAr) : "";
+          const enNorm = kitchenNameEn ? norm(kitchenNameEn) : "";
+          const cuisineMatches =
+            !!recipeCuisineNorm &&
+            (recipeCuisineNorm.includes(slugNorm) ||
+              (arNorm && recipeCuisineNorm.includes(arNorm)) ||
+              (enNorm && recipeCuisineNorm.includes(enNorm)));
+          // Also accept if any tag mentions the kitchen name/slug.
+          const tagsNorm = (r.tags ?? []).map(norm);
+          const tagMatches = tagsNorm.some(
+            (t) =>
+              t.includes(slugNorm) ||
+              (arNorm && t.includes(arNorm)) ||
+              (enNorm && t.includes(enNorm)),
+          );
+          if (!cuisineMatches && !tagMatches) continue;
         }
 
         let matched = 0;
@@ -276,10 +333,16 @@ serve(async (req: Request) => {
     const systemAr = `أنت طاهي محترف يقترح وصفات سهلة وعملية. اكتب كل الردود بالعربية الفصحى البسيطة والمصطلحات الشعبية المصرية. استعمل الأدوات (function calling) لإرجاع النتائج. اجعل الخطوات قصيرة وواضحة (5-8 خطوات كحد أقصى لكل وصفة).`;
     const systemEn = `You are a friendly chef. Suggest practical recipes from the user's ingredients. Reply in English. Use the tool to return structured results. Keep steps short (5-8 max per recipe).`;
 
-    const filterText = filters.length
+    const kitchenText = kitchenSlug
       ? language === "ar"
-        ? `الفلاتر المطلوبة: ${filters.join("، ")}.`
-        : `Filters: ${filters.join(", ")}.`
+        ? `مهم جداً: كل الوصفات لازم تكون من المطبخ ${kitchenNameAr ?? kitchenSlug} فقط. ممنوع تقترح أي وصفة من مطبخ تاني (مثلاً لو المطبخ إيطالي، ممنوع تقترح وصفات مصرية أو مغربية). ضع قيمة "cuisine" في كل وصفة = "${kitchenNameAr ?? kitchenSlug}".`
+        : `VERY IMPORTANT: ALL recipes MUST be from the ${kitchenNameEn ?? kitchenSlug} cuisine only. Do NOT suggest recipes from any other cuisine. Set the "cuisine" field on every recipe to "${kitchenNameEn ?? kitchenSlug}".`
+      : "";
+
+    const filterText = userFilters.length
+      ? language === "ar"
+        ? `الفلاتر المطلوبة: ${userFilters.join("، ")}.`
+        : `Filters: ${userFilters.join(", ")}.`
       : "";
     const excludeText = exclude.length
       ? language === "ar"
@@ -295,8 +358,8 @@ serve(async (req: Request) => {
 
     const userMsg =
       language === "ar"
-        ? `المكونات المتوفرة عندي: ${ingredients.join("، ")}.\n${excludeText}\n${filterText}\n${avoidText}\nاقترح ${aiNeeded} وصفات جديدة أقدر أعملها بالمكونات دي. حاول تستعمل أقل عدد من المكونات الناقصة.`
-        : `My ingredients: ${ingredients.join(", ")}.\n${excludeText}\n${filterText}\n${avoidText}\nSuggest ${aiNeeded} new recipes I can make. Minimize missing ingredients.`;
+        ? `${kitchenText}\nالمكونات المتوفرة عندي: ${ingredients.join("، ")}.\n${excludeText}\n${filterText}\n${avoidText}\nاقترح ${aiNeeded} وصفات جديدة أقدر أعملها بالمكونات دي${kitchenSlug ? ` من مطبخ ${kitchenNameAr ?? kitchenSlug} فقط` : ""}. حاول تستعمل أقل عدد من المكونات الناقصة.`
+        : `${kitchenText}\nMy ingredients: ${ingredients.join(", ")}.\n${excludeText}\n${filterText}\n${avoidText}\nSuggest ${aiNeeded} new recipes I can make${kitchenSlug ? ` from ${kitchenNameEn ?? kitchenSlug} cuisine only` : ""}. Minimize missing ingredients.`;
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
