@@ -46,13 +46,23 @@ function KitchenRecipesPage() {
     let cancelled = false;
     setLoading(true);
     (async () => {
+      // Some kitchen slugs are aliases that map to multiple cuisine codes
+      // stored in the recipes table. This way kitchens like "levantine"
+      // (شامي) can pull from both lebanese & syrian recipes, etc.
+      const SLUG_ALIASES: Record<string, string[]> = {
+        levantine: ["lebanese", "syrian", "levantine"],
+        asian: ["indian", "asian"],
+        general: ["world", "general"],
+      };
+      const cuisines = SLUG_ALIASES[slug] ?? [slug];
+
       // Try the user's current language first; if empty, fall back to any language
       // so kitchens that only have recipes in one language still render.
       let { data, error } = await supabase
         .from("recipes")
         .select("*")
         .eq("is_published", true)
-        .eq("cuisine", slug)
+        .in("cuisine", cuisines)
         .eq("language", lang)
         .order("created_at", { ascending: false })
         .limit(PAGE_SIZE);
@@ -62,7 +72,7 @@ function KitchenRecipesPage() {
           .from("recipes")
           .select("*")
           .eq("is_published", true)
-          .eq("cuisine", slug)
+          .in("cuisine", cuisines)
           .order("created_at", { ascending: false })
           .limit(PAGE_SIZE);
         data = fallback.data;
