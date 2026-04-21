@@ -60,6 +60,7 @@ export function Header() {
           <img
             src={logo}
             alt={siteName}
+            onError={handleLogoError}
             className="h-14 w-14 shrink-0 object-contain transition-transform group-hover:scale-105 sm:h-16 sm:w-16"
           />
           <span className="hidden truncate text-base font-extrabold tracking-tight md:inline">
