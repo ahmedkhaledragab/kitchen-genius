@@ -120,6 +120,10 @@ function AdminIngredientsPage() {
     const lc = q.trim().toLowerCase();
     return items.filter((it) => {
       if (activeCategory !== "all" && it.category !== activeCategory) return false;
+      if (activeKitchen !== "all") {
+        const linked = kitchenLinks[it.id] ?? [];
+        if (!linked.includes(activeKitchen)) return false;
+      }
       if (!lc) return true;
       return (
         it.name_ar.toLowerCase().includes(lc) ||
@@ -127,7 +131,18 @@ function AdminIngredientsPage() {
         (it.category ?? "").toLowerCase().includes(lc)
       );
     });
-  }, [items, q, activeCategory]);
+  }, [items, q, activeCategory, activeKitchen, kitchenLinks]);
+
+  // Persist the kitchens link rows for an ingredient (delete-then-insert).
+  const saveKitchenLinks = async (ingredientId: string, kitchenIds: string[]) => {
+    await sb.from("ingredient_kitchens").delete().eq("ingredient_id", ingredientId);
+    if (kitchenIds.length > 0) {
+      await sb.from("ingredient_kitchens").insert(
+        kitchenIds.map((kid) => ({ ingredient_id: ingredientId, kitchen_id: kid })),
+      );
+    }
+    setKitchenLinks((prev) => ({ ...prev, [ingredientId]: [...kitchenIds] }));
+  };
 
   if (authLoading) return null;
   if (!isAdmin) {
