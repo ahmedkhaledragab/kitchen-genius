@@ -124,6 +124,8 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
         pwa_icon_512_url: (data as { pwa_icon_512_url?: string | null }).pwa_icon_512_url ?? null,
         pwa_apple_touch_icon_url: (data as { pwa_apple_touch_icon_url?: string | null }).pwa_apple_touch_icon_url ?? null,
         pwa_display: (data as { pwa_display?: string }).pwa_display ?? "standalone",
+        recipes_target_count: (data as { recipes_target_count?: number }).recipes_target_count ?? 3,
+        recipes_daily_limit: (data as { recipes_daily_limit?: number }).recipes_daily_limit ?? 4,
       });
     }
     setLoading(false);
