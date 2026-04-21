@@ -123,6 +123,48 @@ serve(async (req: Request) => {
       console.warn("could not read site_settings, using defaults", e);
     }
 
+    // ----- Device-bound limit (shared across multiple accounts on same device/IP) -----
+    // Check device limit BEFORE per-user limit so creating extra accounts on the
+    // same browser doesn't bypass the cap. Identity is the client-supplied
+    // device id (random + browser fingerprint) with IP as fallback.
+    const reqBodyRaw = await req.json().catch(() => ({}));
+    const deviceId =
+      typeof reqBodyRaw.deviceId === "string" ? reqBodyRaw.deviceId.slice(0, 200) : "";
+    const clientIp =
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+      req.headers.get("x-real-ip") ||
+      req.headers.get("cf-connecting-ip") ||
+      "";
+
+    const { data: deviceUsage, error: deviceErr } = await admin.rpc(
+      "check_and_increment_device_usage",
+      {
+        _user_id: user.id,
+        _device_id: deviceId,
+        _ip: clientIp,
+        _feature: "generate_recipes",
+        _default_limit: dailyLimit,
+      },
+    );
+    if (deviceErr) {
+      console.error("device usage rpc error", deviceErr);
+      // Non-fatal — fall through to per-user check
+    } else {
+      const d = deviceUsage as { allowed: boolean; reason?: string; used?: number; limit?: number };
+      if (!d.allowed) {
+        return new Response(
+          JSON.stringify({
+            error: "device_limit_reached",
+            message: `وصلت لحد الاستخدام اليومي للجهاز (${d.used}/${d.limit}). جرّب تاني بكرة.`,
+            used: d.used,
+            limit: d.limit,
+            scope: "device",
+          }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+    }
+
     const { data: usage, error: usageError } = await admin.rpc("check_and_increment_usage", {
       _user_id: user.id,
       _feature: "generate_recipes",
@@ -140,10 +182,10 @@ serve(async (req: Request) => {
       const msg = u.reason === "banned"
         ? "حسابك موقوف. تواصل مع الإدارة."
         : u.reason === "limit_reached"
-          ? `وصلت لحد الاستخدام اليومي (${u.used}/${u.limit}).`
+          ? `وصلت لحد الاستخدام اليومي (${u.used}/${u.limit}). جرّب تاني بكرة.`
           : "غير مسموح.";
       return new Response(
-        JSON.stringify({ error: u.reason ?? "blocked", message: msg, used: u.used, limit: u.limit }),
+        JSON.stringify({ error: u.reason ?? "blocked", message: msg, used: u.used, limit: u.limit, scope: "user" }),
         { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
