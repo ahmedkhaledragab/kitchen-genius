@@ -597,10 +597,18 @@ serve(async (req: Request) => {
         : `Avoid duplicating these recipes I already have: ${localTitles.join(", ")}.`
       : "";
 
+    // Build a strong "must use" instruction. The previous prompt only said
+    // "minimize missing ingredients" which let the model invent recipes that
+    // don't actually use the user's main ingredient (e.g. user types fish →
+    // model returns a fig appetizer). We now require every recipe to use the
+    // user's listed ingredients as the main components.
+    const mustUseAr = `قاعدة أساسية: كل وصفة لازم تكون مبنية على المكونات اللي عندي وتستخدمها كمكون رئيسي. لو كتبت بروتين (سمك، فراخ، لحمه، جمبري، خروف، بيض) فالوصفة لازم تحتوي عليه فعلاً. ممنوع تقترح وصفات مالهاش علاقة بالمكونات دي.`;
+    const mustUseEn = `Hard rule: every recipe MUST be built around the ingredients I provided and use them as the MAIN components. If I listed a protein (fish, chicken, beef, shrimp, lamb, eggs), the recipe MUST contain that protein. Do NOT suggest recipes unrelated to my ingredients.`;
+
     const userMsg =
       language === "ar"
-        ? `${kitchenText}\nالمكونات المتوفرة عندي: ${ingredients.join("، ")}.\n${excludeText}\n${filterText}\n${avoidText}\nاقترح ${aiNeeded} وصفات جديدة أقدر أعملها بالمكونات دي${kitchenSlug ? ` من مطبخ ${kitchenNameAr ?? kitchenSlug} فقط` : ""}. حاول تستعمل أقل عدد من المكونات الناقصة.`
-        : `${kitchenText}\nMy ingredients: ${ingredients.join(", ")}.\n${excludeText}\n${filterText}\n${avoidText}\nSuggest ${aiNeeded} new recipes I can make${kitchenSlug ? ` from ${kitchenNameEn ?? kitchenSlug} cuisine only` : ""}. Minimize missing ingredients.`;
+        ? `${kitchenText}\n${mustUseAr}\nالمكونات المتوفرة عندي: ${ingredients.join("، ")}.\n${excludeText}\n${filterText}\n${avoidText}\nاقترح ${aiNeeded} وصفات جديدة أقدر أعملها بالمكونات دي${kitchenSlug ? ` من مطبخ ${kitchenNameAr ?? kitchenSlug} فقط` : ""}. حاول تستعمل أقل عدد من المكونات الناقصة.`
+        : `${kitchenText}\n${mustUseEn}\nMy ingredients: ${ingredients.join(", ")}.\n${excludeText}\n${filterText}\n${avoidText}\nSuggest ${aiNeeded} new recipes I can make${kitchenSlug ? ` from ${kitchenNameEn ?? kitchenSlug} cuisine only` : ""}. Minimize missing ingredients.`;
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
