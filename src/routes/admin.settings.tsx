@@ -239,6 +239,8 @@ function AdminSettingsPage() {
         pwa_icon_192_url: pwaIcon192,
         pwa_icon_512_url: pwaIcon512,
         pwa_apple_touch_icon_url: pwaAppleIcon,
+        recipes_target_count: Math.min(Math.max(recipesTargetCount || 3, 1), 10),
+        recipes_daily_limit: Math.min(Math.max(recipesDailyLimit || 4, 1), 100),
         updated_by: user?.id ?? null,
       })
       .eq("singleton", true);
