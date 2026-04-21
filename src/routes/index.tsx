@@ -264,7 +264,7 @@ function HomePage() {
             onClick={() => addIngredient(input)}
             className="rounded-xl gradient-primary text-primary-foreground hover:opacity-95"
           >
-            <Plus className="h-4 w-4" />
+            <span aria-hidden className="text-base">➕</span>
             <span className="hidden sm:inline">{pick(c.home_add_btn, t.home.addBtn)}</span>
           </Button>
         </div>
