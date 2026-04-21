@@ -512,7 +512,20 @@ serve(async (req: Request) => {
           const filtered = (kitchenPool ?? []).filter((r) => {
             const ings: string[] = Array.isArray(r.ingredients) ? (r.ingredients as string[]) : [];
             const ingsNorm = ings.map((x) => norm(String(x)));
-            return !excludeNorm.some((ex) => ingsNorm.some((ing) => ing.includes(ex)));
+            // Respect excludes
+            if (excludeNorm.some((ex) => ingsNorm.some((ing) => ing.includes(ex)))) {
+              return false;
+            }
+            // Respect protein requirement: if the user listed a protein,
+            // the fallback recipe MUST also contain that protein. Otherwise
+            // we'd return e.g. lentil soup when the user asked for chicken.
+            if (requiredProteinTerms.length > 0) {
+              const hasProtein = ingsNorm.some((ing) =>
+                requiredProteinTerms.some((p) => ing.includes(p) || p.includes(ing)),
+              );
+              if (!hasProtein) return false;
+            }
+            return true;
           });
 
           localMatches = filtered.slice(0, TARGET_COUNT).map((r) => {
