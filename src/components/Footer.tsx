@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import defaultLogo from "@/assets/logo.png";
 
 /**
  * Build a tappable WhatsApp URL.
