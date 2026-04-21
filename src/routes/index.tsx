@@ -344,7 +344,7 @@ function HomePage() {
               onClick={() => addExclude(excludeInput)}
               className="rounded-xl border-accent/40 text-accent hover:bg-accent/10"
             >
-              <Plus className="h-4 w-4" />
+              <span aria-hidden className="text-base">➕</span>
             </Button>
           </div>
           {excluded.length > 0 && (
