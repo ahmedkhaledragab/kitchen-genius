@@ -218,11 +218,24 @@ function HomePage() {
           transition={{ duration: 0.5 }}
         >
           <div className="inline-flex items-center gap-2 rounded-full bg-card/70 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
-            <Sparkles className="h-3.5 w-3.5" />
+            <span aria-hidden className="text-sm">✨</span>
             {pick(c.hero_badge, lang === "ar" ? "مدعوم بالذكاء الاصطناعي" : "AI-powered")}
           </div>
           <h1 className="mt-3 text-3xl font-black leading-tight sm:text-5xl">
-            <span className="gradient-text">{pick(c.hero_title, t.home.heroTitle)}</span>
+            {(() => {
+              const title = pick(c.hero_title, t.home.heroTitle);
+              // Split out trailing emoji so gradient-text (transparent fill) doesn't hide it
+              const match = title.match(/^(.*?)(\s*[\p{Emoji_Presentation}\p{Extended_Pictographic}]+\s*)$/u);
+              if (match) {
+                return (
+                  <>
+                    <span className="gradient-text">{match[1]}</span>
+                    <span aria-hidden>{match[2]}</span>
+                  </>
+                );
+              }
+              return <span className="gradient-text">{title}</span>;
+            })()}
           </h1>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
             {pick(c.hero_sub, t.home.heroSub)}
