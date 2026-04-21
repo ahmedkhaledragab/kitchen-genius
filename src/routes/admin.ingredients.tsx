@@ -235,19 +235,26 @@ function AdminIngredientsPage() {
       return;
     }
     setBusyId("__new__");
-    const { error } = await supabase.from("ingredients_catalog").insert({
-      name_ar: newDraft.name_ar.trim(),
-      name_en: newDraft.name_en.trim(),
-      category: newDraft.category.trim() || null,
-      sort_order: Number(newDraft.sort_order) || 999,
-      is_active: true,
-    });
+    const { data: inserted, error } = await supabase
+      .from("ingredients_catalog")
+      .insert({
+        name_ar: newDraft.name_ar.trim(),
+        name_en: newDraft.name_en.trim(),
+        category: newDraft.category.trim() || null,
+        sort_order: Number(newDraft.sort_order) || 999,
+        is_active: true,
+      })
+      .select("id")
+      .single();
+    if (!error && inserted && newDraft.kitchen_ids.length > 0) {
+      await saveKitchenLinks(inserted.id, newDraft.kitchen_ids);
+    }
     setBusyId(null);
     if (error) {
       toast.error(error.message);
     } else {
       toast.success(tx.added);
-      setNewDraft({ name_ar: "", name_en: "", category: "", sort_order: 999 });
+      setNewDraft({ name_ar: "", name_en: "", category: "", sort_order: 999, kitchen_ids: [] });
       setAdding(false);
       refresh();
     }
