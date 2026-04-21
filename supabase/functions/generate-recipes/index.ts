@@ -328,6 +328,34 @@ serve(async (req: Request) => {
     // Pre-expand user ingredients with synonyms once.
     const userIngsExpanded = userIngsNorm.map(expandTerm);
 
+    // Identify "core" protein/main ingredients the user listed. If they
+    // typed fish, chicken, shrimp, beef, lamb or eggs we MUST guarantee at
+    // least one of those proteins appears in any recipe we return — otherwise
+    // we surface unrelated dishes (e.g. fig appetizer when user asked for fish).
+    const PROTEIN_CANONICALS = new Set([
+      norm("سمك"),
+      norm("فراخ"),
+      norm("جمبري"),
+      norm("لحمه"),
+      norm("لحمه مفرومه"),
+      norm("خروف"),
+      norm("بيض"),
+    ]);
+    const userProteinCanonicals = new Set<string>();
+    for (const ing of userIngsNorm) {
+      const canonical = synonymMap.get(ing);
+      if (canonical && PROTEIN_CANONICALS.has(canonical)) {
+        userProteinCanonicals.add(canonical);
+      }
+    }
+    // Build the set of all synonym terms that satisfy "user has a protein".
+    const requiredProteinTerms: string[] = [];
+    if (userProteinCanonicals.size > 0) {
+      for (const [term, canonical] of synonymMap.entries()) {
+        if (userProteinCanonicals.has(canonical)) requiredProteinTerms.push(term);
+      }
+    }
+
     type LocalRecipeOut = {
       id: string;
       title: string;
