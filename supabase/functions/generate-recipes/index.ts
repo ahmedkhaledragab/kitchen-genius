@@ -140,7 +140,6 @@ serve(async (req: Request) => {
     // could return Egyptian/Moroccan recipes — which is exactly the bug.
     let kitchenNameAr: string | null = null;
     let kitchenNameEn: string | null = null;
-    let kitchenIngredientIds: Set<string> | null = null;
     const language = body.language === "en" ? "en" : "ar";
 
     if (kitchenSlug) {
@@ -153,12 +152,6 @@ serve(async (req: Request) => {
         if (k) {
           kitchenNameAr = k.name_ar;
           kitchenNameEn = k.name_en;
-          const { data: links } = await admin
-            .from("ingredient_kitchens")
-            .select("ingredient_id")
-            .eq("kitchen_id", k.id);
-          const ids = (links ?? []).map((l: { ingredient_id: string }) => l.ingredient_id);
-          kitchenIngredientIds = new Set(ids);
         }
       } catch (e) {
         console.error("kitchen lookup failed:", e);

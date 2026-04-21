@@ -41,10 +41,11 @@ interface DraftRow {
   name_en: string;
   category: string;
   sort_order: number;
-  kitchen_ids: string[];
+  // Kitchens this ingredient is HIDDEN from. Default = empty (visible in all).
+  excluded_kitchen_ids: string[];
 }
 
-// `ingredient_kitchens` is a new table not yet in the auto-generated types.
+// `ingredient_kitchen_excludes` is a new table not yet in the auto-generated types.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sb = supabase as any;
 
@@ -58,8 +59,8 @@ function AdminIngredientsPage() {
   const { items: kitchens } = useKitchens();
 
   const [items, setItems] = useState<Ingredient[]>([]);
-  // Map of ingredient_id -> kitchen_id[] (so we can show chips per row).
-  const [kitchenLinks, setKitchenLinks] = useState<Record<string, string[]>>({});
+  // Map of ingredient_id -> kitchen_id[] of kitchens this ingredient is HIDDEN from.
+  const [kitchenExcludes, setKitchenExcludes] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | "all">("all");
@@ -72,7 +73,7 @@ function AdminIngredientsPage() {
     name_en: "",
     category: "",
     sort_order: 999,
-    kitchen_ids: [],
+    excluded_kitchen_ids: [],
   });
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -89,7 +90,7 @@ function AdminIngredientsPage() {
         .order("category", { ascending: true, nullsFirst: false })
         .order("sort_order", { ascending: true })
         .order("name_ar", { ascending: true }),
-      sb.from("ingredient_kitchens").select("ingredient_id, kitchen_id"),
+      sb.from("ingredient_kitchen_excludes").select("ingredient_id, kitchen_id"),
     ]);
     setLoading(false);
     if (error) {
@@ -101,7 +102,7 @@ function AdminIngredientsPage() {
     for (const l of (links ?? []) as Array<{ ingredient_id: string; kitchen_id: string }>) {
       (map[l.ingredient_id] ??= []).push(l.kitchen_id);
     }
-    setKitchenLinks(map);
+    setKitchenExcludes(map);
   }, []);
 
   useEffect(() => {
@@ -121,8 +122,9 @@ function AdminIngredientsPage() {
     return items.filter((it) => {
       if (activeCategory !== "all" && it.category !== activeCategory) return false;
       if (activeKitchen !== "all") {
-        const linked = kitchenLinks[it.id] ?? [];
-        if (!linked.includes(activeKitchen)) return false;
+        // Show ingredients VISIBLE in the selected kitchen (not in the excludes list).
+        const excludedFrom = kitchenExcludes[it.id] ?? [];
+        if (excludedFrom.includes(activeKitchen)) return false;
       }
       if (!lc) return true;
       return (
@@ -131,17 +133,17 @@ function AdminIngredientsPage() {
         (it.category ?? "").toLowerCase().includes(lc)
       );
     });
-  }, [items, q, activeCategory, activeKitchen, kitchenLinks]);
+  }, [items, q, activeCategory, activeKitchen, kitchenExcludes]);
 
-  // Persist the kitchens link rows for an ingredient (delete-then-insert).
-  const saveKitchenLinks = async (ingredientId: string, kitchenIds: string[]) => {
-    await sb.from("ingredient_kitchens").delete().eq("ingredient_id", ingredientId);
+  // Persist excluded kitchens for an ingredient (delete-then-insert).
+  const saveKitchenExcludes = async (ingredientId: string, kitchenIds: string[]) => {
+    await sb.from("ingredient_kitchen_excludes").delete().eq("ingredient_id", ingredientId);
     if (kitchenIds.length > 0) {
-      await sb.from("ingredient_kitchens").insert(
+      await sb.from("ingredient_kitchen_excludes").insert(
         kitchenIds.map((kid) => ({ ingredient_id: ingredientId, kitchen_id: kid })),
       );
     }
-    setKitchenLinks((prev) => ({ ...prev, [ingredientId]: [...kitchenIds] }));
+    setKitchenExcludes((prev) => ({ ...prev, [ingredientId]: [...kitchenIds] }));
   };
 
   if (authLoading) return null;
@@ -162,7 +164,7 @@ function AdminIngredientsPage() {
       name_en: it.name_en,
       category: it.category ?? "",
       sort_order: it.sort_order,
-      kitchen_ids: kitchenLinks[it.id] ?? [],
+      excluded_kitchen_ids: kitchenExcludes[it.id] ?? [],
     });
   };
 
@@ -188,7 +190,7 @@ function AdminIngredientsPage() {
       })
       .eq("id", id);
     if (!error) {
-      await saveKitchenLinks(id, editDraft.kitchen_ids);
+      await saveKitchenExcludes(id, editDraft.excluded_kitchen_ids);
     }
     setBusyId(null);
     if (error) {
@@ -246,15 +248,15 @@ function AdminIngredientsPage() {
       })
       .select("id")
       .single();
-    if (!error && inserted && newDraft.kitchen_ids.length > 0) {
-      await saveKitchenLinks(inserted.id, newDraft.kitchen_ids);
+    if (!error && inserted && newDraft.excluded_kitchen_ids.length > 0) {
+      await saveKitchenExcludes(inserted.id, newDraft.excluded_kitchen_ids);
     }
     setBusyId(null);
     if (error) {
       toast.error(error.message);
     } else {
       toast.success(tx.added);
-      setNewDraft({ name_ar: "", name_en: "", category: "", sort_order: 999, kitchen_ids: [] });
+      setNewDraft({ name_ar: "", name_en: "", category: "", sort_order: 999, excluded_kitchen_ids: [] });
       setAdding(false);
       refresh();
     }
@@ -345,11 +347,13 @@ function AdminIngredientsPage() {
           {kitchens.length > 0 && (
             <div className="mt-3">
               <label className="text-xs font-semibold">
-                {lang === "ar" ? "المطابخ اللي يظهر فيها" : "Kitchens"}
+                {lang === "ar"
+                  ? "إخفاء من المطابخ دي (افتراضياً يظهر في كل المطابخ)"
+                  : "Hide from these kitchens (shown in all by default)"}
               </label>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {kitchens.map((k) => {
-                  const checked = newDraft.kitchen_ids.includes(k.id);
+                  const checked = newDraft.excluded_kitchen_ids.includes(k.id);
                   return (
                     <button
                       key={k.id}
@@ -357,15 +361,15 @@ function AdminIngredientsPage() {
                       onClick={() =>
                         setNewDraft((d) => ({
                           ...d,
-                          kitchen_ids: checked
-                            ? d.kitchen_ids.filter((x) => x !== k.id)
-                            : [...d.kitchen_ids, k.id],
+                          excluded_kitchen_ids: checked
+                            ? d.excluded_kitchen_ids.filter((x: string) => x !== k.id)
+                            : [...d.excluded_kitchen_ids, k.id],
                         }))
                       }
                       className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs transition ${
                         checked
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-background text-muted-foreground hover:border-primary"
+                          ? "border-destructive bg-destructive text-destructive-foreground line-through"
+                          : "border-border bg-background text-muted-foreground hover:border-destructive"
                       }`}
                     >
                       {k.icon && <span aria-hidden>{k.icon}</span>}
@@ -465,8 +469,9 @@ function AdminIngredientsPage() {
                 {lang === "ar" ? "الكل" : "All"}
               </button>
               {kitchens.map((k) => {
-                const count = items.filter((it) =>
-                  (kitchenLinks[it.id] ?? []).includes(k.id),
+                // Count = ingredients VISIBLE in this kitchen (not excluded).
+                const count = items.filter(
+                  (it) => !(kitchenExcludes[it.id] ?? []).includes(k.id),
                 ).length;
                 return (
                   <button
@@ -670,14 +675,16 @@ function AdminIngredientsPage() {
                       </td>
                     </tr>
                     {isEditing && editDraft && kitchens.length > 0 && (
-                      <tr key={`${it.id}-kitchens`} className="bg-primary/5">
+                      <tr key={`${it.id}-kitchens`} className="bg-destructive/5">
                         <td colSpan={6} className="px-3 py-2">
                           <p className="mb-1.5 text-xs font-semibold text-muted-foreground">
-                            {lang === "ar" ? "المطابخ:" : "Kitchens:"}
+                            {lang === "ar"
+                              ? "إخفاء من المطابخ دي (افتراضياً يظهر في الكل):"
+                              : "Hide from these kitchens (shown in all by default):"}
                           </p>
                           <div className="flex flex-wrap gap-1.5">
                             {kitchens.map((k) => {
-                              const checked = editDraft.kitchen_ids.includes(k.id);
+                              const checked = editDraft.excluded_kitchen_ids.includes(k.id);
                               return (
                                 <button
                                   key={k.id}
@@ -687,17 +694,17 @@ function AdminIngredientsPage() {
                                       d
                                         ? {
                                             ...d,
-                                            kitchen_ids: checked
-                                              ? d.kitchen_ids.filter((x) => x !== k.id)
-                                              : [...d.kitchen_ids, k.id],
+                                            excluded_kitchen_ids: checked
+                                              ? d.excluded_kitchen_ids.filter((x: string) => x !== k.id)
+                                              : [...d.excluded_kitchen_ids, k.id],
                                           }
                                         : d,
                                     )
                                   }
                                   className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs transition ${
                                     checked
-                                      ? "border-primary bg-primary text-primary-foreground"
-                                      : "border-border bg-background text-muted-foreground hover:border-primary"
+                                      ? "border-destructive bg-destructive text-destructive-foreground line-through"
+                                      : "border-border bg-background text-muted-foreground hover:border-destructive"
                                   }`}
                                 >
                                   {k.icon && <span aria-hidden>{k.icon}</span>}

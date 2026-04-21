@@ -411,7 +411,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ingredient_kitchens: {
+      ingredient_kitchen_excludes: {
         Row: {
           created_at: string
           id: string
