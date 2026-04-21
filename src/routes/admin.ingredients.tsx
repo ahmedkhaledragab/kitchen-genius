@@ -342,7 +342,40 @@ function AdminIngredientsPage() {
               />
             </div>
           </div>
-          <div className="mt-3 flex justify-end gap-2">
+          {kitchens.length > 0 && (
+            <div className="mt-3">
+              <label className="text-xs font-semibold">
+                {lang === "ar" ? "المطابخ اللي يظهر فيها" : "Kitchens"}
+              </label>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                {kitchens.map((k) => {
+                  const checked = newDraft.kitchen_ids.includes(k.id);
+                  return (
+                    <button
+                      key={k.id}
+                      type="button"
+                      onClick={() =>
+                        setNewDraft((d) => ({
+                          ...d,
+                          kitchen_ids: checked
+                            ? d.kitchen_ids.filter((x) => x !== k.id)
+                            : [...d.kitchen_ids, k.id],
+                        }))
+                      }
+                      className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs transition ${
+                        checked
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background text-muted-foreground hover:border-primary"
+                      }`}
+                    >
+                      {k.icon && <span aria-hidden>{k.icon}</span>}
+                      {lang === "ar" ? k.name_ar : k.name_en}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
             <Button
               type="button"
               variant="outline"
