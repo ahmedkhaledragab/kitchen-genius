@@ -55,11 +55,15 @@ function AdminIngredientsPage() {
   const tx = t.admin.ingredientsCatalog;
 
   const { items: catOptions } = useCategoriesCatalog("ingredient_categories");
+  const { items: kitchens } = useKitchens();
 
   const [items, setItems] = useState<Ingredient[]>([]);
+  // Map of ingredient_id -> kitchen_id[] (so we can show chips per row).
+  const [kitchenLinks, setKitchenLinks] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | "all">("all");
+  const [activeKitchen, setActiveKitchen] = useState<string | "all">("all");
   const [editId, setEditId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<DraftRow | null>(null);
   const [adding, setAdding] = useState(false);
@@ -68,6 +72,7 @@ function AdminIngredientsPage() {
     name_en: "",
     category: "",
     sort_order: 999,
+    kitchen_ids: [],
   });
   const [busyId, setBusyId] = useState<string | null>(null);
 
