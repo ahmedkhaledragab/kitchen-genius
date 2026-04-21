@@ -141,6 +141,29 @@ serve(async (req: Request) => {
     let kitchenNameAr: string | null = null;
     let kitchenNameEn: string | null = null;
     let kitchenIngredientIds: Set<string> | null = null;
+    const language = body.language === "en" ? "en" : "ar";
+
+    if (kitchenSlug) {
+      try {
+        const { data: k } = await admin
+          .from("kitchens")
+          .select("id, name_ar, name_en")
+          .eq("slug", kitchenSlug)
+          .maybeSingle();
+        if (k) {
+          kitchenNameAr = k.name_ar;
+          kitchenNameEn = k.name_en;
+          const { data: links } = await admin
+            .from("ingredient_kitchens")
+            .select("ingredient_id")
+            .eq("kitchen_id", k.id);
+          const ids = (links ?? []).map((l: { ingredient_id: string }) => l.ingredient_id);
+          kitchenIngredientIds = new Set(ids);
+        }
+      } catch (e) {
+        console.error("kitchen lookup failed:", e);
+      }
+    }
 
     if (ingredients.length === 0) {
       return new Response(JSON.stringify({ error: "No ingredients provided" }), {
