@@ -123,6 +123,8 @@ function AdminSettingsPage() {
     setPwaIcon192(settings.pwa_icon_192_url);
     setPwaIcon512(settings.pwa_icon_512_url);
     setPwaAppleIcon(settings.pwa_apple_touch_icon_url);
+    setRecipesTargetCount(settings.recipes_target_count ?? 3);
+    setRecipesDailyLimit(settings.recipes_daily_limit ?? 4);
   }, [settings]);
 
   if (loading) return null;
