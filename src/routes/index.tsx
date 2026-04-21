@@ -188,6 +188,7 @@ function HomePage() {
     }
     setLoading(true);
     setRecipes(null);
+    setLimitInfo(null);
     const res = await generateRecipes({
       ingredients,
       exclude: excluded,
@@ -196,7 +197,18 @@ function HomePage() {
     });
     setLoading(false);
     if ("error" in res) {
-      toast.error(res.message ?? t.common.error);
+      const isLimit =
+        res.error === "limit_reached" || res.error === "device_limit_reached";
+      if (isLimit) {
+        setLimitInfo({
+          used: res.used,
+          limit: res.limit,
+          scope: res.scope,
+          message: res.message,
+        });
+      } else {
+        toast.error(res.message ?? t.common.error);
+      }
       return;
     }
     setRecipes(res.recipes ?? []);
