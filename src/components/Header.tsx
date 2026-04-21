@@ -45,6 +45,12 @@ export function Header() {
   const logo = settings.logo_url || defaultLogo;
   const siteName = lang === "ar" ? settings.site_name_ar : settings.site_name_en;
 
+  const handleLogoError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    if (e.currentTarget.src !== defaultLogo) {
+      e.currentTarget.src = defaultLogo;
+    }
+  };
+
   const close = () => setOpen(false);
 
   return (
@@ -54,6 +60,7 @@ export function Header() {
           <img
             src={logo}
             alt={siteName}
+            onError={handleLogoError}
             className="h-14 w-14 shrink-0 object-contain transition-transform group-hover:scale-105 sm:h-16 sm:w-16"
           />
           <span className="hidden truncate text-base font-extrabold tracking-tight md:inline">
@@ -164,7 +171,7 @@ export function Header() {
             >
               <SheetHeader className="border-b border-border/60 p-6 pb-4">
                 <SheetTitle className="flex items-center gap-2">
-                  <img src={logo} alt={siteName} className="h-9 w-9 object-contain" />
+                  <img src={logo} alt={siteName} onError={handleLogoError} className="h-9 w-9 object-contain" />
                   <span className="truncate">{siteName}</span>
                 </SheetTitle>
               </SheetHeader>
