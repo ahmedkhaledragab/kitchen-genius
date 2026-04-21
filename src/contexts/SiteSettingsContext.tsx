@@ -68,6 +68,8 @@ const DEFAULTS: SiteSettings = {
   pwa_icon_512_url: null,
   pwa_apple_touch_icon_url: null,
   pwa_display: "standalone",
+  recipes_target_count: 3,
+  recipes_daily_limit: 4,
 };
 
 interface SiteSettingsContextValue {
