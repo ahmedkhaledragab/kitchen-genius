@@ -61,6 +61,12 @@ function HomePage() {
   const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState<Recipe[] | null>(null);
   const [openRecipe, setOpenRecipe] = useState<Recipe | null>(null);
+  const [limitInfo, setLimitInfo] = useState<{
+    used?: number;
+    limit?: number;
+    scope?: "device" | "user";
+    message?: string;
+  } | null>(null);
 
   // Catalog of all active ingredients (full catalog, no kitchen filter).
   const [catalogAr, setCatalogAr] = useState<string[]>([]);
