@@ -280,7 +280,7 @@ function HomePage() {
               >
                 {iconByName[ing] && <span aria-hidden>{iconByName[ing]}</span>}
                 {ing}
-                <X className="h-3 w-3 opacity-60 group-hover:opacity-100" />
+                <span aria-hidden className="text-xs opacity-70 group-hover:opacity-100">❌</span>
               </button>
             ))}
           </div>
