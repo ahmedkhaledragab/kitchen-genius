@@ -328,6 +328,34 @@ serve(async (req: Request) => {
     // Pre-expand user ingredients with synonyms once.
     const userIngsExpanded = userIngsNorm.map(expandTerm);
 
+    // Identify "core" protein/main ingredients the user listed. If they
+    // typed fish, chicken, shrimp, beef, lamb or eggs we MUST guarantee at
+    // least one of those proteins appears in any recipe we return — otherwise
+    // we surface unrelated dishes (e.g. fig appetizer when user asked for fish).
+    const PROTEIN_CANONICALS = new Set([
+      norm("سمك"),
+      norm("فراخ"),
+      norm("جمبري"),
+      norm("لحمه"),
+      norm("لحمه مفرومه"),
+      norm("خروف"),
+      norm("بيض"),
+    ]);
+    const userProteinCanonicals = new Set<string>();
+    for (const ing of userIngsNorm) {
+      const canonical = synonymMap.get(ing);
+      if (canonical && PROTEIN_CANONICALS.has(canonical)) {
+        userProteinCanonicals.add(canonical);
+      }
+    }
+    // Build the set of all synonym terms that satisfy "user has a protein".
+    const requiredProteinTerms: string[] = [];
+    if (userProteinCanonicals.size > 0) {
+      for (const [term, canonical] of synonymMap.entries()) {
+        if (userProteinCanonicals.has(canonical)) requiredProteinTerms.push(term);
+      }
+    }
+
     type LocalRecipeOut = {
       id: string;
       title: string;
@@ -420,6 +448,16 @@ serve(async (req: Request) => {
           }
         }
         if (matched === 0) continue;
+
+        // Hard filter: if the user provided a protein/main ingredient, the
+        // recipe MUST contain at least one of those proteins. Prevents
+        // returning fig-appetizer when the user typed "fish".
+        if (requiredProteinTerms.length > 0) {
+          const hasProtein = ingsNorm.some((ing) =>
+            requiredProteinTerms.some((p) => ing.includes(p) || p.includes(ing)),
+          );
+          if (!hasProtein) continue;
+        }
 
         const missing = Math.max(0, ingsNorm.length - matched);
         scored.push({ r, matched, missing });
@@ -559,10 +597,18 @@ serve(async (req: Request) => {
         : `Avoid duplicating these recipes I already have: ${localTitles.join(", ")}.`
       : "";
 
+    // Build a strong "must use" instruction. The previous prompt only said
+    // "minimize missing ingredients" which let the model invent recipes that
+    // don't actually use the user's main ingredient (e.g. user types fish →
+    // model returns a fig appetizer). We now require every recipe to use the
+    // user's listed ingredients as the main components.
+    const mustUseAr = `قاعدة أساسية: كل وصفة لازم تكون مبنية على المكونات اللي عندي وتستخدمها كمكون رئيسي. لو كتبت بروتين (سمك، فراخ، لحمه، جمبري، خروف، بيض) فالوصفة لازم تحتوي عليه فعلاً. ممنوع تقترح وصفات مالهاش علاقة بالمكونات دي.`;
+    const mustUseEn = `Hard rule: every recipe MUST be built around the ingredients I provided and use them as the MAIN components. If I listed a protein (fish, chicken, beef, shrimp, lamb, eggs), the recipe MUST contain that protein. Do NOT suggest recipes unrelated to my ingredients.`;
+
     const userMsg =
       language === "ar"
-        ? `${kitchenText}\nالمكونات المتوفرة عندي: ${ingredients.join("، ")}.\n${excludeText}\n${filterText}\n${avoidText}\nاقترح ${aiNeeded} وصفات جديدة أقدر أعملها بالمكونات دي${kitchenSlug ? ` من مطبخ ${kitchenNameAr ?? kitchenSlug} فقط` : ""}. حاول تستعمل أقل عدد من المكونات الناقصة.`
-        : `${kitchenText}\nMy ingredients: ${ingredients.join(", ")}.\n${excludeText}\n${filterText}\n${avoidText}\nSuggest ${aiNeeded} new recipes I can make${kitchenSlug ? ` from ${kitchenNameEn ?? kitchenSlug} cuisine only` : ""}. Minimize missing ingredients.`;
+        ? `${kitchenText}\n${mustUseAr}\nالمكونات المتوفرة عندي: ${ingredients.join("، ")}.\n${excludeText}\n${filterText}\n${avoidText}\nاقترح ${aiNeeded} وصفات جديدة أقدر أعملها بالمكونات دي${kitchenSlug ? ` من مطبخ ${kitchenNameAr ?? kitchenSlug} فقط` : ""}. حاول تستعمل أقل عدد من المكونات الناقصة.`
+        : `${kitchenText}\n${mustUseEn}\nMy ingredients: ${ingredients.join(", ")}.\n${excludeText}\n${filterText}\n${avoidText}\nSuggest ${aiNeeded} new recipes I can make${kitchenSlug ? ` from ${kitchenNameEn ?? kitchenSlug} cuisine only` : ""}. Minimize missing ingredients.`;
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -644,7 +690,20 @@ serve(async (req: Request) => {
     }
 
     // Merge: local first, then AI fills the rest (capped at TARGET_COUNT).
-    const aiRecipes = (parsed.recipes ?? []).map((r) => ({ ...r, source: "ai" as const }));
+    let aiRecipes = (parsed.recipes ?? []).map((r) => ({ ...r, source: "ai" as const }));
+
+    // Post-filter AI output: if the user listed a protein, drop any AI recipe
+    // that doesn't actually include that protein in its ingredients list.
+    if (requiredProteinTerms.length > 0) {
+      aiRecipes = aiRecipes.filter((r) => {
+        const ings = Array.isArray(r.ingredients) ? (r.ingredients as string[]) : [];
+        const ingsNorm = ings.map((x) => norm(String(x)));
+        return ingsNorm.some((ing) =>
+          requiredProteinTerms.some((p) => ing.includes(p) || p.includes(ing)),
+        );
+      });
+    }
+
     const merged = [...localMatches, ...aiRecipes].slice(0, TARGET_COUNT);
     const sourceLabel = localMatches.length > 0 && aiRecipes.length > 0
       ? "hybrid"
