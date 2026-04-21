@@ -1,7 +1,6 @@
-import { Outlet, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 
-import appCss from "../styles.css?url";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -34,63 +33,12 @@ function NotFoundComponent() {
 }
 
 export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "من اللي عندك؟ — وصفات من مكوناتك" },
-      {
-        name: "description",
-        content:
-          "اكتب اللي عندك في المطبخ ونقترحلك وصفات تقدر تعملها فوراً بالذكاء الاصطناعي.",
-      },
-      { name: "author", content: "Manar Elsheikh" },
-      { name: "theme-color", content: "#16a34a" },
-      { name: "mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
-      { property: "og:title", content: "من اللي عندك؟ — وصفات من مكوناتك" },
-      {
-        property: "og:description",
-        content: "أدخل المكونات اللي عندك واحصل على وصفات فورية بالذكاء الاصطناعي.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-      { rel: "alternate icon", type: "image/png", href: "/favicon.png" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap",
-      },
-    ],
-  }),
-  shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
 });
 
-function RootShell({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="ar" dir="rtl">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-
 function RootComponent() {
+  // Update document title from route head() — we use a simple effect-based approach for SPA
   return (
     <LanguageProvider>
       <AuthProvider>

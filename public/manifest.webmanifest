@@ -1,0 +1,21 @@
+{
+  "name": "من اللي عندك؟ — وصفات من مكوناتك",
+  "short_name": "من اللي عندك",
+  "description": "اكتب اللي عندك في المطبخ ونقترحلك وصفات تقدر تعملها فوراً",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#16a34a",
+  "background_color": "#ffffff",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
