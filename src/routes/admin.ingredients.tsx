@@ -347,11 +347,13 @@ function AdminIngredientsPage() {
           {kitchens.length > 0 && (
             <div className="mt-3">
               <label className="text-xs font-semibold">
-                {lang === "ar" ? "المطابخ اللي يظهر فيها" : "Kitchens"}
+                {lang === "ar"
+                  ? "إخفاء من المطابخ دي (افتراضياً يظهر في كل المطابخ)"
+                  : "Hide from these kitchens (shown in all by default)"}
               </label>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {kitchens.map((k) => {
-                  const checked = newDraft.kitchen_ids.includes(k.id);
+                  const checked = newDraft.excluded_kitchen_ids.includes(k.id);
                   return (
                     <button
                       key={k.id}
@@ -359,15 +361,15 @@ function AdminIngredientsPage() {
                       onClick={() =>
                         setNewDraft((d) => ({
                           ...d,
-                          kitchen_ids: checked
-                            ? d.kitchen_ids.filter((x) => x !== k.id)
-                            : [...d.kitchen_ids, k.id],
+                          excluded_kitchen_ids: checked
+                            ? d.excluded_kitchen_ids.filter((x: string) => x !== k.id)
+                            : [...d.excluded_kitchen_ids, k.id],
                         }))
                       }
                       className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs transition ${
                         checked
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-background text-muted-foreground hover:border-primary"
+                          ? "border-destructive bg-destructive text-destructive-foreground line-through"
+                          : "border-border bg-background text-muted-foreground hover:border-destructive"
                       }`}
                     >
                       {k.icon && <span aria-hidden>{k.icon}</span>}
@@ -467,8 +469,9 @@ function AdminIngredientsPage() {
                 {lang === "ar" ? "الكل" : "All"}
               </button>
               {kitchens.map((k) => {
-                const count = items.filter((it) =>
-                  (kitchenLinks[it.id] ?? []).includes(k.id),
+                // Count = ingredients VISIBLE in this kitchen (not excluded).
+                const count = items.filter(
+                  (it) => !(kitchenExcludes[it.id] ?? []).includes(k.id),
                 ).length;
                 return (
                   <button
@@ -672,14 +675,16 @@ function AdminIngredientsPage() {
                       </td>
                     </tr>
                     {isEditing && editDraft && kitchens.length > 0 && (
-                      <tr key={`${it.id}-kitchens`} className="bg-primary/5">
+                      <tr key={`${it.id}-kitchens`} className="bg-destructive/5">
                         <td colSpan={6} className="px-3 py-2">
                           <p className="mb-1.5 text-xs font-semibold text-muted-foreground">
-                            {lang === "ar" ? "المطابخ:" : "Kitchens:"}
+                            {lang === "ar"
+                              ? "إخفاء من المطابخ دي (افتراضياً يظهر في الكل):"
+                              : "Hide from these kitchens (shown in all by default):"}
                           </p>
                           <div className="flex flex-wrap gap-1.5">
                             {kitchens.map((k) => {
-                              const checked = editDraft.kitchen_ids.includes(k.id);
+                              const checked = editDraft.excluded_kitchen_ids.includes(k.id);
                               return (
                                 <button
                                   key={k.id}
@@ -689,17 +694,17 @@ function AdminIngredientsPage() {
                                       d
                                         ? {
                                             ...d,
-                                            kitchen_ids: checked
-                                              ? d.kitchen_ids.filter((x) => x !== k.id)
-                                              : [...d.kitchen_ids, k.id],
+                                            excluded_kitchen_ids: checked
+                                              ? d.excluded_kitchen_ids.filter((x: string) => x !== k.id)
+                                              : [...d.excluded_kitchen_ids, k.id],
                                           }
                                         : d,
                                     )
                                   }
                                   className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs transition ${
                                     checked
-                                      ? "border-primary bg-primary text-primary-foreground"
-                                      : "border-border bg-background text-muted-foreground hover:border-primary"
+                                      ? "border-destructive bg-destructive text-destructive-foreground line-through"
+                                      : "border-border bg-background text-muted-foreground hover:border-destructive"
                                   }`}
                                 >
                                   {k.icon && <span aria-hidden>{k.icon}</span>}
