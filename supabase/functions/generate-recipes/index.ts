@@ -358,8 +358,8 @@ serve(async (req: Request) => {
 
     const userMsg =
       language === "ar"
-        ? `المكونات المتوفرة عندي: ${ingredients.join("، ")}.\n${excludeText}\n${filterText}\n${avoidText}\nاقترح ${aiNeeded} وصفات جديدة أقدر أعملها بالمكونات دي. حاول تستعمل أقل عدد من المكونات الناقصة.`
-        : `My ingredients: ${ingredients.join(", ")}.\n${excludeText}\n${filterText}\n${avoidText}\nSuggest ${aiNeeded} new recipes I can make. Minimize missing ingredients.`;
+        ? `${kitchenText}\nالمكونات المتوفرة عندي: ${ingredients.join("، ")}.\n${excludeText}\n${filterText}\n${avoidText}\nاقترح ${aiNeeded} وصفات جديدة أقدر أعملها بالمكونات دي${kitchenSlug ? ` من مطبخ ${kitchenNameAr ?? kitchenSlug} فقط` : ""}. حاول تستعمل أقل عدد من المكونات الناقصة.`
+        : `${kitchenText}\nMy ingredients: ${ingredients.join(", ")}.\n${excludeText}\n${filterText}\n${avoidText}\nSuggest ${aiNeeded} new recipes I can make${kitchenSlug ? ` from ${kitchenNameEn ?? kitchenSlug} cuisine only` : ""}. Minimize missing ingredients.`;
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
