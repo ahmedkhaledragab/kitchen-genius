@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { ArrowLeft, Plus, Trash2, Search, Pencil, Check, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -520,8 +520,8 @@ function AdminIngredientsPage() {
                 {filtered.map((it, i) => {
                   const isEditing = editId === it.id;
                   return (
+                    <React.Fragment key={it.id}>
                     <tr
-                      key={it.id}
                       className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}
                     >
                       <td className="px-3 py-2">
