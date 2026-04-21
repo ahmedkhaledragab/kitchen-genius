@@ -61,6 +61,10 @@ function AdminSettingsPage() {
   const [telegramUrl, setTelegramUrl] = useState("");
   const [twitterUrl, setTwitterUrl] = useState("");
 
+  // Recipe generation controls
+  const [recipesTargetCount, setRecipesTargetCount] = useState<number>(3);
+  const [recipesDailyLimit, setRecipesDailyLimit] = useState<number>(4);
+
   // PWA state
   const [pwaEnabled, setPwaEnabled] = useState(false);
   const [pwaShortNameAr, setPwaShortNameAr] = useState("");
