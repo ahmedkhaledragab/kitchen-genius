@@ -56,10 +56,6 @@ function HomePage() {
   const { isFavorite, toggle } = useFavorites();
   const navigate = useNavigate();
   const { content: c } = usePageContent("home");
-  const { items: kitchens, loading: kitchensLoading } = useKitchens();
-
-  // The user must pick a kitchen before seeing the ingredients UI.
-  const [selectedKitchen, setSelectedKitchen] = useState<KitchenOption | null>(null);
 
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [excluded, setExcluded] = useState<string[]>([]);
@@ -70,27 +66,18 @@ function HomePage() {
   const [recipes, setRecipes] = useState<Recipe[] | null>(null);
   const [openRecipe, setOpenRecipe] = useState<Recipe | null>(null);
 
-  // Catalog of ingredients filtered by the selected kitchen.
+  // Catalog of all active ingredients (full catalog, no kitchen filter).
   const [catalogAr, setCatalogAr] = useState<string[]>([]);
   const [catalogEn, setCatalogEn] = useState<string[]>([]);
   const [iconByName, setIconByName] = useState<Record<string, string>>({});
-  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogLoading, setCatalogLoading] = useState(true);
 
-  // Reload the ingredient catalog whenever the selected kitchen changes.
-  // New behavior: ALL active ingredients show by default in every kitchen.
-  // The `ingredient_kitchen_excludes` junction holds ingredients the admin
-  // explicitly hid for this kitchen — we filter those out client-side.
+  // Load full ingredient catalog once.
   useEffect(() => {
-    if (!selectedKitchen) {
-      setCatalogAr([]);
-      setCatalogEn([]);
-      setIconByName({});
-      return;
-    }
     let cancelled = false;
     setCatalogLoading(true);
     (async () => {
-      const [ingsRes, catsRes, exRes] = await Promise.all([
+      const [ingsRes, catsRes] = await Promise.all([
         supabase
           .from("ingredients_catalog")
           .select("id, name_ar, name_en, category")
@@ -101,19 +88,18 @@ function HomePage() {
           .from("ingredient_categories")
           .select("slug, icon")
           .eq("is_active", true),
-        sb
-          .from("ingredient_kitchen_excludes")
-          .select("ingredient_id")
-          .eq("kitchen_id", selectedKitchen.id),
       ]);
       if (cancelled) return;
-      const excludedIds = new Set(
-        ((exRes.data ?? []) as Array<{ ingredient_id: string }>).map((x) => x.ingredient_id),
-      );
-      const ings = ((ingsRes.data ?? []) as Array<{ id: string; name_ar: string; name_en: string; category: string | null }>).filter(
-        (i) => !excludedIds.has(i.id),
-      );
-      const cats = (catsRes.data ?? []) as Array<{ slug: string; icon: string | null }>;
+      const ings = (ingsRes.data ?? []) as Array<{
+        id: string;
+        name_ar: string;
+        name_en: string;
+        category: string | null;
+      }>;
+      const cats = (catsRes.data ?? []) as Array<{
+        slug: string;
+        icon: string | null;
+      }>;
       setCatalogAr(ings.map((d) => d.name_ar));
       setCatalogEn(ings.map((d) => d.name_en));
       const iconBySlug: Record<string, string> = {};
@@ -132,7 +118,7 @@ function HomePage() {
     return () => {
       cancelled = true;
     };
-  }, [selectedKitchen]);
+  }, []);
 
   // Reset everything when language changes (recipes returned in other lang).
   useEffect(() => {
@@ -147,9 +133,7 @@ function HomePage() {
   const suggestions = useMemo(() => {
     const fromCatalog = lang === "ar" ? catalogAr : catalogEn;
     const fallback = lang === "ar" ? COMMON_INGREDIENTS_AR : COMMON_INGREDIENTS_EN;
-    // Only fall back to the hardcoded list when no kitchen is picked or the
-    // kitchen catalog is empty — otherwise we'd show off-cuisine items.
-    const all = fromCatalog.length > 0 ? fromCatalog : selectedKitchen ? [] : fallback;
+    const all = fromCatalog.length > 0 ? fromCatalog : fallback;
     const lc = input.trim().toLowerCase();
     const filtered = all
       .filter(
@@ -160,7 +144,7 @@ function HomePage() {
       )
       .slice(0, lc ? 10 : 16);
     return filtered;
-  }, [input, ingredients, excluded, lang, catalogAr, catalogEn, selectedKitchen]);
+  }, [input, ingredients, excluded, lang, catalogAr, catalogEn]);
 
   const addIngredient = (val: string) => {
     const v = val.trim();
@@ -202,14 +186,10 @@ function HomePage() {
     }
     setLoading(true);
     setRecipes(null);
-    // Tag the kitchen as a filter so the AI knows the cuisine context.
-    const kitchenFilter = selectedKitchen
-      ? [`kitchen:${selectedKitchen.slug}`]
-      : [];
     const res = await generateRecipes({
       ingredients,
       exclude: excluded,
-      filters: [...activeFilters, ...kitchenFilter],
+      filters: activeFilters,
       language: lang,
     });
     setLoading(false);
@@ -231,115 +211,9 @@ function HomePage() {
     toggle(r);
   };
 
-  const changeKitchen = () => {
-    setSelectedKitchen(null);
-    setRecipes(null);
-    setIngredients([]);
-    setExcluded([]);
-    setInput("");
-    setExcludeInput("");
-  };
-
-  // ============== KITCHEN PICKER (shown first) ==============
-  if (!selectedKitchen) {
-    return (
-      <div className="mx-auto max-w-5xl px-4 pb-20 pt-6 sm:pt-10">
-        <section className="relative overflow-hidden rounded-3xl gradient-hero p-6 sm:p-10">
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="inline-flex items-center gap-2 rounded-full bg-card/70 px-3 py-1 text-xs font-semibold text-primary backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5" />
-              {pick(c.hero_badge, lang === "ar" ? "مدعوم بالذكاء الاصطناعي" : "AI-powered")}
-            </div>
-            <h1 className="mt-3 text-3xl font-black leading-tight sm:text-5xl">
-              <span className="gradient-text">
-                {lang === "ar" ? "اختاري المطبخ الأول 👩‍🍳" : "Pick your kitchen first 👩‍🍳"}
-              </span>
-            </h1>
-            <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
-              {lang === "ar"
-                ? "كل مطبخ ليه مكوناته الخاصة. اختاري واحد وهنوريكي اللي يناسبه."
-                : "Each kitchen has its own ingredient list — pick one to start."}
-            </p>
-          </motion.div>
-        </section>
-
-        <div className="mt-8">
-          {kitchensLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : kitchens.length === 0 ? (
-            <Card className="rounded-2xl bg-muted p-6 text-center text-sm text-muted-foreground">
-              {lang === "ar"
-                ? "لسه مفيش مطابخ. الأدمن لازم يضيف مطابخ من لوحة التحكم."
-                : "No kitchens yet. The admin needs to add some from the dashboard."}
-            </Card>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {kitchens.map((k, i) => (
-                <motion.button
-                  key={k.id}
-                  type="button"
-                  onClick={() => setSelectedKitchen(k)}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: i * 0.04 }}
-                  className="group flex flex-col items-center gap-2 rounded-3xl border border-border/60 bg-card p-5 text-center shadow-card transition hover:-translate-y-0.5 hover:border-primary hover:shadow-warm"
-                >
-                  <span className="grid h-16 w-16 place-items-center rounded-2xl bg-primary/10 text-3xl transition group-hover:bg-primary/20">
-                    {k.icon || "🍳"}
-                  </span>
-                  <p className="text-base font-extrabold">
-                    {lang === "ar" ? k.name_ar : k.name_en}
-                  </p>
-                  {(lang === "ar" ? k.description_ar : k.description_en) && (
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {lang === "ar" ? k.description_ar : k.description_en}
-                    </p>
-                  )}
-                </motion.button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // ============== INGREDIENTS UI (after kitchen is picked) ==============
+  // ============== INGREDIENTS UI ==============
   return (
     <div className="mx-auto max-w-3xl px-4 pb-20 pt-6 sm:pt-10">
-      {/* Selected kitchen header with change button */}
-      <Card className="mb-4 flex items-center justify-between rounded-3xl border-primary/30 bg-primary/5 p-4">
-        <div className="flex items-center gap-3">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/15 text-2xl">
-            {selectedKitchen.icon || "🍳"}
-          </span>
-          <div>
-            <p className="text-xs text-muted-foreground">
-              {lang === "ar" ? "المطبخ المختار" : "Selected kitchen"}
-            </p>
-            <p className="text-base font-extrabold">
-              {lang === "ar" ? selectedKitchen.name_ar : selectedKitchen.name_en}
-            </p>
-          </div>
-        </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={changeKitchen}
-          className="rounded-full text-primary hover:bg-primary/10"
-        >
-          <ArrowLeft className="me-1 h-4 w-4 rtl:rotate-180" />
-          {lang === "ar" ? "تغيير المطبخ" : "Change"}
-        </Button>
-      </Card>
-
       {/* Hero */}
       <section className="relative overflow-hidden rounded-3xl gradient-hero p-6 sm:p-10">
         <motion.div
