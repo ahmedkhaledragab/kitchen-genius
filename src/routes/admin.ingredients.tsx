@@ -447,6 +447,46 @@ function AdminIngredientsPage() {
             })}
           </div>
         )}
+        {kitchens.length > 0 && (
+          <div className="mt-3 border-t border-border/50 pt-3">
+            <p className="mb-1.5 text-xs font-semibold text-muted-foreground">
+              {lang === "ar" ? "فلترة بالمطبخ" : "Filter by kitchen"}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => setActiveKitchen("all")}
+                className={`rounded-full border px-3 py-1 text-xs transition ${
+                  activeKitchen === "all"
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-muted-foreground hover:border-primary hover:text-primary"
+                }`}
+              >
+                {lang === "ar" ? "الكل" : "All"}
+              </button>
+              {kitchens.map((k) => {
+                const count = items.filter((it) =>
+                  (kitchenLinks[it.id] ?? []).includes(k.id),
+                ).length;
+                return (
+                  <button
+                    key={k.id}
+                    type="button"
+                    onClick={() => setActiveKitchen(k.id)}
+                    className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs transition ${
+                      activeKitchen === k.id
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-primary hover:text-primary"
+                    }`}
+                  >
+                    {k.icon && <span aria-hidden>{k.icon}</span>}
+                    {lang === "ar" ? k.name_ar : k.name_en} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* List */}
