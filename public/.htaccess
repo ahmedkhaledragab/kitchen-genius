@@ -1,0 +1,37 @@
+# SPA fallback for Hostinger / Apache shared hosting
+# يعيد كل الـ routes إلى index.html علشان React Router يشتغل
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # لو الملف موجود فعلاً (CSS, JS, صور) قدّمه مباشرة
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # غير كده، حوّل لـ index.html
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Cache headers للـ assets
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType application/manifest+json "access plus 1 day"
+</IfModule>
+
+# Gzip compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json image/svg+xml
+</IfModule>
+
+# Manifest MIME type
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+</IfModule>
