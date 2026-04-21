@@ -180,8 +180,87 @@ serve(async (req: Request) => {
         .replace(/[^\p{L}\p{N}\s]/gu, " ")
         .replace(/\s+/g, " ");
 
+    // Ingredient synonyms — Arabic dialects + English equivalents.
+    // Each group maps to a canonical key. e.g. "فراخ" and "دجاج" both → "chicken".
+    // This makes local recipe search find a "chicken" recipe even if the user
+    // typed "فراخ" or vice versa.
+    const SYNONYM_GROUPS: string[][] = [
+      ["فراخ", "دجاج", "فرخه", "chicken", "poultry"],
+      ["طماطم", "بندوره", "قوطه", "tomato", "tomatoes"],
+      ["بطاطس", "بطاطا", "potato", "potatoes"],
+      ["بصل", "بصله", "onion", "onions"],
+      ["ثوم", "توم", "garlic"],
+      ["جبنه", "جبن", "cheese"],
+      ["جبنه بيضا", "جبنه فيتا", "feta"],
+      ["جبنه موزاريلا", "موتزاريلا", "mozzarella"],
+      ["لحمه", "لحم", "بقري", "beef", "meat"],
+      ["لحمه مفرومه", "لحم مفروم", "كفته", "minced meat", "ground beef"],
+      ["خروف", "ضاني", "ضان", "غنم", "lamb", "mutton"],
+      ["سمك", "حوت", "fish"],
+      ["جمبري", "روبيان", "قريدس", "shrimp", "prawn", "prawns"],
+      ["بيض", "بيضه", "egg", "eggs"],
+      ["لبن", "حليب", "milk"],
+      ["زبده", "زبد", "سمنه", "سمن", "butter", "ghee"],
+      ["زيت", "زيت زيتون", "oil", "olive oil"],
+      ["عيش", "خبز", "bread"],
+      ["دقيق", "طحين", "flour"],
+      ["ارز", "رز", "rice"],
+      ["مكرونه", "معكرونه", "باستا", "pasta", "macaroni"],
+      ["شطه", "فلفل حار", "هريسه", "chili", "chilli", "hot pepper"],
+      ["فلفل", "فلفل اخضر", "فلفل رومي", "فليفله", "pepper", "bell pepper", "capsicum"],
+      ["كوسه", "kousa", "zucchini"],
+      ["باذنجان", "بزنجان", "eggplant", "aubergine"],
+      ["خس", "خساس", "lettuce"],
+      ["جزر", "carrot", "carrots"],
+      ["خيار", "cucumber"],
+      ["ليمون", "lemon", "lime"],
+      ["برتقال", "orange"],
+      ["تفاح", "apple", "apples"],
+      ["موز", "banana"],
+      ["سكر", "sugar"],
+      ["ملح", "salt"],
+      ["فلفل اسود", "black pepper"],
+      ["كمون", "cumin"],
+      ["كزبره", "كزبره ناشفه", "coriander", "cilantro"],
+      ["بقدونس", "معدنوس", "parsley"],
+      ["نعناع", "mint"],
+      ["شبت", "dill"],
+      ["خل", "vinegar"],
+      ["طحينه", "tahini", "sesame paste"],
+      ["زبادي", "روب", "yogurt", "yoghurt"],
+      ["قشطه", "كريمه", "كريمه طازه", "cream"],
+      ["شيكولاته", "شوكولاته", "chocolate"],
+      ["عسل", "honey"],
+      ["تمر", "بلح", "date", "dates"],
+      ["جوز", "عين جمل", "walnut", "walnuts"],
+      ["لوز", "almond", "almonds"],
+    ];
+
+    // Build a map: normalized term → canonical key (just the first item normalized).
+    const synonymMap = new Map<string, string>();
+    for (const group of SYNONYM_GROUPS) {
+      const canonical = norm(group[0]);
+      for (const term of group) {
+        synonymMap.set(norm(term), canonical);
+      }
+    }
+
+    // Expand a normalized term into all its known synonyms (for matching).
+    // Returns at minimum the original term so non-synonym words still match.
+    const expandTerm = (t: string): string[] => {
+      const canonical = synonymMap.get(t);
+      if (!canonical) return [t];
+      const synonyms: string[] = [t];
+      for (const [key, val] of synonymMap.entries()) {
+        if (val === canonical && key !== t) synonyms.push(key);
+      }
+      return synonyms;
+    };
+
     const userIngsNorm = ingredients.map(norm).filter(Boolean);
     const excludeNorm = exclude.map(norm).filter(Boolean);
+    // Pre-expand user ingredients with synonyms once.
+    const userIngsExpanded = userIngsNorm.map(expandTerm);
 
     type LocalRecipeOut = {
       id: string;
@@ -262,9 +341,17 @@ serve(async (req: Request) => {
           if (!cuisineMatches && !tagMatches) continue;
         }
 
+        // Match using synonym expansion: a recipe ingredient counts as matched
+        // if any synonym of the user's ingredient appears in it (or vice versa).
         let matched = 0;
-        for (const u of userIngsNorm) {
-          if (ingsNorm.some((ing) => ing.includes(u) || u.includes(ing))) matched++;
+        for (const variants of userIngsExpanded) {
+          if (
+            ingsNorm.some((ing) =>
+              variants.some((v) => ing.includes(v) || v.includes(ing)),
+            )
+          ) {
+            matched++;
+          }
         }
         if (matched === 0) continue;
 
@@ -279,7 +366,9 @@ serve(async (req: Request) => {
         const ingsNorm = ings.map((x) => norm(String(x)));
         const missingList = ings.filter((_, i) => {
           const ing = ingsNorm[i];
-          return !userIngsNorm.some((u) => ing.includes(u) || u.includes(ing));
+          return !userIngsExpanded.some((variants) =>
+            variants.some((v) => ing.includes(v) || v.includes(ing)),
+          );
         });
         return {
           id: r.id,
