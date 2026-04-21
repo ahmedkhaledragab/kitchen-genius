@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Sparkles, X, Loader2, ChefHat } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -264,7 +264,7 @@ function HomePage() {
             onClick={() => addIngredient(input)}
             className="rounded-xl gradient-primary text-primary-foreground hover:opacity-95"
           >
-            <Plus className="h-4 w-4" />
+            <span aria-hidden className="text-base">➕</span>
             <span className="hidden sm:inline">{pick(c.home_add_btn, t.home.addBtn)}</span>
           </Button>
         </div>
@@ -280,7 +280,7 @@ function HomePage() {
               >
                 {iconByName[ing] && <span aria-hidden>{iconByName[ing]}</span>}
                 {ing}
-                <X className="h-3 w-3 opacity-60 group-hover:opacity-100" />
+                <span aria-hidden className="text-xs opacity-70 group-hover:opacity-100">❌</span>
               </button>
             ))}
           </div>
@@ -344,7 +344,7 @@ function HomePage() {
               onClick={() => addExclude(excludeInput)}
               className="rounded-xl border-accent/40 text-accent hover:bg-accent/10"
             >
-              <Plus className="h-4 w-4" />
+              <span aria-hidden className="text-base">➕</span>
             </Button>
           </div>
           {excluded.length > 0 && (
@@ -357,7 +357,7 @@ function HomePage() {
                   className="group inline-flex items-center gap-1 rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent hover:bg-accent/20"
                 >
                   {ing}
-                  <X className="h-3 w-3 opacity-60 group-hover:opacity-100" />
+                  <span aria-hidden className="text-xs opacity-70 group-hover:opacity-100">❌</span>
                 </button>
               ))}
             </div>
@@ -411,7 +411,7 @@ function HomePage() {
             </>
           ) : (
             <>
-              <ChefHat className="me-1 h-5 w-5" />
+              <span aria-hidden className="me-1 text-xl">👨‍🍳</span>
               {pick(c.home_cook_btn, t.home.cookBtn)}
             </>
           )}
