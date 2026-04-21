@@ -44,11 +44,7 @@ const FILTERS = [
   { key: "arabic", labelKey: "filterArab" },
 ] as const;
 
-// `ingredient_kitchens` is a new junction table that may not yet appear in the
-// auto-generated supabase types. Cast through `any` while we wait for the types
-// to refresh.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const sb = supabase as any;
+
 
 function HomePage() {
   const { t, lang } = useLang();
