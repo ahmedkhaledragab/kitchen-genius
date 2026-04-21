@@ -1,34 +1,72 @@
 # Kitchen Genius 🍳
 
-تطبيق وصفات طبخ بالذكاء الاصطناعي، مبني على **Lovable** + **TanStack Start** + **Lovable Cloud**.
+تطبيق وصفات طبخ بالذكاء الاصطناعي. **SPA** بسيط يشتغل على أي استضافة (Hostinger, cPanel, Netlify, GitHub Pages).
 
 🔗 [Lovable Project](https://lovable.dev/projects/e9d04f20-5322-4b46-b4ad-d7ef4e85ae09)
 
 ---
 
-## ✏️ التعديل
+## 🚀 التشغيل المحلي
 
-- **Lovable**: ادخل اللينك فوق وابدأ prompting (الأسهل).
-- **محلياً**: `git clone` → `npm i` → `npm run dev` (يتطلب Node 20+).
-- **GitHub**: عدّل أي ملف مباشرة من الواجهة.
+```bash
+git clone https://github.com/ahmedkhaledragab/kitchen-genius
+cd kitchen-genius
+npm install
+npm run dev
+```
+
+التطبيق هيشتغل على: `http://localhost:8080`
+
+---
+
+## 📦 البناء والرفع على Hostinger
+
+### 1️⃣ ابني المشروع
+```bash
+npm run build
+```
+
+هتلاقي مجلد `dist/` فيه:
+- `index.html` — الملف الرئيسي
+- `assets/` — كل الـ JS و CSS
+- `.htaccess` — مهم جداً لـ routing على Hostinger
+- `manifest.webmanifest`, `sitemap.xml`, `robots.txt`
+- `favicon.svg`, `apple-touch-icon.png`, `sw.js`
+
+### 2️⃣ ارفع على Hostinger
+1. ادخلي **Hostinger File Manager** → `public_html/`
+2. احذفي أي ملفات قديمة
+3. ارفعي **محتوى مجلد `dist/`** (مش المجلد نفسه — اللي جواه)
+4. تأكدي إن ملف `.htaccess` موجود (مهم جداً للـ routing!)
+
+### 3️⃣ خلاص!
+الموقع شغال على دومينك. كل الـ AI features شغالة عبر Lovable Cloud.
 
 ---
 
 ## 🛠️ التقنيات
 
-Vite • React 19 • TypeScript • TanStack Start • Tailwind v4 • shadcn/ui • Lovable Cloud
-
----
-
-## 📦 النشر
-
-- **الأسهل**: من Lovable → **Share → Publish**.
-- **VPS / Vercel / Cloudflare**: راجع [DEPLOYMENT.md](./DEPLOYMENT.md).
-
-> ⚠️ المشروع يعمل على **Cloudflare Workers runtime** — لا يشتغل بـ `node dist/server/index.js`.
+- **React 19** + **TypeScript** + **Vite 7**
+- **TanStack Router** (file-based routing، SPA mode)
+- **Tailwind CSS v4** + **shadcn/ui**
+- **TanStack Query** للـ data fetching
+- **Lovable Cloud** للـ Database + Auth + Storage + Edge Functions
+- **Lovable AI Gateway** لتوليد الوصفات والصور
+- **PWA** — يثبّت كتطبيق على الموبايل
 
 ---
 
 ## 🌐 Custom Domain
 
-من Lovable: **Settings → Domains → Connect Domain** ([تفاصيل](https://docs.lovable.dev/tips-tricks/custom-domain)).
+من Lovable: **Settings → Domains → Connect Domain**
+
+أو على Hostinger: ادخلي **Domains** → اضيفي الدومين بتاعك → اربطيه بالاستضافة.
+
+---
+
+## ⚠️ ملاحظات مهمة
+
+- ده **SPA** (Single Page App). كل الـ routing client-side.
+- ملف `.htaccess` ضروري لو هترفعي على Apache/Hostinger/cPanel.
+- لو هترفعي على Nginx، اعملي rewrite rule بدل `.htaccess`.
+- كل الـ backend logic في **Lovable Cloud Edge Functions** (مش محتاج سيرفر).
