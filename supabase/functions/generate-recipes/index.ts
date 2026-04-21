@@ -240,10 +240,33 @@ serve(async (req: Request) => {
         );
         if (hasExcluded) continue;
 
-        if (filters.length) {
+        if (userFilters.length) {
           const tagsNorm = (r.tags ?? []).map(norm);
-          const allMatch = filters.every((f) => tagsNorm.some((t) => t.includes(norm(f))));
+          const allMatch = userFilters.every((f) => tagsNorm.some((t) => t.includes(norm(f))));
           if (!allMatch) continue;
+        }
+
+        // Kitchen filter: only keep recipes whose cuisine matches the selected
+        // kitchen (match by slug OR by kitchen name in Arabic/English).
+        if (kitchenSlug) {
+          const recipeCuisineNorm = norm(r.cuisine ?? "");
+          const slugNorm = norm(kitchenSlug);
+          const arNorm = kitchenNameAr ? norm(kitchenNameAr) : "";
+          const enNorm = kitchenNameEn ? norm(kitchenNameEn) : "";
+          const cuisineMatches =
+            !!recipeCuisineNorm &&
+            (recipeCuisineNorm.includes(slugNorm) ||
+              (arNorm && recipeCuisineNorm.includes(arNorm)) ||
+              (enNorm && recipeCuisineNorm.includes(enNorm)));
+          // Also accept if any tag mentions the kitchen name/slug.
+          const tagsNorm = (r.tags ?? []).map(norm);
+          const tagMatches = tagsNorm.some(
+            (t) =>
+              t.includes(slugNorm) ||
+              (arNorm && t.includes(arNorm)) ||
+              (enNorm && t.includes(enNorm)),
+          );
+          if (!cuisineMatches && !tagMatches) continue;
         }
 
         let matched = 0;
@@ -310,10 +333,16 @@ serve(async (req: Request) => {
     const systemAr = `أنت طاهي محترف يقترح وصفات سهلة وعملية. اكتب كل الردود بالعربية الفصحى البسيطة والمصطلحات الشعبية المصرية. استعمل الأدوات (function calling) لإرجاع النتائج. اجعل الخطوات قصيرة وواضحة (5-8 خطوات كحد أقصى لكل وصفة).`;
     const systemEn = `You are a friendly chef. Suggest practical recipes from the user's ingredients. Reply in English. Use the tool to return structured results. Keep steps short (5-8 max per recipe).`;
 
-    const filterText = filters.length
+    const kitchenText = kitchenSlug
       ? language === "ar"
-        ? `الفلاتر المطلوبة: ${filters.join("، ")}.`
-        : `Filters: ${filters.join(", ")}.`
+        ? `مهم جداً: كل الوصفات لازم تكون من المطبخ ${kitchenNameAr ?? kitchenSlug} فقط. ممنوع تقترح أي وصفة من مطبخ تاني (مثلاً لو المطبخ إيطالي، ممنوع تقترح وصفات مصرية أو مغربية). ضع قيمة "cuisine" في كل وصفة = "${kitchenNameAr ?? kitchenSlug}".`
+        : `VERY IMPORTANT: ALL recipes MUST be from the ${kitchenNameEn ?? kitchenSlug} cuisine only. Do NOT suggest recipes from any other cuisine. Set the "cuisine" field on every recipe to "${kitchenNameEn ?? kitchenSlug}".`
+      : "";
+
+    const filterText = userFilters.length
+      ? language === "ar"
+        ? `الفلاتر المطلوبة: ${userFilters.join("، ")}.`
+        : `Filters: ${userFilters.join(", ")}.`
       : "";
     const excludeText = exclude.length
       ? language === "ar"
