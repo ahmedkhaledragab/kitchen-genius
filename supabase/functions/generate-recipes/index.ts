@@ -129,7 +129,18 @@ serve(async (req: Request) => {
     const ingredients = (body.ingredients ?? []).filter(Boolean);
     const exclude = (body.exclude ?? []).filter(Boolean);
     const filters = body.filters ?? [];
-    const language = body.language === "en" ? "en" : "ar";
+    // Extract kitchen tag sent by the frontend (e.g. "kitchen:italian").
+    const kitchenTag = filters.find((f) => f.startsWith("kitchen:"));
+    const kitchenSlug = kitchenTag ? kitchenTag.slice("kitchen:".length) : null;
+    // Keep user-facing filters (quick/healthy/etc.) separate from the kitchen tag.
+    const userFilters = filters.filter((f) => !f.startsWith("kitchen:"));
+
+    // Look up the kitchen's display names so we can tell the AI *which* cuisine
+    // to cook. Without this, picking "Italian" and entering pizza ingredients
+    // could return Egyptian/Moroccan recipes — which is exactly the bug.
+    let kitchenNameAr: string | null = null;
+    let kitchenNameEn: string | null = null;
+    let kitchenIngredientIds: Set<string> | null = null;
 
     if (ingredients.length === 0) {
       return new Response(JSON.stringify({ error: "No ingredients provided" }), {
