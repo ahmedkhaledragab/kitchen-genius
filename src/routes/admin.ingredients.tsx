@@ -82,18 +82,26 @@ function AdminIngredientsPage() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("ingredients_catalog")
-      .select("*")
-      .order("category", { ascending: true, nullsFirst: false })
-      .order("sort_order", { ascending: true })
-      .order("name_ar", { ascending: true });
+    const [{ data, error }, { data: links }] = await Promise.all([
+      supabase
+        .from("ingredients_catalog")
+        .select("*")
+        .order("category", { ascending: true, nullsFirst: false })
+        .order("sort_order", { ascending: true })
+        .order("name_ar", { ascending: true }),
+      sb.from("ingredient_kitchens").select("ingredient_id, kitchen_id"),
+    ]);
     setLoading(false);
     if (error) {
       toast.error(error.message);
       return;
     }
     setItems((data ?? []) as Ingredient[]);
+    const map: Record<string, string[]> = {};
+    for (const l of (links ?? []) as Array<{ ingredient_id: string; kitchen_id: string }>) {
+      (map[l.ingredient_id] ??= []).push(l.kitchen_id);
+    }
+    setKitchenLinks(map);
   }, []);
 
   useEffect(() => {
