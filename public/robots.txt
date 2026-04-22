@@ -3,5 +3,13 @@ Allow: /
 Disallow: /admin
 Disallow: /admin/
 Disallow: /profile
+Disallow: /auth
 
-Sitemap: /sitemap.xml
+# Allow major AI crawlers (optional, comment out to block)
+User-agent: GPTBot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+Sitemap: https://minellyandak.com/sitemap.xml

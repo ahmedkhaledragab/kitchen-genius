@@ -11,30 +11,92 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
-    <title>من اللي عندك؟ — وصفات من مكوناتك</title>
+    <!-- Primary SEO -->
+    <title>من اللي عندك؟ — وصفات سريعة من مكوناتك بالذكاء الاصطناعي</title>
     <meta
       name="description"
-      content="اكتب اللي عندك في المطبخ ونقترحلك وصفات تقدر تعملها فوراً بالذكاء الاصطناعي."
+      content="اكتبي المكونات اللي عندك في المطبخ واحصلي على وصفات جاهزة ومبتكرة بالذكاء الاصطناعي. وصفات عربية، مصرية، شامية، خليجية وعالمية في ثواني."
+    />
+    <meta
+      name="keywords"
+      content="وصفات, طبخ, مكونات, ذكاء اصطناعي, وصفات مصرية, وصفات عربية, مطبخ, طبخات سريعة, وصفات بالمكونات, اقتراح وصفات, من اللي عندك"
     />
     <meta name="author" content="Manar Elsheikh" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <link rel="canonical" href="https://minellyandak.com/" />
 
-    <meta property="og:title" content="من اللي عندك؟ — وصفات من مكوناتك" />
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="من اللي عندك؟" />
+    <meta property="og:locale" content="ar_AR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:url" content="https://minellyandak.com/" />
+    <meta property="og:title" content="من اللي عندك؟ — وصفات سريعة من مكوناتك" />
     <meta
       property="og:description"
-      content="أدخل المكونات اللي عندك واحصل على وصفات فورية بالذكاء الاصطناعي."
+      content="أدخلي المكونات اللي عندك واحصلي على وصفات فورية بالذكاء الاصطناعي."
     />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content="https://minellyandak.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="مكونات طازجة لتحضير وصفات شهية" />
 
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="من اللي عندك؟ — وصفات من مكوناتك" />
+    <meta
+      name="twitter:description"
+      content="أدخلي المكونات اللي عندك واحصلي على وصفات فورية بالذكاء الاصطناعي."
+    />
+    <meta name="twitter:image" content="https://minellyandak.com/og-image.jpg" />
+
+    <!-- Performance hints -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://ammshebfszuhmqvclfff.supabase.co" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap"
     />
+
+    <!-- Structured Data: WebSite + SearchAction -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "من اللي عندك؟",
+        "alternateName": "Min Elly Andak",
+        "url": "https://minellyandak.com/",
+        "inLanguage": ["ar", "en"],
+        "description": "وصفات سريعة من مكوناتك بالذكاء الاصطناعي.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://minellyandak.com/?ingredients={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    <!-- Structured Data: Organization -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "من اللي عندك؟",
+        "url": "https://minellyandak.com/",
+        "logo": "https://minellyandak.com/favicon.svg",
+        "founder": { "@type": "Person", "name": "Manar Elsheikh" }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <div style="padding:24px;text-align:center;font-family:sans-serif">
+        من اللي عندك؟ — موقع وصفات بالذكاء الاصطناعي. الرجاء تفعيل JavaScript لتشغيل التطبيق.
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
