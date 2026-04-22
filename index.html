@@ -12,14 +12,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
     <!-- Primary SEO -->
-    <title>من اللي عندك؟ — وصفات سريعة من مكوناتك بالذكاء الاصطناعي</title>
+    <title>من اللي عندك؟ | وصفات بالذكاء الاصطناعي من مكوناتك في المطبخ</title>
     <meta
       name="description"
-      content="اكتبي المكونات اللي عندك في المطبخ واحصلي على وصفات جاهزة ومبتكرة بالذكاء الاصطناعي. وصفات عربية، مصرية، شامية، خليجية وعالمية في ثواني."
+      content="من اللي عندك؟ موقع وصفات ذكي يقترح عليكِ أكلات من المكونات الموجودة في مطبخك. وصفات مصرية، شامية، خليجية، إيطالية، صينية وعالمية بالذكاء الاصطناعي مجاناً."
     />
     <meta
       name="keywords"
-      content="وصفات, طبخ, مكونات, ذكاء اصطناعي, وصفات مصرية, وصفات عربية, مطبخ, طبخات سريعة, وصفات بالمكونات, اقتراح وصفات, من اللي عندك"
+      content="من اللي عندك, minellyandak, وصفات طبخ, وصفات بالمكونات, ايه اطبخ النهاردة, وصفات سريعة, وصفات مصرية, وصفات شامية, وصفات سعودية, اكلات سهلة, طبخات بيتي, وصفات رمضان, وصفات صحية, وصفات دايت, وصفات بالدجاج, وصفات بالبطاطس, ذكاء اصطناعي طبخ, AI recipes, recipe generator, what to cook, مولد وصفات"
     />
     <meta name="author" content="Manar Elsheikh" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
@@ -78,15 +78,83 @@
       }
     </script>
 
-    <!-- Structured Data: Organization -->
+    <!-- Structured Data: Organization (with logo for Google Knowledge Panel) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "من اللي عندك؟",
+        "alternateName": ["Min Elly Andak", "minellyandak"],
         "url": "https://minellyandak.com/",
-        "logo": "https://minellyandak.com/favicon.svg",
-        "founder": { "@type": "Person", "name": "Manar Elsheikh" }
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://minellyandak.com/logo.png",
+          "width": 512,
+          "height": 512
+        },
+        "image": "https://minellyandak.com/logo.png",
+        "description": "موقع وصفات ذكي بالذكاء الاصطناعي يقترح أكلات من المكونات اللي عندك.",
+        "founder": { "@type": "Person", "name": "Manar Elsheikh" },
+        "sameAs": []
+      }
+    </script>
+
+    <!-- Structured Data: FAQ (يظهر في نتائج جوجل كأسئلة قابلة للتوسيع) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "إيه هو موقع من اللي عندك؟",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "موقع وصفات ذكي يستخدم الذكاء الاصطناعي لاقتراح أكلات تقدري تعمليها من المكونات الموجودة عندك في المطبخ، بدون ما تحتاجي تشتري حاجة جديدة."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "إزاي أعرف ايه أطبخ النهاردة؟",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "اكتبي المكونات اللي عندك في المطبخ، اختاري نوع المطبخ المفضل (مصري، شامي، عالمي...)، واضغطي يلا نطبخ. هتحصلي على وصفات جاهزة في ثواني."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "هل الموقع مجاني؟",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "نعم، استخدام موقع من اللي عندك؟ مجاني بالكامل لتوليد الوصفات بالذكاء الاصطناعي."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "هل في وصفات عربية ومصرية؟",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "أيوه، الموقع يدعم المطبخ المصري، الشامي، الخليجي، المغربي، بالإضافة لمطابخ عالمية زي الإيطالي، الصيني، الهندي، المكسيكي وغيرها."
+            }
+          }
+        ]
+      }
+    </script>
+
+    <!-- Structured Data: SiteNavigation (يساعد جوجل يعرض sitelinks) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "itemListElement": [
+          { "@type": "SiteNavigationElement", "position": 1, "name": "الرئيسية", "url": "https://minellyandak.com/" },
+          { "@type": "SiteNavigationElement", "position": 2, "name": "المطابخ", "url": "https://minellyandak.com/kitchens" },
+          { "@type": "SiteNavigationElement", "position": 3, "name": "المجتمع", "url": "https://minellyandak.com/community" },
+          { "@type": "SiteNavigationElement", "position": 4, "name": "أكثر نشاطاً", "url": "https://minellyandak.com/top-creators" },
+          { "@type": "SiteNavigationElement", "position": 5, "name": "مميزاتنا", "url": "https://minellyandak.com/features" },
+          { "@type": "SiteNavigationElement", "position": 6, "name": "من نحن", "url": "https://minellyandak.com/about" },
+          { "@type": "SiteNavigationElement", "position": 7, "name": "تواصل معنا", "url": "https://minellyandak.com/contact" }
+        ]
       }
     </script>
   </head>
