@@ -14,6 +14,7 @@ import { useLang } from "@/contexts/LanguageContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { usePageContent, type PageItem } from "@/hooks/usePageContent";
+import { SEO } from "@/components/SEO";
 
 export const Route = createFileRoute("/features")({
   head: () => ({
@@ -130,6 +131,12 @@ function FeaturesPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-20 pt-6 sm:pt-10">
+      <SEO
+        title={ar ? "مميزات النظام — من اللي عندك؟" : "Features — Min Elly Andak"}
+        description={ar
+          ? "اكتشفي مميزات تطبيق من اللي عندك؟: ذكاء اصطناعي، وصفات بمكوناتك، حفظ المفضلة، عربي وإنجليزي وأكثر."
+          : "Explore Min Elly Andak features: AI recipes, ingredient-based search, favorites, Arabic & English, and more."}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden rounded-3xl gradient-hero p-6 sm:p-10">
         <motion.div

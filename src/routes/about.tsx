@@ -6,6 +6,7 @@ import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { usePageContent, type PageItem } from "@/hooks/usePageContent";
+import { SEO } from "@/components/SEO";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -97,6 +98,12 @@ function AboutPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 pb-20 pt-6 sm:pt-10">
+      <SEO
+        title={ar ? "من نحن — قصة من اللي عندك؟" : "About — Min Elly Andak"}
+        description={ar
+          ? "تعرفي على فكرة تطبيق من اللي عندك؟ ومهمتنا في تحويل مكوناتك لوصفات حلوة بالذكاء الاصطناعي."
+          : "Learn the story behind Min Elly Andak — turning your ingredients into great recipes with AI."}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden rounded-3xl gradient-hero p-6 sm:p-10">
         <motion.div

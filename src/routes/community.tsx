@@ -22,6 +22,7 @@ import { Composer } from "@/components/community/Composer";
 import { PostCard, type FeedPost } from "@/components/community/PostCard";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
 import type { ReactionType } from "@/lib/community";
+import { SEO } from "@/components/SEO";
 
 export const Route = createFileRoute("/community")({
   head: () => ({

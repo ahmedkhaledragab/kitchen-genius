@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { usePageContent, type PageItem } from "@/hooks/usePageContent";
+import { SEO } from "@/components/SEO";
 
 const DEFAULT_EMAIL = "hello@menelyandak.app";
 
@@ -260,6 +261,12 @@ function ContactPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 pb-20 pt-6 sm:pt-10">
+      <SEO
+        title={ar ? "تواصلي معانا — من اللي عندك؟" : "Contact — Min Elly Andak"}
+        description={ar
+          ? "ابعتيلنا أي سؤال أو اقتراح. إحنا دايماً هنا عبر الإيميل والسوشيال ميديا."
+          : "Send us any question or suggestion — reach us via email and social media."}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden rounded-3xl gradient-hero p-6 sm:p-10">
         <motion.div

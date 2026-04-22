@@ -5,6 +5,7 @@ import { Loader2, Utensils } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
 import { useKitchens } from "@/hooks/useKitchens";
 import { Card } from "@/components/ui/card";
+import { SEO } from "@/components/SEO";
 
 export const Route = createFileRoute("/kitchens/")({
   head: () => ({
@@ -30,6 +31,12 @@ function KitchensPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-20 pt-6 sm:pt-10">
+      <SEO
+        title={lang === "ar" ? "المطابخ — وصفات حسب المطبخ | من اللي عندك؟" : "Kitchens — Recipes by Cuisine | Min Elly Andak"}
+        description={lang === "ar"
+          ? "تصفحي وصفات حسب المطبخ: مصري، شامي، خليجي، إيطالي، آسيوي وأكثر."
+          : "Browse recipes by cuisine: Egyptian, Levantine, Gulf, Italian, Asian and more."}
+      />
       <section className="relative overflow-hidden rounded-3xl gradient-hero p-6 sm:p-10">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
