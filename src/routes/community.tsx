@@ -22,6 +22,7 @@ import { Composer } from "@/components/community/Composer";
 import { PostCard, type FeedPost } from "@/components/community/PostCard";
 import { CommunitySidebar } from "@/components/community/CommunitySidebar";
 import type { ReactionType } from "@/lib/community";
+import { SEO } from "@/components/SEO";
 
 export const Route = createFileRoute("/community")({
   head: () => ({
@@ -179,6 +180,10 @@ function CommunityPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6">
+      <SEO
+        title="مجتمع المطبخ — شاركي وصفاتك | من اللي عندك؟"
+        description="انضمي لمجتمع من اللي عندك؟ شاركي وصفاتك وتفاعلي مع غيرك من محبي الطبخ."
+      />
       <div className="mb-5 text-center">
         <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{t.community.title}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t.community.subtitle}</p>
