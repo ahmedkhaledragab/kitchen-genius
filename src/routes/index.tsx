@@ -18,6 +18,7 @@ import type { Recipe } from "@/lib/recipe";
 import { RecipeCard } from "@/components/RecipeCard";
 import { RecipeDetail } from "@/components/RecipeDetail";
 import { usePageContent } from "@/hooks/usePageContent";
+import { SEO } from "@/components/SEO";
 
 const pick = (custom: string | undefined, fallback: string): string => {
   const v = (custom ?? "").trim();
@@ -228,6 +229,14 @@ function HomePage() {
   // ============== INGREDIENTS UI ==============
   return (
     <div className="mx-auto max-w-3xl px-4 pb-20 pt-6 sm:pt-10">
+      <SEO
+        title={lang === "ar"
+          ? "من اللي عندك؟ — وصفات سريعة من مكوناتك بالذكاء الاصطناعي"
+          : "Min Elly Andak — Fast AI Recipes from Your Ingredients"}
+        description={lang === "ar"
+          ? "اكتبي المكونات اللي عندك في المطبخ واحصلي على وصفات جاهزة بالذكاء الاصطناعي، مصرية وعربية وعالمية."
+          : "Type the ingredients you have and get ready-to-cook AI recipes — Arabic, Egyptian and global cuisines."}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden rounded-3xl gradient-hero p-6 sm:p-10">
         <motion.div
